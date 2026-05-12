@@ -1,8 +1,6 @@
 const SUPABASE_URL = "https://klpxoffkajijjktxztmc.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_O_MlVkyfreG125LVia6nag_1GL5bUli";
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 const form = document.getElementById("loginForm");
 const cpf = document.getElementById("cpf");
 const nascimento = document.getElementById("nascimento");
@@ -36,7 +34,6 @@ function maskDate(value) {
 
 function dateToSupabase(value) {
   const numbers = onlyNumbers(value);
-
   if (numbers.length !== 8) return "";
 
   const dia = numbers.slice(0, 2);
@@ -61,6 +58,15 @@ form.addEventListener("submit", async function (event) {
   loginBtn.textContent = "Entrando...";
 
   try {
+    if (!window.supabase) {
+      throw new Error("Supabase não carregou. Verifique a internet ou o script no HTML.");
+    }
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
     const dataNascimento = dateToSupabase(nascimento.value);
 
     if (!dataNascimento) {
