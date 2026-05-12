@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+inpututOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -90,12 +90,15 @@
     <div class="field" id="fieldNascimento">
       <label for="nascimento">Data de nascimento</label>
 
-      <input
-        id="nascimento"
-        type="date"
-        required
-      />
-
+   
+<input
+  type="text"
+  id="nascimento"
+  placeholder="dd/mm/aaaa"
+  maxlength="10"
+  inputmode="numeric"
+  required
+>
       <div class="error">
         Informe uma data válida. Idade mínima: 16 anos.
       </div>
@@ -129,7 +132,7 @@
         <div class="error">Informe quem te indicou. Caso ninguém tenha indicado, digite "Não tive indicação".</div>
       </div>
 
-      <div class="section-title">Chave PIX</div>
+      <div clasection-titleitle">Chave PIX</div>
 
       <div class="pix-options">
         <label class="pix-card"><input type="radio" name="pixTipo" value="cpf" checked /><div><strong>CPF</strong><span id="pixCpfPreview">Usar o CPF deste cadastro</span></div></label>
