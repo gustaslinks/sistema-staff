@@ -887,6 +887,9 @@ body {
   .acoes-inscrito-admin {
     width: 100%;
   }
+   .botao-alterar-status-corrida {
+  width: 100%;
+}
 }
 
 
