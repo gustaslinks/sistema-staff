@@ -8,6 +8,12 @@ const supabaseClient = supabase.createClient(
 
 const listaCorridas = document.getElementById("lista-corridas");
 
+const staffLogado = JSON.parse(localStorage.getItem("staffLogado"));
+
+if (!staffLogado || !staffLogado.id) {
+  window.location.href = "login.html";
+}
+
 async function carregarCorridas() {
   const { data: corridas, error } = await supabaseClient
     .from("corridas")
@@ -30,8 +36,22 @@ async function carregarCorridas() {
     return;
   }
 
+  const { data: inscricoes, error: erroInscricoes } = await supabaseClient
+    .from("inscricoes")
+    .select("corrida_id")
+    .eq("staff_id", staffLogado.id);
+
+  if (erroInscricoes) {
+    console.error("Erro ao buscar inscrições:", erroInscricoes);
+  }
+
+  const corridasJaInscritas = inscricoes
+    ? inscricoes.map(inscricao => inscricao.corrida_id)
+    : [];
+
   listaCorridas.innerHTML = corridas.map(corrida => {
     const dataFormatada = formatarData(corrida.data_corrida);
+
     const prazoFormatado = corrida.prazo_inscricao
       ? formatarData(corrida.prazo_inscricao)
       : "Não informado";
@@ -42,6 +62,8 @@ async function carregarCorridas() {
           currency: "BRL"
         })
       : "Não informado";
+
+    const jaInscrito = corridasJaInscritas.includes(corrida.id);
 
     return `
       <article class="card-corrida">
@@ -55,12 +77,55 @@ async function carregarCorridas() {
         <p><strong>Ajuda de custo:</strong> ${valorFormatado}</p>
         <p><strong>Prazo de inscrição:</strong> ${prazoFormatado}</p>
 
-        <button class="botao-inscricao" data-corrida-id="${corrida.id}">
-          Quero me inscrever
-        </button>
+        ${
+          jaInscrito
+            ? `<button disabled>Inscrição realizada</button>`
+            : `<button class="botao-inscricao" data-corrida-id="${corrida.id}">
+                Quero me inscrever
+              </button>`
+        }
       </article>
     `;
   }).join("");
+
+  adicionarEventosInscricao();
+}
+
+function adicionarEventosInscricao() {
+  const botoes = document.querySelectorAll(".botao-inscricao");
+
+  botoes.forEach(botao => {
+    botao.addEventListener("click", async function () {
+      const corridaId = Number(botao.dataset.corridaId);
+
+      botao.disabled = true;
+      botao.textContent = "Inscrevendo...";
+
+      const { error } = await supabaseClient
+        .from("inscricoes")
+        .insert({
+          staff_id: staffLogado.id,
+          corrida_id: corridaId
+        });
+
+      if (error) {
+        console.error("Erro ao realizar inscrição:", error);
+
+        if (error.code === "23505") {
+          alert("Você já está inscrito nesta corrida.");
+        } else {
+          alert("Não foi possível realizar a inscrição. Tente novamente.");
+        }
+
+        botao.disabled = false;
+        botao.textContent = "Quero me inscrever";
+        return;
+      }
+
+      alert("Inscrição realizada com sucesso!");
+      carregarCorridas();
+    });
+  });
 }
 
 function formatarData(dataISO) {
