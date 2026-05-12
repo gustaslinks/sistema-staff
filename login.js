@@ -77,7 +77,8 @@ localStorage.setItem("staffLogado", JSON.stringify({
   cpf: data.cpf,
   email: data.email,
   cidade: data.cidade,
-  foto_url: data.foto_url
+  foto_url: data.foto_url,
+  is_admin: data.is_admin
 }));
 
     window.location.href = "corridas.html";
