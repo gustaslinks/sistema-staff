@@ -128,6 +128,49 @@ async function carregarCorridasAdmin() {
         }</p>
         <p><strong>Inscritos:</strong> ${totalInscritos}</p>
 
+        <div class="gerenciar-dias">
+          <h4>Dias da corrida</h4>
+
+          <input
+            type="text"
+            id="dia-nome-${corrida.id}"
+            placeholder="Nome. Ex: Entrega de kit - Quinta"
+          >
+
+          <input
+            type="date"
+            id="dia-data-${corrida.id}"
+          >
+
+          <input
+            type="time"
+            id="dia-inicio-${corrida.id}"
+          >
+
+          <input
+            type="time"
+            id="dia-fim-${corrida.id}"
+          >
+
+          <input
+            type="text"
+            id="dia-tipo-${corrida.id}"
+            placeholder="Tipo. Ex: Entrega de kit"
+          >
+
+          <input
+            type="number"
+            id="dia-vagas-${corrida.id}"
+            placeholder="Vagas"
+          >
+
+          <button onclick="adicionarDiaCorrida(${corrida.id})">
+            Adicionar dia
+          </button>
+
+          <div id="dias-corrida-${corrida.id}"></div>
+        </div>
+
         <div class="admin-card-footer">
           <span class="admin-status ${corrida.status}">
             ${corrida.status}
@@ -139,6 +182,7 @@ async function carregarCorridasAdmin() {
           >
             Ver inscritos
           </button>
+
           <button
             class="botao-alterar-status-corrida"
             data-corrida-id="${corrida.id}"
@@ -156,9 +200,13 @@ async function carregarCorridasAdmin() {
     `;
   }).join("");
 
+  corridas.forEach(corrida => {
+    carregarDiasCorrida(corrida.id);
+  });
+
   ativarBotoesVerInscritos();
   ativarBotoesStatusCorrida();
-  }
+}
 
 // VER INSCRITOS
 function ativarBotoesVerInscritos() {
@@ -414,3 +462,199 @@ function formatarStatusInscricao(status) {
 
 // INICIALIZAÇÃO
 carregarCorridasAdmin();
+async function carregarDiasCorrida(corridaId) {
+  const container = document.getElementById(`dias-corrida-${corridaId}`);
+
+  if (!container) return;
+
+  const { data: dias, error } = await supabaseClient
+    .from("corrida_dias")
+    .select("*")
+    .eq("corrida_id", corridaId)
+    .order("data_dia", { ascending: true });
+
+  if (error) {
+    container.innerHTML = "<p>Erro ao carregar dias da corrida.</p>";
+    return;
+  }
+
+  if (!dias || dias.length === 0) {
+    container.innerHTML = "<p>Nenhum dia cadastrado para esta corrida.</p>";
+    return;
+  }
+
+  container.innerHTML = dias.map(dia => `
+    <div class="dia-corrida-card">
+      <p><strong>${dia.nome}</strong></p>
+      <p><strong>Data:</strong> ${formatarData(dia.data_dia)}</p>
+      <p><strong>Horário:</strong> ${dia.horario_inicio || "-"} até ${dia.horario_fim || "-"}</p>
+      <p><strong>Tipo:</strong> ${dia.tipo || "-"}</p>
+      <p><strong>Vagas:</strong> ${dia.vagas || 0}</p>
+
+      <button onclick="excluirDiaCorrida(${dia.id}, ${corridaId})">
+        Excluir dia
+      </button>
+    </div>
+  `).join("");
+}
+
+async function adicionarDiaCorrida(corridaId) {
+  const nome = document.getElementById(`dia-nome-${corridaId}`).value.trim();
+  const dataDia = document.getElementById(`dia-data-${corridaId}`).value;
+  const horarioInicio = document.getElementById(`dia-inicio-${corridaId}`).value;
+  const horarioFim = document.getElementById(`dia-fim-${corridaId}`).value;
+  const tipo = document.getElementById(`dia-tipo-${corridaId}`).value.trim();
+  const vagas = Number(document.getElementById(`dia-vagas-${corridaId}`).value);
+
+  if (!nome || !dataDia) {
+    alert("Preencha pelo menos o nome e a data do dia.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("corrida_dias")
+    .insert([
+      {
+        corrida_id: corridaId,
+        nome: nome,
+        data_dia: dataDia,
+        horario_inicio: horarioInicio || null,
+        horario_fim: horarioFim || null,
+        tipo: tipo || null,
+        vagas: vagas || 0
+      }
+    ]);
+
+  if (error) {
+    alert("Erro ao cadastrar dia da corrida.");
+    console.error(error);
+    return;
+  }
+
+  document.getElementById(`dia-nome-${corridaId}`).value = "";
+  document.getElementById(`dia-data-${corridaId}`).value = "";
+  document.getElementById(`dia-inicio-${corridaId}`).value = "";
+  document.getElementById(`dia-fim-${corridaId}`).value = "";
+  document.getElementById(`dia-tipo-${corridaId}`).value = "";
+  document.getElementById(`dia-vagas-${corridaId}`).value = "";
+
+  await carregarDiasCorrida(corridaId);
+}
+
+async function excluirDiaCorrida(diaId, corridaId) {
+  const confirmar = confirm("Tem certeza que deseja excluir este dia da corrida?");
+
+  if (!confirmar) return;
+
+  const { error } = await supabaseClient
+    .from("corrida_dias")
+    .delete()
+    .eq("id", diaId);
+
+  if (error) {
+    alert("Erro ao excluir dia da corrida.");
+    console.error(error);
+    return;
+  }
+
+  await carregarDiasCorrida(corridaId);
+}
+
+async function carregarDiasCorrida(corridaId) {
+  const container = document.getElementById(`dias-corrida-${corridaId}`);
+
+  if (!container) return;
+
+  const { data: dias, error } = await supabaseClient
+    .from("corrida_dias")
+    .select("*")
+    .eq("corrida_id", corridaId)
+    .order("data_dia", { ascending: true });
+
+  if (error) {
+    console.error("Erro ao carregar dias:", error);
+    container.innerHTML = "<p>Erro ao carregar dias da corrida.</p>";
+    return;
+  }
+
+  if (!dias || dias.length === 0) {
+    container.innerHTML = "<p>Nenhum dia cadastrado para esta corrida.</p>";
+    return;
+  }
+
+  container.innerHTML = dias.map(dia => `
+    <div class="dia-corrida-card">
+      <p><strong>${dia.nome}</strong></p>
+      <p><strong>Data:</strong> ${formatarData(dia.data_dia)}</p>
+      <p><strong>Horário:</strong> ${dia.horario_inicio || "-"} até ${dia.horario_fim || "-"}</p>
+      <p><strong>Tipo:</strong> ${dia.tipo || "-"}</p>
+      <p><strong>Vagas:</strong> ${dia.vagas || 0}</p>
+
+      <button onclick="excluirDiaCorrida(${dia.id}, ${corridaId})">
+        Excluir dia
+      </button>
+    </div>
+  `).join("");
+}
+
+async function adicionarDiaCorrida(corridaId) {
+  const nome = document.getElementById(`dia-nome-${corridaId}`).value.trim();
+  const dataDia = document.getElementById(`dia-data-${corridaId}`).value;
+  const horarioInicio = document.getElementById(`dia-inicio-${corridaId}`).value;
+  const horarioFim = document.getElementById(`dia-fim-${corridaId}`).value;
+  const tipo = document.getElementById(`dia-tipo-${corridaId}`).value.trim();
+  const vagas = Number(document.getElementById(`dia-vagas-${corridaId}`).value);
+
+  if (!nome || !dataDia) {
+    alert("Preencha pelo menos o nome e a data do dia.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("corrida_dias")
+    .insert([
+      {
+        corrida_id: corridaId,
+        nome: nome,
+        data_dia: dataDia,
+        horario_inicio: horarioInicio || null,
+        horario_fim: horarioFim || null,
+        tipo: tipo || null,
+        vagas: vagas || 0
+      }
+    ]);
+
+  if (error) {
+    alert("Erro ao cadastrar dia da corrida.");
+    console.error(error);
+    return;
+  }
+
+  document.getElementById(`dia-nome-${corridaId}`).value = "";
+  document.getElementById(`dia-data-${corridaId}`).value = "";
+  document.getElementById(`dia-inicio-${corridaId}`).value = "";
+  document.getElementById(`dia-fim-${corridaId}`).value = "";
+  document.getElementById(`dia-tipo-${corridaId}`).value = "";
+  document.getElementById(`dia-vagas-${corridaId}`).value = "";
+
+  await carregarDiasCorrida(corridaId);
+}
+
+async function excluirDiaCorrida(diaId, corridaId) {
+  const confirmar = confirm("Tem certeza que deseja excluir este dia da corrida?");
+
+  if (!confirmar) return;
+
+  const { error } = await supabaseClient
+    .from("corrida_dias")
+    .delete()
+    .eq("id", diaId);
+
+  if (error) {
+    alert("Erro ao excluir dia da corrida.");
+    console.error(error);
+    return;
+  }
+
+  await carregarDiasCorrida(corridaId);
+}
