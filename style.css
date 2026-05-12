@@ -426,6 +426,26 @@ body {
   background: #374151;
 }
 
+.acoes-staff {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.botao-admin {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botao-admin:hover {
+  background: #1d4ed8;
+}
 
 /* =========================================================
    CABEÇALHO DAS CORRIDAS
@@ -672,4 +692,13 @@ body {
     min-width: auto;
     width: 100%;
   }
+
+   .acoes-staff {
+  width: 100%;
+  flex-direction: column;
+}
+
+.botao-admin {
+  width: 100%;
+}
 }
