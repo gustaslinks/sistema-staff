@@ -272,22 +272,50 @@ async function carregarInscritosDaCorrida(corridaId, areaInscritos) {
         </div>
 
         <div class="acoes-inscrito-admin">
-          <button
-            class="botao-confirmar-inscrito"
-            data-inscricao-id="${inscricao.id}"
-            data-corrida-id="${corridaId}"
-          >
-            Confirmar
-          </button>
 
-          <button
-            class="botao-cancelar-inscrito"
-            data-inscricao-id="${inscricao.id}"
-            data-corrida-id="${corridaId}"
-          >
-            Cancelar
-          </button>
-        </div>
+  <button
+    class="botao-confirmar-inscrito ${
+      inscricao.status === "confirmado"
+        ? "ativo-confirmado"
+        : ""
+    }"
+    data-inscricao-id="${inscricao.id}"
+    data-corrida-id="${corridaId}"
+    ${
+      inscricao.status === "confirmado"
+        ? "disabled"
+        : ""
+    }
+  >
+    ${
+      inscricao.status === "confirmado"
+        ? "Confirmado"
+        : "Confirmar"
+    }
+  </button>
+
+  <button
+    class="botao-cancelar-inscrito ${
+      inscricao.status === "cancelado"
+        ? "ativo-cancelado"
+        : ""
+    }"
+    data-inscricao-id="${inscricao.id}"
+    data-corrida-id="${corridaId}"
+    ${
+      inscricao.status === "cancelado"
+        ? "disabled"
+        : ""
+    }
+  >
+    ${
+      inscricao.status === "cancelado"
+        ? "Cancelado"
+        : "Cancelar"
+    }
+  </button>
+
+</div>
       </article>
     `;
   }).join("");
