@@ -71,12 +71,14 @@ form.addEventListener("submit", async function (event) {
       throw new Error("Cadastro não encontrado.");
     }
 
-    localStorage.setItem("staffLogado", JSON.stringify({
-      id: data.id,
-      nome_completo: data.nome_completo,
-      cpf: data.cpf,
-      email: data.email
-    }));
+localStorage.setItem("staffLogado", JSON.stringify({
+  id: data.id,
+  nome_completo: data.nome_completo,
+  cpf: data.cpf,
+  email: data.email,
+  cidade: data.cidade,
+  foto_url: data.foto_url
+}));
 
     window.location.href = "corridas.html";
 
