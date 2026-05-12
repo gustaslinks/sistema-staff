@@ -528,6 +528,101 @@ body {
   cursor: default;
 }
 
+/* =========================================================
+   MINHAS INSCRIÇÕES
+========================================================= */
+
+.secao-minhas-inscricoes {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.titulo-secao {
+  padding: 26px 30px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.titulo-secao h2 {
+  margin-bottom: 8px;
+  color: #111827;
+  font-size: 28px;
+}
+
+.titulo-secao p {
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.lista-minhas-inscricoes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lista-minhas-inscricoes > p {
+  padding: 22px;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #4b5563;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.card-minha-inscricao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 24px 26px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.conteudo-minha-inscricao h3 {
+  margin-bottom: 14px;
+  color: #111827;
+  font-size: 22px;
+}
+
+.conteudo-minha-inscricao p {
+  margin-bottom: 7px;
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.conteudo-minha-inscricao p strong {
+  color: #111827;
+}
+
+.status-inscricao {
+  flex-shrink: 0;
+  min-width: 128px;
+  padding: 14px 18px;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.status-inscrito {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-confirmado {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-cancelado {
+  background: #fee2e2;
+  color: #b91c1c;
+}
 
 /* =========================================================
    RESPONSIVIDADE
@@ -572,6 +667,23 @@ body {
   .botao-sair,
   .botao-inscricao,
   .card-corrida button:disabled {
+    width: 100%;
+  }
+     .titulo-secao {
+    padding: 24px;
+  }
+
+  .titulo-secao h2 {
+    font-size: 24px;
+  }
+
+  .card-minha-inscricao {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-inscricao {
+    min-width: auto;
     width: 100%;
   }
 }
