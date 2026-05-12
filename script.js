@@ -259,6 +259,33 @@ document.querySelectorAll('input[name="pixTipo"]').forEach(radio=>{
   });
 });
 
+
+function maskDate(value) {
+
+  value = onlyNumbers(value).slice(0, 8);
+
+  value = value.replace(/(\d{2})(\d)/, '$1/$2');
+  value = value.replace(/(\d{2})(\d)/, '$1/$2');
+
+  return value;
+}
+
+function dateToDatabase(value) {
+
+  const parts = value.split('/');
+
+  if (parts.length !== 3) return '';
+
+  return `${parts[2]}-${parts[1]}-${parts[0]}`;
+}
+
+nascimento.addEventListener('input', () => {
+
+  nascimento.value = maskDate(nascimento.value);
+
+});
+
+
 form.addEventListener('submit',async function(event){
   event.preventDefault();
   successMessage.style.display='none';
@@ -298,7 +325,7 @@ form.addEventListener('submit',async function(event){
     if(pixTipo==='telefone') chavePixFinal=telefone.value;
     if(pixTipo==='outro') chavePixFinal=pixOutro.value;
 
-    const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:nascimento.value,telefone:telefone.value,email:email.value,cidade:cidade.value,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value,foto_url:fotoPublica.data.publicUrl};
+    const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value,foto_url:fotoPublica.data.publicUrl};
     const salvarCadastro=await supabaseClient.from('staffs').insert([dadosCadastro]);
     if (salvarCadastro.error) {
   const mensagemErro = salvarCadastro.error.message.toLowerCase();
