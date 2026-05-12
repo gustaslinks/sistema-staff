@@ -10,9 +10,36 @@ const listaCorridas = document.getElementById("lista-corridas");
 
 const staffLogado = JSON.parse(localStorage.getItem("staffLogado"));
 
+const nomeStaff = document.getElementById("nome-staff");
+const cidadeStaff = document.getElementById("cidade-staff");
+const emailStaff = document.getElementById("email-staff");
+const fotoStaff = document.getElementById("foto-staff");
+const botaoSair = document.getElementById("botao-sair");
+
 if (!staffLogado || !staffLogado.id) {
   window.location.href = "login.html";
 }
+
+function carregarCardStaff() {
+  nomeStaff.textContent = staffLogado.nome_completo || "Staff";
+
+  cidadeStaff.textContent = staffLogado.cidade
+    ? `Cidade: ${staffLogado.cidade}`
+    : "Cidade não informada";
+
+  emailStaff.textContent = staffLogado.email
+    ? `E-mail: ${staffLogado.email}`
+    : "E-mail não informado";
+
+  fotoStaff.src = staffLogado.foto_url || "https://placehold.co/120x120?text=Foto";
+}
+
+botaoSair.addEventListener("click", function () {
+  localStorage.removeItem("staffLogado");
+  window.location.href = "login.html";
+});
+
+carregarCardStaff();
 
 async function carregarCorridas() {
   const { data: corridas, error } = await supabaseClient
