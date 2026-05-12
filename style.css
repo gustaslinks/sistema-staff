@@ -770,7 +770,15 @@ body {
   color: #b91c1c;
 }
 
+.ativo-confirmado {
+  background: #16a34a !important;
+  color: #ffffff !important;
+}
 
+.ativo-cancelado {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
 
 .admin-card-footer {
   display: flex;
