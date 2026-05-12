@@ -1,5 +1,6 @@
-const SUPABASE_URL = "COLE_AQUI_PROJECT_URL";
-const SUPABASE_ANON_KEY = "COLE_AQUI_PUBLISHABLE_KEY";
+const SUPABASE_URL = "https://klpxoffkajijjktxztmc.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_O_MlVkyfreG125LVia6nag_1GL5bUli";
+// NÃO use service_role, direct connection string ou senha do banco.
 
 const supabaseClient = supabase.createClient(
 SUPABASE_URL,
