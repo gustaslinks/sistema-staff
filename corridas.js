@@ -8,7 +8,7 @@ const supabaseClient = supabase.createClient(
 
 // ELEMENTOS DA PÁGINA
 const listaCorridas = document.getElementById("lista-corridas");
-
+const listaMinhasInscricoes = document.getElementById("lista-minhas-inscricoes");
 const nomeStaff = document.getElementById("nome-staff");
 const cidadeStaff = document.getElementById("cidade-staff");
 const emailStaff = document.getElementById("email-staff");
@@ -178,11 +178,87 @@ function ativarBotoesInscricao() {
       }
 
       alert("Inscrição realizada com sucesso!");
-      carregarCorridas();
+carregarCorridas();
+carregarMinhasInscricoes();
     });
   });
 }
 
+// =========================================================
+// MINHAS INSCRIÇÕES
+// =========================================================
+
+async function carregarMinhasInscricoes() {
+  listaMinhasInscricoes.innerHTML = `<p>Carregando suas inscrições...</p>`;
+
+  const { data: inscricoes, error: erroInscricoes } = await supabaseClient
+    .from("inscricoes")
+    .select("id, corrida_id, status, created_at")
+    .eq("staff_id", staffLogado.id)
+    .order("created_at", { ascending: false });
+
+  if (erroInscricoes) {
+    console.error("Erro ao buscar minhas inscrições:", erroInscricoes);
+
+    listaMinhasInscricoes.innerHTML = `
+      <p>Não foi possível carregar suas inscrições no momento.</p>
+    `;
+    return;
+  }
+
+  if (!inscricoes || inscricoes.length === 0) {
+    listaMinhasInscricoes.innerHTML = `
+      <p>Você ainda não se inscreveu em nenhuma corrida.</p>
+    `;
+    return;
+  }
+
+  const corridaIds = inscricoes.map(inscricao => inscricao.corrida_id);
+
+  const { data: corridas, error: erroCorridas } = await supabaseClient
+    .from("corridas")
+    .select("id, nome, data_corrida, local, cidade")
+    .in("id", corridaIds);
+
+  if (erroCorridas) {
+    console.error("Erro ao buscar dados das corridas inscritas:", erroCorridas);
+
+    listaMinhasInscricoes.innerHTML = `
+      <p>Não foi possível carregar os dados das corridas.</p>
+    `;
+    return;
+  }
+
+  const corridasPorId = {};
+
+  corridas.forEach(corrida => {
+    corridasPorId[corrida.id] = corrida;
+  });
+
+  listaMinhasInscricoes.innerHTML = inscricoes.map(inscricao => {
+    const corrida = corridasPorId[inscricao.corrida_id];
+
+    if (!corrida) {
+      return "";
+    }
+
+    return `
+      <article class="card-minha-inscricao">
+        <div class="conteudo-minha-inscricao">
+          <h3>${corrida.nome}</h3>
+
+          <p><strong>Data:</strong> ${formatarData(corrida.data_corrida)}</p>
+          <p><strong>Local:</strong> ${corrida.local || "Não informado"}</p>
+          <p><strong>Cidade:</strong> ${corrida.cidade || "Não informada"}</p>
+        </div>
+
+        <div class="status-inscricao status-${inscricao.status}">
+          ${formatarStatusInscricao(inscricao.status)}
+        </div>
+      </article>
+    `;
+  }).join("");
+}
 
 // =========================================================
 // FORMATAÇÕES
@@ -199,6 +275,15 @@ function formatarHorario(horario) {
   return horario.slice(0, 5);
 }
 
+function formatarStatusInscricao(status) {
+  const statusFormatados = {
+    inscrito: "Inscrito",
+    confirmado: "Confirmado",
+    cancelado: "Cancelado"
+  };
+
+  return statusFormatados[status] || status;
+}
 
 // =========================================================
 // INICIALIZAÇÃO
@@ -206,3 +291,4 @@ function formatarHorario(horario) {
 
 carregarCardStaff();
 carregarCorridas();
+carregarMinhasInscricoes();
