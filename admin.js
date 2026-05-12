@@ -173,11 +173,18 @@ async function carregarCorridasAdmin() {
 
           <h4>Dias da corrida</h4>
 
-          <input
-            type="text"
-            id="dia-nome-${corrida.id}"
-            placeholder="Nome. Ex: Entrega de kit - Quinta"
+          <select
+            id="dia-tipo-${corrida.id}"
+            class="campo-dia-corrida"
           >
+            <option value="Entrega de kit">
+              Entrega de kit
+            </option>
+
+            <option value="Corrida">
+              Corrida
+            </option>
+          </select>
 
           <input
             type="date"
@@ -193,19 +200,13 @@ async function carregarCorridasAdmin() {
             type="time"
             id="dia-fim-${corrida.id}"
           >
-
-          <input
-            type="text"
-            id="dia-tipo-${corrida.id}"
-            placeholder="Tipo. Ex: Entrega de kit"
-          >
-
+<!--
           <input
             type="number"
             id="dia-vagas-${corrida.id}"
             placeholder="Vagas"
           >
-
+-->
           <button onclick="adicionarDiaCorrida(${corrida.id})">
             Adicionar dia
           </button>
@@ -795,14 +796,16 @@ async function carregarDiasCorrida(corridaId) {
 // ADICIONAR DIA
 async function adicionarDiaCorrida(corridaId) {
 
-  const nome = document
-    .getElementById(`dia-nome-${corridaId}`)
-    .value
-    .trim();
-
   const dataDia = document
     .getElementById(`dia-data-${corridaId}`)
     .value;
+
+    const tipo = document
+  .getElementById(`dia-tipo-${corridaId}`)
+  .value;
+
+const nome =
+  `${tipo} - ${obterDiaSemana(dataDia)}`;
 
   const horarioInicio = document
     .getElementById(`dia-inicio-${corridaId}`)
@@ -812,16 +815,7 @@ async function adicionarDiaCorrida(corridaId) {
     .getElementById(`dia-fim-${corridaId}`)
     .value;
 
-  const tipo = document
-    .getElementById(`dia-tipo-${corridaId}`)
-    .value
-    .trim();
-
-  const vagas = Number(
-    document.getElementById(
-      `dia-vagas-${corridaId}`
-    ).value
-  );
+  const vagas = 0;
 
   if (!nome || !dataDia) {
     alert(
@@ -856,10 +850,6 @@ async function adicionarDiaCorrida(corridaId) {
   }
 
   document.getElementById(
-    `dia-nome-${corridaId}`
-  ).value = "";
-
-  document.getElementById(
     `dia-data-${corridaId}`
   ).value = "";
 
@@ -875,11 +865,15 @@ async function adicionarDiaCorrida(corridaId) {
     `dia-tipo-${corridaId}`
   ).value = "";
 
-  document.getElementById(
-    `dia-vagas-${corridaId}`
-  ).value = "";
-
   await carregarDiasCorrida(corridaId);
+
+const areaInscritos = document.getElementById(
+  `inscritos-corrida-${corridaId}`
+);
+
+if (areaInscritos && !areaInscritos.classList.contains("hidden")) {
+  await carregarInscritosDaCorrida(corridaId, areaInscritos);
+}
 }
 
 // EXCLUIR DIA
@@ -1100,6 +1094,25 @@ function inserirEstilosPrioridadeAdmin() {
 
   document.head.appendChild(style);
 }
+
+
+function obterDiaSemana(dataISO) {
+
+  const diasSemana = [
+    "Domingo",
+    "Segunda",
+    "Terça",
+    "Quarta",
+    "Quinta",
+    "Sexta",
+    "Sábado"
+  ];
+
+  const data = new Date(`${dataISO}T00:00:00`);
+
+  return diasSemana[data.getDay()];
+}
+
 
 // INICIALIZAÇÃO
 inserirEstilosPrioridadeAdmin();

@@ -1003,6 +1003,23 @@ body {
   background: #b91c1c;
 }
 
+.campo-dia-corrida {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #cfd6df;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+}
+
+.gerenciar-dias button {
+  width: fit-content;
+  margin-top: 8px;
+}
+
 /* =========================================================
    RESPONSIVO - DIAS DA CORRIDA
 ========================================================= */
@@ -1265,4 +1282,36 @@ body {
   font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
+}
+
+
+[id^="dias-corrida-"] {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.dia-corrida-card {
+  padding: 16px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #dde3ea;
+}
+
+.dia-corrida-card button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+@media (max-width: 1100px) {
+  [id^="dias-corrida-"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  [id^="dias-corrida-"] {
+    grid-template-columns: 1fr;
+  }
 }
