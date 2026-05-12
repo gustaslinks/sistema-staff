@@ -402,9 +402,53 @@ async function carregarInscritosDaCorrida(
     return;
   }
 
+  const inscricaoIds = inscricoes.map(
+    inscricao => inscricao.id
+  );
+
+  const {
+    data: disponibilidades,
+    error: erroDisponibilidades
+  } = await supabaseClient
+    .from("inscricao_disponibilidades")
+    .select(`
+      inscricao_id,
+      corrida_dias (
+        id,
+        nome,
+        data_dia
+      )
+    `)
+    .in("inscricao_id", inscricaoIds);
+
+  if (erroDisponibilidades) {
+    console.error(
+      "Erro ao buscar disponibilidades:",
+      erroDisponibilidades
+    );
+  }
+
+  const disponibilidadesPorInscricao = {};
+
+  if (disponibilidades) {
+
+    disponibilidades.forEach(item => {
+
+      if (!disponibilidadesPorInscricao[item.inscricao_id]) {
+        disponibilidadesPorInscricao[item.inscricao_id] = [];
+      }
+
+      disponibilidadesPorInscricao[item.inscricao_id]
+        .push(item.corrida_dias);
+    });
+  }
+
   areaInscritos.innerHTML = inscricoes.map(inscricao => {
 
     const staff = inscricao.staffs;
+
+    const diasDisponiveis =
+      disponibilidadesPorInscricao[inscricao.id] || [];
 
     return `
       <article class="card-inscrito-admin">
@@ -441,6 +485,24 @@ async function carregarInscritosDaCorrida(
             <strong>Status:</strong>
             ${formatarStatusInscricao(inscricao.status)}
           </p>
+
+          <div class="admin-disponibilidade-staff">
+
+            <p>
+              <strong>Disponibilidade:</strong>
+            </p>
+
+            <div class="admin-tags-disponibilidade">
+
+              ${diasDisponiveis.map(dia => `
+                <span class="admin-tag-disponibilidade">
+                  ${dia.nome}
+                </span>
+              `).join("")}
+
+            </div>
+
+          </div>
 
         </div>
 
@@ -628,9 +690,9 @@ async function carregarDiasCorrida(corridaId) {
 
       <p>
         <strong>Horário:</strong>
-        ${dia.horario_inicio || "-"}
+        ${formatarHorario(dia.horario_inicio)}
         até
-        ${dia.horario_fim || "-"}
+        ${formatarHorario(dia.horario_fim)}
       </p>
 
       <p>

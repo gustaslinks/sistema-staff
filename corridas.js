@@ -24,7 +24,6 @@ if (!staffLogado || !staffLogado.id) {
   window.location.href = "login.html";
 }
 
-
 // =========================================================
 // CARD DO STAFF
 // =========================================================
@@ -56,7 +55,6 @@ botaoAdmin.addEventListener("click", function () {
   window.location.href = "admin.html";
 });
 
-
 // =========================================================
 // CORRIDAS DISPONÍVEIS
 // =========================================================
@@ -73,76 +71,222 @@ async function carregarCorridas() {
   if (erroCorridas) {
     console.error("Erro ao buscar corridas:", erroCorridas);
 
-    listaCorridas.innerHTML = `
-      <p>Não foi possível carregar as corridas no momento.</p>
-    `;
+    listaCorridas.innerHTML =
+      `<p>Não foi possível carregar as corridas no momento.</p>`;
+
     return;
   }
 
   if (!corridas || corridas.length === 0) {
-    listaCorridas.innerHTML = `
-      <p>Não há corridas abertas para inscrição.</p>
-    `;
+    listaCorridas.innerHTML =
+      `<p>Não há corridas abertas para inscrição.</p>`;
+
     return;
   }
 
-  const { data: inscricoes, error: erroInscricoes } = await supabaseClient
-    .from("inscricoes")
-    .select("corrida_id")
-    .eq("staff_id", staffLogado.id);
+  const { data: inscricoes, error: erroInscricoes } =
+    await supabaseClient
+      .from("inscricoes")
+      .select("corrida_id")
+      .eq("staff_id", staffLogado.id);
 
   if (erroInscricoes) {
-    console.error("Erro ao buscar inscrições do staff:", erroInscricoes);
+    console.error(
+      "Erro ao buscar inscrições do staff:",
+      erroInscricoes
+    );
   }
 
   const corridasJaInscritas = inscricoes
-    ? inscricoes.map(inscricao => inscricao.corrida_id)
+    ? inscricoes.map(
+        inscricao => inscricao.corrida_id
+      )
     : [];
 
-  listaCorridas.innerHTML = corridas.map(corrida => {
-    const dataFormatada = formatarData(corrida.data_corrida);
+  // REMOVE CORRIDAS JÁ INSCRITAS
+  const corridasDisponiveis = corridas.filter(
+    corrida => !corridasJaInscritas.includes(corrida.id)
+  );
 
-    const prazoFormatado = corrida.prazo_inscricao
-      ? formatarData(corrida.prazo_inscricao)
-      : "Não informado";
+  if (corridasDisponiveis.length === 0) {
+    listaCorridas.innerHTML =
+      `<p>Você já está inscrito em todas as corridas disponíveis.</p>`;
 
-    const valorFormatado = corrida.valor_ajuda_custo !== null
-      ? Number(corrida.valor_ajuda_custo).toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL"
-        })
-      : "Não informado";
+    return;
+  }
 
-    const jaInscrito = corridasJaInscritas.includes(corrida.id);
+  const corridaIds = corridasDisponiveis.map(
+    corrida => corrida.id
+  );
+
+  const { data: diasCorridas, error: erroDias } =
+    await supabaseClient
+      .from("corrida_dias")
+      .select("*")
+      .in("corrida_id", corridaIds)
+      .order("data_dia", { ascending: true });
+
+  if (erroDias) {
+    console.error(
+      "Erro ao buscar dias das corridas:",
+      erroDias
+    );
+  }
+
+  const diasPorCorrida = {};
+
+  if (diasCorridas) {
+    diasCorridas.forEach(dia => {
+
+      if (!diasPorCorrida[dia.corrida_id]) {
+        diasPorCorrida[dia.corrida_id] = [];
+      }
+
+      diasPorCorrida[dia.corrida_id].push(dia);
+    });
+  }
+
+  listaCorridas.innerHTML = corridasDisponiveis.map(corrida => {
+
+    const dataFormatada =
+      formatarData(corrida.data_corrida);
+
+    const prazoFormatado =
+      corrida.prazo_inscricao
+        ? formatarData(corrida.prazo_inscricao)
+        : "Não informado";
+
+    const valorFormatado =
+      corrida.valor_ajuda_custo !== null
+        ? Number(
+            corrida.valor_ajuda_custo
+          ).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+          })
+        : "Não informado";
+
+    const diasDaCorrida =
+      diasPorCorrida[corrida.id] || [];
+
+    const htmlDias =
+      diasDaCorrida.length > 0
+        ? `
+        <div class="disponibilidade-corrida">
+
+          <h4>Disponibilidade para trabalho</h4>
+
+          <div class="texto-disponibilidade-info">
+            <strong>
+              Staffs com disponibilidade para TODOS os dias do evento
+              terão prioridade na seleção.
+            </strong>
+
+            <span>
+              Informe abaixo os dias em que você possui disponibilidade para trabalhar.
+            </span>
+          </div>
+
+          <div class="texto-disponibilidade-alerta">
+            <strong>Importante:</strong>
+
+            O envio da inscrição NÃO garante convocação para a equipe.
+
+            A confirmação da escala será realizada posteriormente
+            pela organização via WhatsApp ou e-mail.
+          </div>
+
+          <div class="lista-dias-disponibilidade">
+
+            ${diasDaCorrida.map(dia => `
+              <label class="checkbox-dia-disponibilidade">
+
+                <input
+                  type="checkbox"
+                  class="disponibilidade-dia"
+                  data-corrida-id="${corrida.id}"
+                  data-dia-id="${dia.id}"
+                >
+
+                <span>
+                  <strong>${dia.nome}</strong>
+
+                  <small>
+                    ${formatarData(dia.data_dia)}
+
+                    ${
+                      dia.horario_inicio
+                        ? ` • ${formatarHorario(dia.horario_inicio)}`
+                        : ""
+                    }
+
+                    ${
+                      dia.horario_fim
+                        ? ` às ${formatarHorario(dia.horario_fim)}`
+                        : ""
+                    }
+                  </small>
+
+                </span>
+
+              </label>
+            `).join("")}
+
+          </div>
+
+        </div>
+      `
+        : `
+        <div class="disponibilidade-corrida aviso-disponibilidade">
+          <p>
+            Dias de trabalho ainda não cadastrados pelo administrador.
+          </p>
+        </div>
+      `;
 
     return `
       <article class="card-corrida">
+
         <h2>${corrida.nome}</h2>
 
-        <p><strong>Data:</strong> ${dataFormatada}</p>
-        <p><strong>Horário:</strong> ${formatarHorario(corrida.horario)}</p>
-        <p><strong>Local:</strong> ${corrida.local || "Não informado"}</p>
-        <p><strong>Cidade:</strong> ${corrida.cidade || "Não informada"}</p>
-        <p><strong>Distância:</strong> ${corrida.distancia || "Não informada"}</p>
-        <p><strong>Ajuda de custo:</strong> ${valorFormatado}</p>
-        <p><strong>Prazo de inscrição:</strong> ${prazoFormatado}</p>
+        <p><strong>Data:</strong>
+          ${dataFormatada}
+        </p>
 
-        ${
-          jaInscrito
-            ? `
-              <button disabled>
-                Inscrição realizada
-              </button>
-            `
-            : `
-              <button
-                class="botao-inscricao"
-                data-corrida-id="${corrida.id}"
-              >
-                Quero me inscrever
-              </button>
-            `
-        }
+        <p><strong>Horário:</strong>
+          ${formatarHorario(corrida.horario)}
+        </p>
+
+        <p><strong>Local:</strong>
+          ${corrida.local || "Não informado"}
+        </p>
+
+        <p><strong>Cidade:</strong>
+          ${corrida.cidade || "Não informada"}
+        </p>
+
+        <p><strong>Distância:</strong>
+          ${corrida.distancia || "Não informada"}
+        </p>
+
+        <p><strong>Ajuda de custo:</strong>
+          ${valorFormatado}
+        </p>
+
+        <p><strong>Prazo de inscrição:</strong>
+          ${prazoFormatado}
+        </p>
+
+        ${htmlDias}
+
+        <button
+          class="botao-inscricao"
+          data-corrida-id="${corrida.id}"
+          disabled
+        >
+          Quero me inscrever
+        </button>
+
       </article>
     `;
   }).join("");
@@ -150,27 +294,57 @@ async function carregarCorridas() {
   ativarBotoesInscricao();
 }
 
-
 // =========================================================
 // INSCRIÇÃO EM CORRIDA
 // =========================================================
 
 function ativarBotoesInscricao() {
   const botoes = document.querySelectorAll(".botao-inscricao");
+  const checkboxes = document.querySelectorAll(".disponibilidade-dia");
+
+checkboxes.forEach(checkbox => {
+  checkbox.addEventListener("change", function () {
+    const corridaId = checkbox.dataset.corridaId;
+
+    const algumSelecionado = document.querySelectorAll(
+      `.disponibilidade-dia[data-corrida-id="${corridaId}"]:checked`
+    ).length > 0;
+
+    const botao = document.querySelector(
+      `.botao-inscricao[data-corrida-id="${corridaId}"]`
+    );
+
+    if (botao) {
+      botao.disabled = !algumSelecionado;
+    }
+  });
+});
 
   botoes.forEach(botao => {
     botao.addEventListener("click", async function () {
       const corridaId = Number(botao.dataset.corridaId);
 
+      const checkboxesSelecionados = document.querySelectorAll(
+        `.disponibilidade-dia[data-corrida-id="${corridaId}"]:checked`
+      );
+
+      if (checkboxesSelecionados.length === 0) {
+        alert("Selecione pelo menos um dia de disponibilidade.");
+        return;
+      }
+
       botao.disabled = true;
       botao.textContent = "Inscrevendo...";
 
-      const { error } = await supabaseClient
+      const { data: inscricaoCriada, error } = await supabaseClient
         .from("inscricoes")
         .insert({
           staff_id: staffLogado.id,
-          corrida_id: corridaId
-        });
+          corrida_id: corridaId,
+          status: "inscrito"
+        })
+        .select("id")
+        .single();
 
       if (error) {
         console.error("Erro ao realizar inscrição:", error);
@@ -186,9 +360,37 @@ function ativarBotoesInscricao() {
         return;
       }
 
+      const disponibilidades = Array.from(checkboxesSelecionados).map(checkbox => {
+        return {
+          inscricao_id: inscricaoCriada.id,
+          corrida_dia_id: Number(checkbox.dataset.diaId),
+          disponivel: true
+        };
+      });
+
+      const { error: erroDisponibilidades } = await supabaseClient
+        .from("inscricao_disponibilidades")
+        .insert(disponibilidades);
+
+      if (erroDisponibilidades) {
+        console.error("Erro ao salvar disponibilidade:", erroDisponibilidades);
+
+        await supabaseClient
+          .from("inscricoes")
+          .delete()
+          .eq("id", inscricaoCriada.id);
+
+        alert("Não foi possível salvar sua disponibilidade. Tente novamente.");
+
+        botao.disabled = false;
+        botao.textContent = "Quero me inscrever";
+        return;
+      }
+
       alert("Inscrição realizada com sucesso!");
-carregarCorridas();
-carregarMinhasInscricoes();
+
+      carregarCorridas();
+      carregarMinhasInscricoes();
     });
   });
 }
@@ -198,75 +400,197 @@ carregarMinhasInscricoes();
 // =========================================================
 
 async function carregarMinhasInscricoes() {
-  listaMinhasInscricoes.innerHTML = `<p>Carregando suas inscrições...</p>`;
 
-  const { data: inscricoes, error: erroInscricoes } = await supabaseClient
-    .from("inscricoes")
-    .select("id, corrida_id, status, created_at")
-    .eq("staff_id", staffLogado.id)
-    .order("created_at", { ascending: false });
+  listaMinhasInscricoes.innerHTML =
+    `<p>Carregando suas inscrições...</p>`;
+
+  const { data: inscricoes, error: erroInscricoes } =
+    await supabaseClient
+      .from("inscricoes")
+      .select("id, corrida_id, status, created_at")
+      .eq("staff_id", staffLogado.id)
+      .order("created_at", {
+        ascending: false
+      });
 
   if (erroInscricoes) {
-    console.error("Erro ao buscar minhas inscrições:", erroInscricoes);
+    console.error(
+      "Erro ao buscar minhas inscrições:",
+      erroInscricoes
+    );
 
-    listaMinhasInscricoes.innerHTML = `
-      <p>Não foi possível carregar suas inscrições no momento.</p>
-    `;
+    listaMinhasInscricoes.innerHTML =
+      `<p>Não foi possível carregar suas inscrições no momento.</p>`;
+
     return;
   }
 
   if (!inscricoes || inscricoes.length === 0) {
-    listaMinhasInscricoes.innerHTML = `
-      <p>Você ainda não se inscreveu em nenhuma corrida.</p>
-    `;
+    listaMinhasInscricoes.innerHTML =
+      `<p>Você ainda não se inscreveu em nenhuma corrida.</p>`;
+
     return;
   }
 
-  const corridaIds = inscricoes.map(inscricao => inscricao.corrida_id);
+  const corridaIds =
+    inscricoes.map(
+      inscricao => inscricao.corrida_id
+    );
 
-  const { data: corridas, error: erroCorridas } = await supabaseClient
-    .from("corridas")
-    .select("id, nome, data_corrida, local, cidade")
-    .in("id", corridaIds);
+  const inscricaoIds =
+    inscricoes.map(
+      inscricao => inscricao.id
+    );
+
+  const { data: corridas, error: erroCorridas } =
+    await supabaseClient
+      .from("corridas")
+      .select("*")
+      .in("id", corridaIds);
 
   if (erroCorridas) {
-    console.error("Erro ao buscar dados das corridas inscritas:", erroCorridas);
+    console.error(
+      "Erro ao buscar dados das corridas:",
+      erroCorridas
+    );
 
-    listaMinhasInscricoes.innerHTML = `
-      <p>Não foi possível carregar os dados das corridas.</p>
-    `;
+    listaMinhasInscricoes.innerHTML =
+      `<p>Não foi possível carregar os dados das corridas.</p>`;
+
     return;
+  }
+
+  const {
+    data: disponibilidades,
+    error: erroDisponibilidades
+  } = await supabaseClient
+    .from("inscricao_disponibilidades")
+    .select(`
+      inscricao_id,
+      corrida_dias (
+        id,
+        nome,
+        data_dia,
+        horario_inicio,
+        horario_fim
+      )
+    `)
+    .in("inscricao_id", inscricaoIds);
+
+  if (erroDisponibilidades) {
+    console.error(
+      "Erro ao buscar disponibilidades:",
+      erroDisponibilidades
+    );
   }
 
   const corridasPorId = {};
+  const disponibilidadesPorInscricao = {};
 
   corridas.forEach(corrida => {
     corridasPorId[corrida.id] = corrida;
   });
 
-  listaMinhasInscricoes.innerHTML = inscricoes.map(inscricao => {
-    const corrida = corridasPorId[inscricao.corrida_id];
+  if (disponibilidades) {
 
-    if (!corrida) {
-      return "";
-    }
+    disponibilidades.forEach(item => {
 
-    return `
-      <article class="card-minha-inscricao">
-        <div class="conteudo-minha-inscricao">
-          <h3>${corrida.nome}</h3>
+      if (!disponibilidadesPorInscricao[item.inscricao_id]) {
+        disponibilidadesPorInscricao[item.inscricao_id] = [];
+      }
 
-          <p><strong>Data:</strong> ${formatarData(corrida.data_corrida)}</p>
-          <p><strong>Local:</strong> ${corrida.local || "Não informado"}</p>
-          <p><strong>Cidade:</strong> ${corrida.cidade || "Não informada"}</p>
-        </div>
+      disponibilidadesPorInscricao[item.inscricao_id]
+        .push(item.corrida_dias);
+    });
+  }
 
-        <div class="status-inscricao status-${inscricao.status}">
-          ${formatarStatusInscricao(inscricao.status)}
-        </div>
-      </article>
-    `;
-  }).join("");
+  listaMinhasInscricoes.innerHTML =
+    inscricoes.map(inscricao => {
+
+      const corrida =
+        corridasPorId[inscricao.corrida_id];
+
+      const diasDisponiveis =
+        disponibilidadesPorInscricao[inscricao.id] || [];
+
+      if (!corrida) {
+        return "";
+      }
+
+      const valorFormatado =
+        corrida.valor_ajuda_custo !== null
+          ? Number(
+              corrida.valor_ajuda_custo
+            ).toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL"
+            })
+          : "Não informado";
+
+      return `
+        <article class="card-minha-inscricao">
+
+          <div class="conteudo-minha-inscricao">
+
+            <h3>${corrida.nome}</h3>
+
+            <p>
+              <strong>Data:</strong>
+              ${formatarData(corrida.data_corrida)}
+            </p>
+
+            <p>
+              <strong>Horário:</strong>
+              ${formatarHorario(corrida.horario)}
+            </p>
+
+            <p>
+              <strong>Local:</strong>
+              ${corrida.local || "Não informado"}
+            </p>
+
+            <p>
+              <strong>Cidade:</strong>
+              ${corrida.cidade || "Não informada"}
+            </p>
+
+            <p>
+              <strong>Distância:</strong>
+              ${corrida.distancia || "Não informada"}
+            </p>
+
+            <p>
+              <strong>Ajuda de custo:</strong>
+              ${valorFormatado}
+            </p>
+
+            <div class="minha-disponibilidade">
+
+              <p>
+                <strong>Minha disponibilidade:</strong>
+              </p>
+
+              <div class="tags-disponibilidade">
+
+                ${diasDisponiveis.map(dia => `
+                  <span class="tag-disponibilidade">
+                    ${dia.nome}
+                  </span>
+                `).join("")}
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="status-inscricao status-${inscricao.status}">
+            ${formatarStatusInscricao(inscricao.status)}
+          </div>
+
+        </article>
+      `;
+    }).join("");
 }
 
 // =========================================================
@@ -274,6 +598,8 @@ async function carregarMinhasInscricoes() {
 // =========================================================
 
 function formatarData(dataISO) {
+  if (!dataISO) return "Não informado";
+
   const [ano, mes, dia] = dataISO.split("-");
   return `${dia}/${mes}/${ano}`;
 }
