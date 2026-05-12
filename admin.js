@@ -213,21 +213,25 @@ function ativarBotoesVerInscritos() {
   const botoes = document.querySelectorAll(".botao-ver-inscritos");
 
   botoes.forEach(botao => {
-    botao.addEventListener("click", async function () {
-      const corridaId = Number(botao.dataset.corridaId);
-      const areaInscritos = document.getElementById(`inscritos-corrida-${corridaId}`);
+    botao.addEventListener("click", async () => {
+      const corridaId = botao.dataset.corridaId;
+      const container = document.getElementById(`inscritos-corrida-${corridaId}`);
 
-      if (!areaInscritos.classList.contains("hidden")) {
-        areaInscritos.classList.add("hidden");
+      if (!container) return;
+
+      const estaAberto = !container.classList.contains("hidden");
+
+      if (estaAberto) {
+        container.classList.add("hidden");
+        container.innerHTML = "";
         botao.textContent = "Ver inscritos";
         return;
       }
 
-      areaInscritos.classList.remove("hidden");
+      container.classList.remove("hidden");
       botao.textContent = "Ocultar inscritos";
-      areaInscritos.innerHTML = `<p>Carregando inscritos...</p>`;
 
-      await carregarInscritosDaCorrida(corridaId, areaInscritos);
+      await carregarInscritosCorrida(corridaId);
     });
   });
 }
