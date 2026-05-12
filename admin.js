@@ -65,7 +65,6 @@ salvarCorridaBtn.addEventListener("click", async function () {
 
   if (error) {
     console.error("Erro ao salvar corrida:", error);
-
     alert("Não foi possível salvar a corrida.");
 
     salvarCorridaBtn.disabled = false;
@@ -77,7 +76,6 @@ salvarCorridaBtn.addEventListener("click", async function () {
   alert("Corrida cadastrada com sucesso!");
 
   limparFormularioCorrida();
-
   formNovaCorrida.classList.add("hidden");
 
   salvarCorridaBtn.disabled = false;
@@ -288,7 +286,6 @@ function ativarBotoesVerInscritos() {
       }
 
       container.classList.remove("hidden");
-
       botao.textContent = "Ocultar inscritos";
 
       await carregarInscritosDaCorrida(
@@ -362,6 +359,26 @@ async function carregarInscritosDaCorrida(
   areaInscritos
 ) {
 
+  areaInscritos.innerHTML =
+    `<p>Carregando inscritos...</p>`;
+
+  const { data: diasCorrida, error: erroDiasCorrida } =
+    await supabaseClient
+      .from("corrida_dias")
+      .select("id")
+      .eq("corrida_id", corridaId);
+
+  if (erroDiasCorrida) {
+    console.error(
+      "Erro ao buscar dias da corrida para prioridade:",
+      erroDiasCorrida
+    );
+  }
+
+  const totalDiasCorrida = diasCorrida
+    ? diasCorrida.length
+    : 0;
+
   const { data: inscricoes, error } =
     await supabaseClient
       .from("inscricoes")
@@ -402,9 +419,95 @@ async function carregarInscritosDaCorrida(
     return;
   }
 
-  areaInscritos.innerHTML = inscricoes.map(inscricao => {
+  const inscricaoIds = inscricoes.map(
+    inscricao => inscricao.id
+  );
+
+  const {
+    data: disponibilidades,
+    error: erroDisponibilidades
+  } = await supabaseClient
+    .from("inscricao_disponibilidades")
+    .select(`
+      inscricao_id,
+      disponivel,
+      corrida_dias (
+        id,
+        nome,
+        data_dia
+      )
+    `)
+    .in("inscricao_id", inscricaoIds);
+
+  if (erroDisponibilidades) {
+    console.error(
+      "Erro ao buscar disponibilidades:",
+      erroDisponibilidades
+    );
+  }
+
+  const disponibilidadesPorInscricao = {};
+
+  if (disponibilidades) {
+
+    disponibilidades.forEach(item => {
+
+      if (item.disponivel === false || !item.corrida_dias) {
+        return;
+      }
+
+      if (!disponibilidadesPorInscricao[item.inscricao_id]) {
+        disponibilidadesPorInscricao[item.inscricao_id] = [];
+      }
+
+      disponibilidadesPorInscricao[item.inscricao_id]
+        .push(item.corrida_dias);
+    });
+  }
+
+  const inscricoesComPrioridade = inscricoes.map(inscricao => {
+
+    const diasDisponiveis = removerDiasDuplicados(
+      disponibilidadesPorInscricao[inscricao.id] || []
+    );
+
+    const prioridade = calcularPrioridadeInscricao(
+      diasDisponiveis.length,
+      totalDiasCorrida
+    );
+
+    return {
+      ...inscricao,
+      diasDisponiveis,
+      quantidadeDiasDisponiveis: diasDisponiveis.length,
+      prioridade
+    };
+  });
+
+  inscricoesComPrioridade.sort((a, b) => {
+    if (
+      b.quantidadeDiasDisponiveis !==
+      a.quantidadeDiasDisponiveis
+    ) {
+      return b.quantidadeDiasDisponiveis -
+        a.quantidadeDiasDisponiveis;
+    }
+
+    return new Date(a.created_at) -
+      new Date(b.created_at);
+  });
+
+  areaInscritos.innerHTML = inscricoesComPrioridade.map(inscricao => {
 
     const staff = inscricao.staffs;
+
+    const diasDisponiveis =
+      inscricao.diasDisponiveis || [];
+
+    const textoQuantidadeDias = formatarQuantidadeDiasDisponiveis(
+      inscricao.quantidadeDiasDisponiveis,
+      totalDiasCorrida
+    );
 
     return `
       <article class="card-inscrito-admin">
@@ -420,7 +523,20 @@ async function carregarInscritosDaCorrida(
 
         <div class="dados-inscrito-admin">
 
-          <h4>${staff.nome_completo}</h4>
+          <div class="admin-inscrito-topo">
+
+            <h4>${staff.nome_completo}</h4>
+
+            <span class="admin-badge-prioridade ${inscricao.prioridade.classe}">
+              ${inscricao.prioridade.texto}
+            </span>
+
+          </div>
+
+          <p>
+            <strong>Dias disponíveis:</strong>
+            ${textoQuantidadeDias}
+          </p>
 
           <p>
             <strong>Cidade:</strong>
@@ -441,6 +557,29 @@ async function carregarInscritosDaCorrida(
             <strong>Status:</strong>
             ${formatarStatusInscricao(inscricao.status)}
           </p>
+
+          <div class="admin-disponibilidade-staff">
+
+            <p>
+              <strong>Disponibilidade:</strong>
+            </p>
+
+            <div class="admin-tags-disponibilidade">
+
+              ${diasDisponiveis.length > 0
+                ? diasDisponiveis.map(dia => `
+                  <span class="admin-tag-disponibilidade">
+                    ${dia.nome}
+                  </span>
+                `).join("")
+                : `<span class="admin-tag-disponibilidade sem-disponibilidade">
+                    Nenhum dia selecionado
+                  </span>`
+              }
+
+            </div>
+
+          </div>
 
         </div>
 
@@ -628,9 +767,9 @@ async function carregarDiasCorrida(corridaId) {
 
       <p>
         <strong>Horário:</strong>
-        ${dia.horario_inicio || "-"}
+        ${formatarHorario(dia.horario_inicio)}
         até
-        ${dia.horario_fim || "-"}
+        ${formatarHorario(dia.horario_fim)}
       </p>
 
       <p>
@@ -829,5 +968,139 @@ function formatarStatusInscricao(status) {
   return statusFormatados[status] || status;
 }
 
+function removerDiasDuplicados(dias) {
+  const diasUnicos = [];
+  const idsUsados = new Set();
+
+  dias.forEach(dia => {
+    if (!dia || idsUsados.has(dia.id)) return;
+
+    idsUsados.add(dia.id);
+    diasUnicos.push(dia);
+  });
+
+  return diasUnicos;
+}
+
+function calcularPrioridadeInscricao(
+  quantidadeDiasDisponiveis,
+  totalDiasCorrida
+) {
+
+  if (totalDiasCorrida <= 0) {
+    return {
+      texto: "Sem dias cadastrados",
+      classe: "prioridade-neutra"
+    };
+  }
+
+  if (quantidadeDiasDisponiveis >= totalDiasCorrida) {
+    return {
+      texto: "Prioridade alta",
+      classe: "prioridade-alta"
+    };
+  }
+
+  const percentualDisponibilidade =
+    quantidadeDiasDisponiveis / totalDiasCorrida;
+
+  if (percentualDisponibilidade >= 0.5) {
+    return {
+      texto: "Prioridade média",
+      classe: "prioridade-media"
+    };
+  }
+
+  if (quantidadeDiasDisponiveis > 0) {
+    return {
+      texto: "Prioridade baixa",
+      classe: "prioridade-baixa"
+    };
+  }
+
+  return {
+    texto: "Sem disponibilidade",
+    classe: "prioridade-baixa"
+  };
+}
+
+function formatarQuantidadeDiasDisponiveis(
+  quantidadeDiasDisponiveis,
+  totalDiasCorrida
+) {
+
+  if (totalDiasCorrida <= 0) {
+    return `${quantidadeDiasDisponiveis} dia(s)`;
+  }
+
+  return `${quantidadeDiasDisponiveis} de ${totalDiasCorrida} dia(s)`;
+}
+
+function inserirEstilosPrioridadeAdmin() {
+  if (document.getElementById("estilos-prioridade-admin")) {
+    return;
+  }
+
+  const style = document.createElement("style");
+  style.id = "estilos-prioridade-admin";
+  style.textContent = `
+    .admin-inscrito-topo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .admin-inscrito-topo h4 {
+      margin: 0;
+    }
+
+    .admin-badge-prioridade {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .admin-badge-prioridade.prioridade-alta {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .admin-badge-prioridade.prioridade-media {
+      background: #fef9c3;
+      color: #854d0e;
+      border: 1px solid #fde047;
+    }
+
+    .admin-badge-prioridade.prioridade-baixa {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .admin-badge-prioridade.prioridade-neutra {
+      background: #e5e7eb;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+
+    .admin-tag-disponibilidade.sem-disponibilidade {
+      opacity: 0.75;
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
 // INICIALIZAÇÃO
+inserirEstilosPrioridadeAdmin();
 carregarCorridasAdmin();
