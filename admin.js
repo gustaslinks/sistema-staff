@@ -139,6 +139,13 @@ async function carregarCorridasAdmin() {
           >
             Ver inscritos
           </button>
+          <button
+            class="botao-alterar-status-corrida"
+            data-corrida-id="${corrida.id}"
+            data-status-atual="${corrida.status}"
+          >
+            ${corrida.status === "aberta" ? "Encerrar inscrições" : "Abrir inscrições"}
+          </button>
         </div>
 
         <section
@@ -150,7 +157,8 @@ async function carregarCorridasAdmin() {
   }).join("");
 
   ativarBotoesVerInscritos();
-}
+  ativarBotoesStatusCorrida();
+  }
 
 // VER INSCRITOS
 function ativarBotoesVerInscritos() {
@@ -172,6 +180,43 @@ function ativarBotoesVerInscritos() {
       areaInscritos.innerHTML = `<p>Carregando inscritos...</p>`;
 
       await carregarInscritosDaCorrida(corridaId, areaInscritos);
+    });
+  });
+}
+
+function ativarBotoesStatusCorrida() {
+  const botoes = document.querySelectorAll(".botao-alterar-status-corrida");
+
+  botoes.forEach(botao => {
+    botao.addEventListener("click", async function () {
+      const corridaId = Number(botao.dataset.corridaId);
+      const statusAtual = botao.dataset.statusAtual;
+      const novoStatus = statusAtual === "aberta" ? "encerrada" : "aberta";
+
+      const confirmar = confirm(
+        novoStatus === "encerrada"
+          ? "Deseja encerrar as inscrições desta corrida?"
+          : "Deseja reabrir as inscrições desta corrida?"
+      );
+
+      if (!confirmar) return;
+
+      botao.disabled = true;
+      botao.textContent = "Atualizando...";
+
+      const { error } = await supabaseClient
+        .from("corridas")
+        .update({ status: novoStatus })
+        .eq("id", corridaId);
+
+      if (error) {
+        console.error("Erro ao alterar status da corrida:", error);
+        alert("Não foi possível alterar o status da corrida.");
+        botao.disabled = false;
+        return;
+      }
+
+      carregarCorridasAdmin();
     });
   });
 }
