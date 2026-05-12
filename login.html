@@ -40,10 +40,13 @@
         <label for="nascimento">Data de nascimento</label>
 
         <input
-          type="date"
-          id="nascimento"
-          required
-        >
+  type="text"
+  id="nascimento"
+  placeholder="dd/mm/aaaa"
+  maxlength="10"
+  inputmode="numeric"
+  required
+>
 
         <div class="error" id="nascimentoError">
           Informe sua data de nascimento.
