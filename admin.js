@@ -128,12 +128,166 @@ async function carregarCorridasAdmin() {
         }</p>
         <p><strong>Inscritos:</strong> ${totalInscritos}</p>
 
-        <span class="admin-status ${corrida.status}">
-          ${corrida.status}
-        </span>
+<div class="admin-card-footer">
+  <span class="admin-status ${corrida.status}">
+    ${corrida.status}
+  </span>
+
+  <button
+    class="botao-ver-inscritos"
+    data-corrida-id="${corrida.id}"
+  >
+    Ver inscritos
+  </button>
+</div>
+
+<section
+  id="inscritos-corrida-${corrida.id}"
+  class="lista-inscritos-admin hidden"
+>
+</section>
       </article>
     `;
   }).join("");
+}
+
+function ativarBotoesVerInscritos() {
+  const botoes = document.querySelectorAll(".botao-ver-inscritos");
+
+  botoes.forEach(botao => {
+    botao.addEventListener("click", async function () {
+      const corridaId = Number(botao.dataset.corridaId);
+      const areaInscritos = document.getElementById(`inscritos-corrida-${corridaId}`);
+
+      if (!areaInscritos.classList.contains("hidden")) {
+        areaInscritos.classList.add("hidden");
+        botao.textContent = "Ver inscritos";
+        return;
+      }
+
+      areaInscritos.classList.remove("hidden");
+      botao.textContent = "Ocultar inscritos";
+      areaInscritos.innerHTML = `<p>Carregando inscritos...</p>`;
+
+      await carregarInscritosDaCorrida(corridaId, areaInscritos);
+    });
+  });
+}
+
+async function carregarInscritosDaCorrida(corridaId, areaInscritos) {
+  const { data: inscricoes, error } = await supabaseClient
+    .from("inscricoes")
+    .select(`
+      id,
+      status,
+      created_at,
+      staffs (
+        id,
+        nome_completo,
+        cidade,
+        telefone,
+        email,
+        foto_url
+      )
+    `)
+    .eq("corrida_id", corridaId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Erro ao buscar inscritos:", error);
+    areaInscritos.innerHTML = `<p>Não foi possível carregar os inscritos.</p>`;
+    return;
+  }
+
+  if (!inscricoes || inscricoes.length === 0) {
+    areaInscritos.innerHTML = `<p>Nenhum inscrito nesta corrida.</p>`;
+    return;
+  }
+
+  areaInscritos.innerHTML = inscricoes.map(inscricao => {
+    const staff = inscricao.staffs;
+
+    return `
+      <article class="card-inscrito-admin">
+        <img
+          class="foto-inscrito-admin"
+          src="${staff.foto_url || "https://placehold.co/80x80?text=Foto"}"
+          alt="Foto de ${staff.nome_completo}"
+        >
+
+        <div class="dados-inscrito-admin">
+          <h4>${staff.nome_completo}</h4>
+          <p><strong>Cidade:</strong> ${staff.cidade || "Não informada"}</p>
+          <p><strong>Telefone:</strong> ${staff.telefone || "Não informado"}</p>
+          <p><strong>E-mail:</strong> ${staff.email || "Não informado"}</p>
+          <p><strong>Status:</strong> ${formatarStatusInscricao(inscricao.status)}</p>
+        </div>
+
+        <div class="acoes-inscrito-admin">
+          <button
+            class="botao-confirmar-inscrito"
+            data-inscricao-id="${inscricao.id}"
+            data-corrida-id="${corridaId}"
+          >
+            Confirmar
+          </button>
+
+          <button
+            class="botao-cancelar-inscrito"
+            data-inscricao-id="${inscricao.id}"
+            data-corrida-id="${corridaId}"
+          >
+            Cancelar
+          </button>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  ativarBotoesStatusInscricao();
+}
+
+function ativarBotoesStatusInscricao() {
+  const botoesConfirmar = document.querySelectorAll(".botao-confirmar-inscrito");
+  const botoesCancelar = document.querySelectorAll(".botao-cancelar-inscrito");
+
+  botoesConfirmar.forEach(botao => {
+    botao.addEventListener("click", async function () {
+      await atualizarStatusInscricao(botao, "confirmado");
+    });
+  });
+
+  botoesCancelar.forEach(botao => {
+    botao.addEventListener("click", async function () {
+      await atualizarStatusInscricao(botao, "cancelado");
+    });
+  });
+}
+
+async function atualizarStatusInscricao(botao, novoStatus) {
+  const inscricaoId = Number(botao.dataset.inscricaoId);
+  const corridaId = Number(botao.dataset.corridaId);
+  const areaInscritos = document.getElementById(`inscritos-corrida-${corridaId}`);
+
+  const textoOriginal = botao.textContent;
+  botao.disabled = true;
+  botao.textContent = "Salvando...";
+
+  const { error } = await supabaseClient
+    .from("inscricoes")
+    .update({ status: novoStatus })
+    .eq("id", inscricaoId);
+
+  if (error) {
+    console.error("Erro ao atualizar inscrição:", error);
+    alert("Não foi possível atualizar o status.");
+    botao.disabled = false;
+    botao.textContent = textoOriginal;
+    return;
+  }
+
+  await carregarInscritosDaCorrida(corridaId, areaInscritos);
+  carregarCorridasAdmin();
 }
 
 // LIMPAR FORM
