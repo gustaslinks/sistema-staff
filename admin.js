@@ -128,29 +128,31 @@ async function carregarCorridasAdmin() {
         }</p>
         <p><strong>Inscritos:</strong> ${totalInscritos}</p>
 
-<div class="admin-card-footer">
-  <span class="admin-status ${corrida.status}">
-    ${corrida.status}
-  </span>
+        <div class="admin-card-footer">
+          <span class="admin-status ${corrida.status}">
+            ${corrida.status}
+          </span>
 
-  <button
-    class="botao-ver-inscritos"
-    data-corrida-id="${corrida.id}"
-  >
-    Ver inscritos
-  </button>
-</div>
+          <button
+            class="botao-ver-inscritos"
+            data-corrida-id="${corrida.id}"
+          >
+            Ver inscritos
+          </button>
+        </div>
 
-<section
-  id="inscritos-corrida-${corrida.id}"
-  class="lista-inscritos-admin hidden"
->
-</section>
+        <section
+          id="inscritos-corrida-${corrida.id}"
+          class="lista-inscritos-admin hidden"
+        ></section>
       </article>
     `;
   }).join("");
+
+  ativarBotoesVerInscritos();
 }
 
+// VER INSCRITOS
 function ativarBotoesVerInscritos() {
   const botoes = document.querySelectorAll(".botao-ver-inscritos");
 
@@ -174,6 +176,7 @@ function ativarBotoesVerInscritos() {
   });
 }
 
+// CARREGAR INSCRITOS
 async function carregarInscritosDaCorrida(corridaId, areaInscritos) {
   const { data: inscricoes, error } = await supabaseClient
     .from("inscricoes")
@@ -247,6 +250,7 @@ async function carregarInscritosDaCorrida(corridaId, areaInscritos) {
   ativarBotoesStatusInscricao();
 }
 
+// BOTÕES CONFIRMAR / CANCELAR
 function ativarBotoesStatusInscricao() {
   const botoesConfirmar = document.querySelectorAll(".botao-confirmar-inscrito");
   const botoesCancelar = document.querySelectorAll(".botao-cancelar-inscrito");
@@ -264,6 +268,7 @@ function ativarBotoesStatusInscricao() {
   });
 }
 
+// ATUALIZAR STATUS
 async function atualizarStatusInscricao(botao, novoStatus) {
   const inscricaoId = Number(botao.dataset.inscricaoId);
   const corridaId = Number(botao.dataset.corridaId);
@@ -287,7 +292,6 @@ async function atualizarStatusInscricao(botao, novoStatus) {
   }
 
   await carregarInscritosDaCorrida(corridaId, areaInscritos);
-  carregarCorridasAdmin();
 }
 
 // LIMPAR FORM
@@ -323,6 +327,16 @@ function formatarMoeda(valor) {
     style: "currency",
     currency: "BRL"
   });
+}
+
+function formatarStatusInscricao(status) {
+  const statusFormatados = {
+    inscrito: "Inscrito",
+    confirmado: "Confirmado",
+    cancelado: "Cancelado"
+  };
+
+  return statusFormatados[status] || status;
 }
 
 // INICIALIZAÇÃO
