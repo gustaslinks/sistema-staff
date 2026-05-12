@@ -1,17 +1,12 @@
 const SUPABASE_URL = "https://klpxoffkajijjktxztmc.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_O_MlVkyfreG125LVia6nag_1GL5bUli";
 
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const form = document.getElementById("loginForm");
 const cpf = document.getElementById("cpf");
 const nascimento = document.getElementById("nascimento");
 const loginBtn = document.getElementById("loginBtn");
-
-const resultadoLogin = document.getElementById("resultadoLogin");
-const staffFoto = document.getElementById("staffFoto");
-const staffNome = document.getElementById("staffNome");
-const staffCidade = document.getElementById("staffCidade");
-const staffTelefone = document.getElementById("staffTelefone");
-const staffEmail = document.getElementById("staffEmail");
 
 function onlyNumbers(value) {
   return value.replace(/\D/g, "");
@@ -34,6 +29,7 @@ function maskDate(value) {
 
 function dateToSupabase(value) {
   const numbers = onlyNumbers(value);
+
   if (numbers.length !== 8) return "";
 
   const dia = numbers.slice(0, 2);
@@ -58,15 +54,6 @@ form.addEventListener("submit", async function (event) {
   loginBtn.textContent = "Entrando...";
 
   try {
-    if (!window.supabase) {
-      throw new Error("Supabase não carregou. Verifique a internet ou o script no HTML.");
-    }
-
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
-
     const dataNascimento = dateToSupabase(nascimento.value);
 
     if (!dataNascimento) {
@@ -84,13 +71,14 @@ form.addEventListener("submit", async function (event) {
       throw new Error("Cadastro não encontrado.");
     }
 
-    resultadoLogin.classList.remove("hidden");
+    localStorage.setItem("staffLogado", JSON.stringify({
+      id: data.id,
+      nome_completo: data.nome_completo,
+      cpf: data.cpf,
+      email: data.email
+    }));
 
-    staffFoto.src = data.foto_url || "";
-    staffNome.textContent = data.nome_completo || "";
-    staffCidade.textContent = "Cidade: " + (data.cidade || "");
-    staffTelefone.textContent = "Telefone: " + (data.telefone || "");
-    staffEmail.textContent = "E-mail: " + (data.email || "");
+    window.location.href = "corridas.html";
 
   } catch (error) {
     alert(error.message);
