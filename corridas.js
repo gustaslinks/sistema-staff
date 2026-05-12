@@ -6,9 +6,8 @@ const supabaseClient = supabase.createClient(
   SUPABASE_ANON_KEY
 );
 
+// ELEMENTOS DA PÁGINA
 const listaCorridas = document.getElementById("lista-corridas");
-
-const staffLogado = JSON.parse(localStorage.getItem("staffLogado"));
 
 const nomeStaff = document.getElementById("nome-staff");
 const cidadeStaff = document.getElementById("cidade-staff");
@@ -16,9 +15,18 @@ const emailStaff = document.getElementById("email-staff");
 const fotoStaff = document.getElementById("foto-staff");
 const botaoSair = document.getElementById("botao-sair");
 
+// STAFF LOGADO
+const staffLogado = JSON.parse(localStorage.getItem("staffLogado"));
+
+// BLOQUEIA ACESSO SEM LOGIN
 if (!staffLogado || !staffLogado.id) {
   window.location.href = "login.html";
 }
+
+
+// =========================================================
+// CARD DO STAFF
+// =========================================================
 
 function carregarCardStaff() {
   nomeStaff.textContent = staffLogado.nome_completo || "Staff";
@@ -39,17 +47,23 @@ botaoSair.addEventListener("click", function () {
   window.location.href = "login.html";
 });
 
-carregarCardStaff();
+
+// =========================================================
+// CORRIDAS DISPONÍVEIS
+// =========================================================
 
 async function carregarCorridas() {
-  const { data: corridas, error } = await supabaseClient
+  listaCorridas.innerHTML = `<p>Carregando corridas...</p>`;
+
+  const { data: corridas, error: erroCorridas } = await supabaseClient
     .from("corridas")
     .select("*")
     .eq("status", "aberta")
     .order("data_corrida", { ascending: true });
 
-  if (error) {
-    console.error("Erro ao buscar corridas:", error);
+  if (erroCorridas) {
+    console.error("Erro ao buscar corridas:", erroCorridas);
+
     listaCorridas.innerHTML = `
       <p>Não foi possível carregar as corridas no momento.</p>
     `;
@@ -69,7 +83,7 @@ async function carregarCorridas() {
     .eq("staff_id", staffLogado.id);
 
   if (erroInscricoes) {
-    console.error("Erro ao buscar inscrições:", erroInscricoes);
+    console.error("Erro ao buscar inscrições do staff:", erroInscricoes);
   }
 
   const corridasJaInscritas = inscricoes
@@ -97,7 +111,7 @@ async function carregarCorridas() {
         <h2>${corrida.nome}</h2>
 
         <p><strong>Data:</strong> ${dataFormatada}</p>
-        <p><strong>Horário:</strong> ${corrida.horario || "Não informado"}</p>
+        <p><strong>Horário:</strong> ${formatarHorario(corrida.horario)}</p>
         <p><strong>Local:</strong> ${corrida.local || "Não informado"}</p>
         <p><strong>Cidade:</strong> ${corrida.cidade || "Não informada"}</p>
         <p><strong>Distância:</strong> ${corrida.distancia || "Não informada"}</p>
@@ -106,19 +120,33 @@ async function carregarCorridas() {
 
         ${
           jaInscrito
-            ? `<button disabled>Inscrição realizada</button>`
-            : `<button class="botao-inscricao" data-corrida-id="${corrida.id}">
+            ? `
+              <button disabled>
+                Inscrição realizada
+              </button>
+            `
+            : `
+              <button
+                class="botao-inscricao"
+                data-corrida-id="${corrida.id}"
+              >
                 Quero me inscrever
-              </button>`
+              </button>
+            `
         }
       </article>
     `;
   }).join("");
 
-  adicionarEventosInscricao();
+  ativarBotoesInscricao();
 }
 
-function adicionarEventosInscricao() {
+
+// =========================================================
+// INSCRIÇÃO EM CORRIDA
+// =========================================================
+
+function ativarBotoesInscricao() {
   const botoes = document.querySelectorAll(".botao-inscricao");
 
   botoes.forEach(botao => {
@@ -155,9 +183,26 @@ function adicionarEventosInscricao() {
   });
 }
 
+
+// =========================================================
+// FORMATAÇÕES
+// =========================================================
+
 function formatarData(dataISO) {
   const [ano, mes, dia] = dataISO.split("-");
   return `${dia}/${mes}/${ano}`;
 }
 
+function formatarHorario(horario) {
+  if (!horario) return "Não informado";
+
+  return horario.slice(0, 5);
+}
+
+
+// =========================================================
+// INICIALIZAÇÃO
+// =========================================================
+
+carregarCardStaff();
 carregarCorridas();
