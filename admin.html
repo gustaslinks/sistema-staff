@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Painel Admin | Sistema Staff</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <main class="pagina-admin">
+
+    <section class="cabecalho-corridas">
+      <h1>Painel Administrativo</h1>
+      <p>Gerencie corridas e inscrições do sistema.</p>
+    </section>
+
+    <section class="admin-acoes">
+      <button id="nova-corrida-btn" class="submit-btn">
+        Nova corrida
+      </button>
+    </section>
+
+    <section id="form-nova-corrida" class="form-admin hidden">
+
+      <div class="form-area">
+
+        <h2 class="section-title">
+          Cadastro de corrida
+        </h2>
+
+        <div class="grid">
+
+          <div class="field">
+            <label>Nome da corrida</label>
+            <input type="text" id="corrida-nome">
+          </div>
+
+          <div class="field">
+            <label>Data</label>
+            <input type="date" id="corrida-data">
+          </div>
+
+          <div class="field">
+            <label>Horário</label>
+            <input type="time" id="corrida-horario">
+          </div>
+
+          <div class="field">
+            <label>Cidade</label>
+            <input type="text" id="corrida-cidade">
+          </div>
+
+          <div class="field">
+            <label>Local</label>
+            <input type="text" id="corrida-local">
+          </div>
+
+          <div class="field">
+            <label>Distância</label>
+            <input type="text" id="corrida-distancia">
+          </div>
+
+          <div class="field">
+            <label>Ajuda de custo</label>
+            <input type="number" id="corrida-ajuda">
+          </div>
+
+          <div class="field">
+            <label>Prazo de inscrição</label>
+            <input type="date" id="corrida-prazo">
+          </div>
+
+        </div>
+
+        <div class="field">
+          <label>Observações</label>
+          <textarea id="corrida-observacoes"></textarea>
+        </div>
+
+        <button id="salvar-corrida-btn" class="submit-btn">
+          Salvar corrida
+        </button>
+
+      </div>
+
+    </section>
+
+    <section class="secao-corridas-admin">
+
+      <div class="cabecalho-corridas">
+        <h2>Corridas cadastradas</h2>
+        <p>Visualize e acompanhe as corridas do sistema.</p>
+      </div>
+
+      <section id="lista-corridas-admin" class="lista-corridas">
+        <p>Carregando corridas...</p>
+      </section>
+
+    </section>
+
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
