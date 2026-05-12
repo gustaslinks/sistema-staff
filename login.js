@@ -51,7 +51,7 @@ const { data, error } = await supabaseClient
 .from('staffs')
 .select('*')
 .eq('cpf', cpf.value)
-.eq('data_nascimento', nascimento.value)
+.eq('data_nascimento', dateToSupabase(nascimento.value))
 .single();
 
 if(error || !data){
