@@ -1315,3 +1315,19 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+.botao-admin-secundario {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botao-admin-secundario:hover {
+  background: #1d4ed8;
+}

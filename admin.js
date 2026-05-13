@@ -229,6 +229,13 @@ async function carregarCorridasAdmin() {
           </button>
 
           <button
+            class="botao-exportar-planilha botao-admin-secundario"
+            data-corrida-id="${corrida.id}"
+          >
+            Exportar planilha
+          </button>
+
+          <button
             class="botao-alterar-status-corrida"
             data-corrida-id="${corrida.id}"
             data-status-atual="${corrida.status}"
@@ -255,8 +262,9 @@ async function carregarCorridasAdmin() {
     carregarDiasCorrida(corrida.id);
   });
 
-  ativarBotoesVerInscritos();
-  ativarBotoesStatusCorrida();
+ativarBotoesVerInscritos();
+ativarBotoesExportarPlanilha();
+ativarBotoesStatusCorrida();
 }
 
 // VER INSCRITOS
@@ -387,14 +395,17 @@ async function carregarInscritosDaCorrida(
         id,
         status,
         created_at,
-        staffs (
-          id,
-          nome_completo,
-          cidade,
-          telefone,
-          email,
-          foto_url
-        )
+          staffs (
+            id,
+            nome_completo,
+            cpf,
+            rg,
+            cidade,
+            telefone,
+            email,
+            chave_pix,
+            foto_url
+          )
       `)
       .eq("corrida_id", corridaId)
       .order("created_at", {
@@ -1111,6 +1122,283 @@ function obterDiaSemana(dataISO) {
   const data = new Date(`${dataISO}T00:00:00`);
 
   return diasSemana[data.getDay()];
+}
+
+function ativarBotoesExportarPlanilha() {
+
+  const botoes = document.querySelectorAll(
+    ".botao-exportar-planilha"
+  );
+
+  botoes.forEach(botao => {
+
+    botao.addEventListener("click", async () => {
+
+      const corridaId = Number(
+        botao.dataset.corridaId
+      );
+
+      await exportarPlanilhaCorrida(corridaId);
+    });
+  });
+}
+
+async function exportarPlanilhaCorrida(corridaId) {
+
+  const { data: corrida, error: erroCorrida } =
+    await supabaseClient
+      .from("corridas")
+      .select("*")
+      .eq("id", corridaId)
+      .single();
+
+  if (erroCorrida || !corrida) {
+    alert("Erro ao buscar corrida.");
+    return;
+  }
+
+  const { data: inscricoes, error } =
+    await supabaseClient
+      .from("inscricoes")
+      .select(`
+        status,
+        staffs (
+          nome_completo,
+          cpf,
+          rg,
+          telefone,
+          chave_pix
+        )
+      `)
+      .eq("corrida_id", corridaId)
+      .neq("status", "cancelado");
+
+  if (error) {
+    console.error(error);
+
+    alert("Erro ao gerar planilha.");
+
+    return;
+  }
+
+  const inscritosOrdenados = inscricoes
+    .map(item => item.staffs)
+    .sort((a, b) =>
+      a.nome_completo.localeCompare(
+        b.nome_completo,
+        "pt-BR"
+      )
+    );
+
+  const dados = inscritosOrdenados.map(staff => ({
+    Nome: staff.nome_completo || "",
+    CPF: staff.cpf || "",
+    RG: staff.rg || "",
+    "Celular/Whatsapp": staff.telefone || "",
+    "Chave PIX": staff.chave_pix || "",
+    Assinatura: ""
+  }));
+
+  const workbook = XLSX.utils.book_new();
+
+  const worksheet = XLSX.utils.json_to_sheet(dados, {
+    origin: "A3"
+  });
+
+  XLSX.utils.sheet_add_aoa(
+    worksheet,
+    [[corrida.nome]],
+    { origin: "A1" }
+  );
+
+  worksheet["!merges"] = [
+    {
+      s: { r: 0, c: 0 },
+      e: { r: 0, c: 5 }
+    }
+  ];
+
+  worksheet["!cols"] = [
+    { wch: 40 },
+    { wch: 18 },
+    { wch: 18 },
+    { wch: 22 },
+    { wch: 28 },
+    { wch: 24 }
+  ];
+  worksheet["!rows"] = [];
+
+for (let i = 0; i <= dados.length + 3; i++) {
+  worksheet["!rows"].push({
+    hpx: 30
+  });
+}
+
+  const range = XLSX.utils.decode_range(
+    worksheet["!ref"]
+  );
+
+  for (let C = range.s.c; C <= range.e.c; ++C) {
+
+    const cellAddress =
+      XLSX.utils.encode_cell({
+        r: 2,
+        c: C
+      });
+
+    if (!worksheet[cellAddress]) continue;
+
+worksheet[cellAddress].s = {
+  fill: {
+    fgColor: { rgb: "2F6B58" }
+  },
+  font: {
+    bold: true,
+    color: { rgb: "FFFFFF" }
+  },
+  alignment: {
+    horizontal: "center",
+    vertical: "center"
+  }
+};
+  }
+
+worksheet["A1"].s = {
+  font: {
+    bold: true,
+    sz: 18
+  },
+  alignment: {
+    horizontal: "center",
+    vertical: "center"
+  }
+};
+
+  worksheet["!autofilter"] = {
+    ref: `A3:F${dados.length + 3}`
+  };
+
+const rangeCompleto = XLSX.utils.decode_range(
+  worksheet["!ref"]
+);
+
+for (
+  let R = rangeCompleto.s.r;
+  R <= rangeCompleto.e.r;
+  ++R
+) {
+
+  for (
+    let C = rangeCompleto.s.c;
+    C <= rangeCompleto.e.c;
+    ++C
+  ) {
+
+    const cellAddress =
+      XLSX.utils.encode_cell({
+        r: R,
+        c: C
+      });
+
+    if (!worksheet[cellAddress]) continue;
+
+    if (!worksheet[cellAddress].s) {
+      worksheet[cellAddress].s = {};
+    }
+
+    if (R >= 3) {
+      worksheet[cellAddress].s.font = {
+        sz: 12
+      };
+    }
+
+    worksheet[cellAddress].s.alignment = {
+      vertical: "center"
+    };
+  }
+}
+
+for (
+  let R = rangeCompleto.s.r;
+  R <= rangeCompleto.e.r;
+  ++R
+) {
+
+  for (
+    let C = rangeCompleto.s.c;
+    C <= rangeCompleto.e.c;
+    ++C
+  ) {
+
+    const cellAddress =
+      XLSX.utils.encode_cell({
+        r: R,
+        c: C
+      });
+
+    if (!worksheet[cellAddress]) continue;
+
+    if (!worksheet[cellAddress].s) {
+      worksheet[cellAddress].s = {};
+    }
+
+worksheet[cellAddress].s.alignment = {
+  vertical: "center"
+};
+
+worksheet[cellAddress].s.font = {
+  sz: 12
+};
+  }
+}
+
+worksheet["A1"].s = {
+  font: {
+    bold: true,
+    sz: 18
+  },
+  alignment: {
+    horizontal: "center",
+    vertical: "center"
+  }
+};
+
+for (let C = 0; C <= 5; ++C) {
+
+  const cellAddress =
+    XLSX.utils.encode_cell({
+      r: 2,
+      c: C
+    });
+
+  if (!worksheet[cellAddress]) continue;
+
+  worksheet[cellAddress].s = {
+    fill: {
+      fgColor: { rgb: "2F6B58" }
+    },
+    font: {
+      bold: true,
+      color: { rgb: "FFFFFF" },
+      sz: 12
+    },
+    alignment: {
+      horizontal: "center",
+      vertical: "center"
+    }
+  };
+}
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Inscritos"
+  );
+
+  XLSX.writeFile(
+    workbook,
+    `${corrida.nome}.xlsx`
+  );
 }
 
 
