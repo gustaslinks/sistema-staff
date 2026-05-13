@@ -302,6 +302,24 @@ body {
   transition: 0.2s;
 }
 
+
+.logout-btn {
+  padding: 18px 24px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
 .submit-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
@@ -332,6 +350,10 @@ body {
   background: #374151;
 }
 
+.btn-admin {
+  width: auto;
+  margin-top: 0;
+}
 
 /* =========================================================
    TEXTO DE RODAPÉ
@@ -553,6 +575,22 @@ body {
   cursor: default;
 }
 
+.delete-btn {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.delete-btn:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
 /* =========================================================
    MINHAS INSCRIÇÕES
 ========================================================= */
@@ -718,6 +756,8 @@ body {
 .admin-acoes {
   display: flex;
   justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .admin-acoes .submit-btn {
@@ -1330,4 +1370,41 @@ body {
 
 .botao-admin-secundario:hover {
   background: #1d4ed8;
+}
+/* =========================================================
+   AJUSTES CADASTRO DE CORRIDA - ADMIN
+========================================================= */
+
+.preview-dias-corrida {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 20px 0 28px;
+}
+
+.preview-dias-corrida > p {
+  grid-column: 1 / -1;
+  color: #6b7280;
+}
+
+.form-admin textarea#corrida-local {
+  min-height: 110px;
+  line-height: 1.45;
+}
+
+.form-admin textarea#corrida-observacoes {
+  min-height: 90px;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .preview-dias-corrida {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .preview-dias-corrida {
+    grid-template-columns: 1fr;
+  }
 }

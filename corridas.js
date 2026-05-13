@@ -21,7 +21,7 @@ const staffLogado = JSON.parse(localStorage.getItem("staffLogado"));
 
 // BLOQUEIA ACESSO SEM LOGIN
 if (!staffLogado || !staffLogado.id) {
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
 
 // =========================================================
@@ -44,7 +44,7 @@ function carregarCardStaff() {
 
 botaoSair.addEventListener("click", function () {
   localStorage.removeItem("staffLogado");
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 });
 
 if (staffLogado.is_admin === true) {
@@ -146,24 +146,55 @@ async function carregarCorridas() {
     });
   }
 
-  listaCorridas.innerHTML = corridasDisponiveis.map(corrida => {
+  const { data: contagemInscricoes, error: erroContagemInscricoes } =
+    await supabaseClient
+      .from("inscricoes")
+      .select("corrida_id, status")
+      .in("corrida_id", corridaIds);
+
+  if (erroContagemInscricoes) {
+    console.error("Erro ao buscar contagem de inscrições:", erroContagemInscricoes);
+  }
+
+  const inscritosPorCorrida = {};
+
+  if (contagemInscricoes) {
+    contagemInscricoes.forEach(inscricao => {
+      if (inscricao.status === "cancelado") return;
+
+      inscritosPorCorrida[inscricao.corrida_id] =
+        (inscritosPorCorrida[inscricao.corrida_id] || 0) + 1;
+    });
+  }
+
+  const corridasComVaga = corridasDisponiveis.filter(corrida => {
+    const vagasTotal = Number(corrida.vagas_total || 0);
+    const totalInscritos = inscritosPorCorrida[corrida.id] || 0;
+
+    return vagasTotal <= 0 || totalInscritos < vagasTotal;
+  });
+
+  if (corridasComVaga.length === 0) {
+    listaCorridas.innerHTML =
+      `<p>Não há corridas com vagas abertas no momento.</p>`;
+
+    return;
+  }
+
+  listaCorridas.innerHTML = corridasComVaga.map(corrida => {
 
     const dataFormatada =
-      formatarData(corrida.data_corrida);
+      formatarPeriodoCorrida(corrida);
+
+    const totalInscritos = inscritosPorCorrida[corrida.id] || 0;
+    const vagasTotal = Number(corrida.vagas_total || 0);
+    const textoVagas = vagasTotal > 0
+      ? `${totalInscritos} de ${vagasTotal}`
+      : "Não informado";
 
     const prazoFormatado =
       corrida.prazo_inscricao
         ? formatarData(corrida.prazo_inscricao)
-        : "Não informado";
-
-    const valorFormatado =
-      corrida.valor_ajuda_custo !== null
-        ? Number(
-            corrida.valor_ajuda_custo
-          ).toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-          })
         : "Não informado";
 
     const diasDaCorrida =
@@ -225,6 +256,12 @@ async function carregarCorridas() {
                         ? ` às ${formatarHorario(dia.horario_fim)}`
                         : ""
                     }
+
+                    ${
+                      dia.valor_ajuda_custo !== null && dia.valor_ajuda_custo !== undefined
+                        ? ` • Ajuda de custo: ${formatarMoeda(dia.valor_ajuda_custo)}`
+                        : ""
+                    }
                   </small>
 
                 </span>
@@ -249,7 +286,7 @@ async function carregarCorridas() {
 
         <h2>${corrida.nome}</h2>
 
-        <p><strong>Data:</strong>
+        <p><strong>Período:</strong>
           ${dataFormatada}
         </p>
 
@@ -257,20 +294,16 @@ async function carregarCorridas() {
           ${formatarHorario(corrida.horario)}
         </p>
 
-        <p><strong>Local:</strong>
-          ${corrida.local || "Não informado"}
+        <p><strong>Local:</strong><br>
+          ${formatarTextoComQuebra(corrida.local || "Não informado")}
         </p>
 
         <p><strong>Cidade:</strong>
           ${corrida.cidade || "Não informada"}
         </p>
 
-        <p><strong>Distância:</strong>
-          ${corrida.distancia || "Não informada"}
-        </p>
-
-        <p><strong>Ajuda de custo:</strong>
-          ${valorFormatado}
+        <p><strong>Vagas:</strong>
+          ${textoVagas}
         </p>
 
         <p><strong>Prazo de inscrição:</strong>
@@ -517,16 +550,6 @@ async function carregarMinhasInscricoes() {
         return "";
       }
 
-      const valorFormatado =
-        corrida.valor_ajuda_custo !== null
-          ? Number(
-              corrida.valor_ajuda_custo
-            ).toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            })
-          : "Não informado";
-
       return `
         <article class="card-minha-inscricao">
 
@@ -536,7 +559,7 @@ async function carregarMinhasInscricoes() {
 
             <p>
               <strong>Data:</strong>
-              ${formatarData(corrida.data_corrida)}
+              ${formatarPeriodoCorrida(corrida)}
             </p>
 
             <p>
@@ -546,22 +569,12 @@ async function carregarMinhasInscricoes() {
 
             <p>
               <strong>Local:</strong>
-              ${corrida.local || "Não informado"}
+              ${formatarTextoComQuebra(corrida.local || "Não informado")}
             </p>
 
             <p>
               <strong>Cidade:</strong>
               ${corrida.cidade || "Não informada"}
-            </p>
-
-            <p>
-              <strong>Distância:</strong>
-              ${corrida.distancia || "Não informada"}
-            </p>
-
-            <p>
-              <strong>Ajuda de custo:</strong>
-              ${valorFormatado}
             </p>
 
             <div class="minha-disponibilidade">
@@ -608,6 +621,36 @@ function formatarHorario(horario) {
   if (!horario) return "Não informado";
 
   return horario.slice(0, 5);
+}
+
+
+function formatarMoeda(valor) {
+  if (valor === null || valor === undefined || valor === "") {
+    return "Não informado";
+  }
+
+  return Number(valor).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
+}
+
+function formatarPeriodoCorrida(corrida) {
+  const inicio = corrida.data_inicio || corrida.data_corrida;
+  const fim = corrida.data_fim || corrida.data_corrida;
+
+  if (!inicio && !fim) return "Não informado";
+  if (inicio === fim) return formatarData(fim);
+
+  return `${formatarData(inicio)} até ${formatarData(fim)}`;
+}
+
+function formatarTextoComQuebra(texto) {
+  return String(texto || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>");
 }
 
 function formatarStatusInscricao(status) {

@@ -12,68 +12,189 @@ const formNovaCorrida = document.getElementById("form-nova-corrida");
 const salvarCorridaBtn = document.getElementById("salvar-corrida-btn");
 const listaCorridasAdmin = document.getElementById("lista-corridas-admin");
 
-// CAMPOS
+// CAMPOS DA CORRIDA
 const corridaNome = document.getElementById("corrida-nome");
-const corridaData = document.getElementById("corrida-data");
-const corridaHorario = document.getElementById("corrida-horario");
+const corridaDataInicio = document.getElementById("corrida-data-inicio");
+const corridaDataFim = document.getElementById("corrida-data-fim");
 const corridaCidade = document.getElementById("corrida-cidade");
 const corridaLocal = document.getElementById("corrida-local");
-const corridaDistancia = document.getElementById("corrida-distancia");
-const corridaAjuda = document.getElementById("corrida-ajuda");
 const corridaPrazo = document.getElementById("corrida-prazo");
+const corridaVagas = document.getElementById("corrida-vagas");
 const corridaObservacoes = document.getElementById("corrida-observacoes");
 
-// STAFF LOGADO
-const staffLogado = JSON.parse(localStorage.getItem("staffLogado"));
+// CAMPOS DOS DIAS NO CADASTRO
+const novoDiaTipo = document.getElementById("novo-dia-tipo");
+const novoDiaAjuda = document.getElementById("novo-dia-ajuda");
+const novoDiaInicio = document.getElementById("novo-dia-inicio");
+const novoDiaFim = document.getElementById("novo-dia-fim");
+const novoDiaHorarioInicio = document.getElementById("novo-dia-horario-inicio");
+const novoDiaHorarioFim = document.getElementById("novo-dia-horario-fim");
+const adicionarPeriodoBtn = document.getElementById("adicionar-periodo-btn");
+const previewDiasCorrida = document.getElementById("preview-dias-corrida");
 
-if (!staffLogado || staffLogado.is_admin !== true) {
-  alert("Acesso restrito ao administrador.");
-  window.location.href = "login.html";
+const OBSERVACOES_PADRAO = "Traje obrigatório: calça jeans ou preta. Não levar mochila grande. Levar documento com foto e chegar com antecedência ao local informado.";
+let diasCadastroCorrida = [];
+let corridaEmEdicaoId = null;
+
+const staffLogadoRaw = localStorage.getItem("staffLogado");
+let staffLogado = null;
+
+try {
+  staffLogado = staffLogadoRaw ? JSON.parse(staffLogadoRaw) : null;
+} catch (error) {
+  localStorage.removeItem("staffLogado");
+  window.location.href = "index.html";
 }
+
+const isAdmin =
+  staffLogado &&
+  (staffLogado.is_admin === true || staffLogado.is_admin === "true");
+
+if (!isAdmin) {
+  window.location.href = "index.html";
+}
+
+document.getElementById("foto-staff").src =
+  staffLogado.foto_url || "";
+
+document.getElementById("nome-staff").textContent =
+  staffLogado.nome_completo || "";
+
+document.getElementById("cidade-staff").textContent =
+  "Cidade: " + (staffLogado.cidade || "-");
+
+document.getElementById("email-staff").textContent =
+  "E-mail: " + (staffLogado.email || "-");
+
 
 // MOSTRAR / ESCONDER FORM
 novaCorridaBtn.addEventListener("click", function () {
-  formNovaCorrida.classList.toggle("hidden");
+  const estavaFechado = formNovaCorrida.classList.contains("hidden");
+
+  if (estavaFechado) {
+    prepararNovaCorrida();
+    formNovaCorrida.classList.remove("hidden");
+  } else {
+    formNovaCorrida.classList.add("hidden");
+  }
 });
 
-// SALVAR CORRIDA
+adicionarPeriodoBtn.addEventListener("click", function () {
+  adicionarPeriodoCadastro();
+});
+
+// SALVAR / ATUALIZAR CORRIDA
 salvarCorridaBtn.addEventListener("click", async function () {
-  if (!corridaNome.value || !corridaData.value) {
-    alert("Preencha pelo menos o nome e a data da corrida.");
+  if (!corridaNome.value || !corridaDataInicio.value || !corridaDataFim.value) {
+    alert("Preencha nome, data inicial e data final da corrida.");
     return;
+  }
+
+  if (new Date(`${corridaDataFim.value}T00:00:00`) < new Date(`${corridaDataInicio.value}T00:00:00`)) {
+    alert("A data final não pode ser anterior à data inicial.");
+    return;
+  }
+
+  if (!corridaVagas.value || Number(corridaVagas.value) <= 0) {
+    alert("Informe o número de vagas disponíveis.");
+    return;
+  }
+
+  if (diasCadastroCorrida.length === 0) {
+    const confirmar = confirm(
+      "Nenhum dia foi adicionado. Deseja salvar a corrida mesmo assim?"
+    );
+
+    if (!confirmar) return;
   }
 
   salvarCorridaBtn.disabled = true;
-  salvarCorridaBtn.textContent = "Salvando...";
+  salvarCorridaBtn.textContent = corridaEmEdicaoId ? "Atualizando..." : "Salvando...";
 
-  const { error } = await supabaseClient
-    .from("corridas")
-    .insert({
-      nome: corridaNome.value.trim(),
-      data_corrida: corridaData.value,
-      horario: corridaHorario.value || null,
-      cidade: corridaCidade.value.trim() || null,
-      local: corridaLocal.value.trim() || null,
-      distancia: corridaDistancia.value.trim() || null,
-      valor_ajuda_custo: corridaAjuda.value
-        ? Number(corridaAjuda.value)
-        : null,
-      prazo_inscricao: corridaPrazo.value || null,
-      observacoes: corridaObservacoes.value.trim() || null,
-      status: "aberta"
-    });
+  const dadosCorrida = {
+    nome: corridaNome.value.trim(),
+    data_corrida: corridaDataFim.value,
+    data_inicio: corridaDataInicio.value,
+    data_fim: corridaDataFim.value,
+    cidade: corridaCidade.value.trim() || null,
+    local: corridaLocal.value.trim() || null,
+    vagas_total: Number(corridaVagas.value),
+    prazo_inscricao: corridaPrazo.value || null,
+    observacoes: corridaObservacoes.value.trim() || OBSERVACOES_PADRAO
+  };
 
-  if (error) {
-    console.error("Erro ao salvar corrida:", error);
-    alert("Não foi possível salvar a corrida.");
+  let corridaId = corridaEmEdicaoId;
 
-    salvarCorridaBtn.disabled = false;
-    salvarCorridaBtn.textContent = "Salvar corrida";
+  if (corridaEmEdicaoId) {
+    const { error } = await supabaseClient
+      .from("corridas")
+      .update(dadosCorrida)
+      .eq("id", corridaEmEdicaoId);
 
-    return;
+    if (error) {
+      console.error("Erro ao atualizar corrida:", error);
+      alert("Não foi possível atualizar a corrida.");
+      salvarCorridaBtn.disabled = false;
+      salvarCorridaBtn.textContent = "Atualizar corrida";
+      return;
+    }
+
+    const { error: erroExcluirDias } = await supabaseClient
+      .from("corrida_dias")
+      .delete()
+      .eq("corrida_id", corridaEmEdicaoId);
+
+    if (erroExcluirDias) {
+      console.error("Erro ao atualizar dias da corrida:", erroExcluirDias);
+      alert("A corrida foi atualizada, mas não foi possível substituir os dias cadastrados.");
+      salvarCorridaBtn.disabled = false;
+      salvarCorridaBtn.textContent = "Atualizar corrida";
+      return;
+    }
+  } else {
+    const { data: corridaCriada, error } = await supabaseClient
+      .from("corridas")
+      .insert({
+        ...dadosCorrida,
+        status: "aberta"
+      })
+      .select("id")
+      .single();
+
+    if (error) {
+      console.error("Erro ao salvar corrida:", error);
+      alert("Não foi possível salvar a corrida. Confira se as novas colunas foram criadas no Supabase.");
+      salvarCorridaBtn.disabled = false;
+      salvarCorridaBtn.textContent = "Salvar corrida";
+      return;
+    }
+
+    corridaId = corridaCriada.id;
   }
 
-  alert("Corrida cadastrada com sucesso!");
+  if (diasCadastroCorrida.length > 0) {
+    const diasParaInserir = diasCadastroCorrida.map(dia => ({
+      corrida_id: corridaId,
+      nome: dia.nome,
+      data_dia: dia.data_dia,
+      horario_inicio: dia.horario_inicio || null,
+      horario_fim: dia.horario_fim || null,
+      tipo: dia.tipo || null,
+      valor_ajuda_custo: dia.valor_ajuda_custo,
+      vagas: 0
+    }));
+
+    const { error: erroDias } = await supabaseClient
+      .from("corrida_dias")
+      .insert(diasParaInserir);
+
+    if (erroDias) {
+      console.error("Erro ao salvar dias da corrida:", erroDias);
+      alert("A corrida foi salva, mas não foi possível salvar os dias. Confira se a coluna valor_ajuda_custo existe em corrida_dias.");
+    }
+  }
+
+  alert(corridaEmEdicaoId ? "Corrida atualizada com sucesso!" : "Corrida cadastrada com sucesso!");
 
   limparFormularioCorrida();
   formNovaCorrida.classList.add("hidden");
@@ -133,28 +254,20 @@ async function carregarCorridasAdmin() {
 
         <h3>${corrida.nome}</h3>
 
-        <p><strong>Data:</strong>
-          ${formatarData(corrida.data_corrida)}
-        </p>
-
-        <p><strong>Horário:</strong>
-          ${formatarHorario(corrida.horario)}
+        <p><strong>Período:</strong>
+          ${formatarPeriodoCorrida(corrida)}
         </p>
 
         <p><strong>Cidade:</strong>
           ${corrida.cidade || "Não informada"}
         </p>
 
-        <p><strong>Local:</strong>
-          ${corrida.local || "Não informado"}
+        <p><strong>Local:</strong><br>
+          ${formatarTextoComQuebra(corrida.local || "Não informado")}
         </p>
 
-        <p><strong>Distância:</strong>
-          ${corrida.distancia || "Não informada"}
-        </p>
-
-        <p><strong>Ajuda de custo:</strong>
-          ${formatarMoeda(corrida.valor_ajuda_custo)}
+        <p><strong>Vagas:</strong>
+          ${corrida.vagas_total || "Não informadas"}
         </p>
 
         <p><strong>Prazo:</strong>
@@ -170,49 +283,8 @@ async function carregarCorridasAdmin() {
         </p>
 
         <div class="gerenciar-dias">
-
-          <h4>Dias da corrida</h4>
-
-          <select
-            id="dia-tipo-${corrida.id}"
-            class="campo-dia-corrida"
-          >
-            <option value="Entrega de kit">
-              Entrega de kit
-            </option>
-
-            <option value="Corrida">
-              Corrida
-            </option>
-          </select>
-
-          <input
-            type="date"
-            id="dia-data-${corrida.id}"
-          >
-
-          <input
-            type="time"
-            id="dia-inicio-${corrida.id}"
-          >
-
-          <input
-            type="time"
-            id="dia-fim-${corrida.id}"
-          >
-<!--
-          <input
-            type="number"
-            id="dia-vagas-${corrida.id}"
-            placeholder="Vagas"
-          >
--->
-          <button onclick="adicionarDiaCorrida(${corrida.id})">
-            Adicionar dia
-          </button>
-
+          <h4>Dias cadastrados</h4>
           <div id="dias-corrida-${corrida.id}"></div>
-
         </div>
 
         <div class="admin-card-footer">
@@ -220,6 +292,21 @@ async function carregarCorridasAdmin() {
           <span class="admin-status ${corrida.status}">
             ${corrida.status}
           </span>
+
+          <button
+            class="botao-editar-corrida botao-admin-secundario"
+            data-corrida-id="${corrida.id}"
+          >
+            Editar corrida
+          </button>
+
+          <button
+            class="botao-excluir-corrida delete-btn"
+            data-corrida-id="${corrida.id}"
+            data-total-inscritos="${totalInscritos}"
+          >
+            Excluir corrida
+          </button>
 
           <button
             class="botao-ver-inscritos"
@@ -262,9 +349,166 @@ async function carregarCorridasAdmin() {
     carregarDiasCorrida(corrida.id);
   });
 
+ativarBotoesEditarCorrida();
+ativarBotoesExcluirCorrida();
 ativarBotoesVerInscritos();
 ativarBotoesExportarPlanilha();
 ativarBotoesStatusCorrida();
+}
+
+// EDITAR CORRIDA
+function ativarBotoesEditarCorrida() {
+  const botoes = document.querySelectorAll(".botao-editar-corrida");
+
+  botoes.forEach(botao => {
+    botao.addEventListener("click", async function () {
+      const corridaId = Number(botao.dataset.corridaId);
+      await carregarCorridaParaEdicao(corridaId);
+    });
+  });
+}
+
+async function carregarCorridaParaEdicao(corridaId) {
+  const { data: corrida, error } = await supabaseClient
+    .from("corridas")
+    .select("*")
+    .eq("id", corridaId)
+    .single();
+
+  if (error || !corrida) {
+    console.error("Erro ao carregar corrida para edição:", error);
+    alert("Não foi possível carregar a corrida para edição.");
+    return;
+  }
+
+  const { data: dias, error: erroDias } = await supabaseClient
+    .from("corrida_dias")
+    .select("*")
+    .eq("corrida_id", corridaId)
+    .order("data_dia", { ascending: true });
+
+  if (erroDias) {
+    console.error("Erro ao carregar dias para edição:", erroDias);
+    alert("A corrida foi carregada, mas os dias não puderam ser carregados.");
+  }
+
+  corridaEmEdicaoId = corridaId;
+
+  corridaNome.value = corrida.nome || "";
+  corridaDataInicio.value = corrida.data_inicio || corrida.data_corrida || "";
+  corridaDataFim.value = corrida.data_fim || corrida.data_corrida || "";
+  corridaCidade.value = corrida.cidade || "";
+  corridaLocal.value = corrida.local || "";
+  corridaPrazo.value = corrida.prazo_inscricao || "";
+  corridaVagas.value = corrida.vagas_total || "";
+  corridaObservacoes.value = corrida.observacoes || OBSERVACOES_PADRAO;
+
+  diasCadastroCorrida = (dias || []).map(dia => ({
+    nome: dia.nome,
+    data_dia: dia.data_dia,
+    horario_inicio: dia.horario_inicio,
+    horario_fim: dia.horario_fim,
+    tipo: dia.tipo,
+    valor_ajuda_custo: dia.valor_ajuda_custo
+  }));
+
+  renderizarPreviewDiasCadastro();
+
+  salvarCorridaBtn.textContent = "Atualizar corrida";
+  formNovaCorrida.classList.remove("hidden");
+  formNovaCorrida.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// EXCLUIR CORRIDA
+function ativarBotoesExcluirCorrida() {
+  const botoes = document.querySelectorAll(".botao-excluir-corrida");
+
+  botoes.forEach(botao => {
+    botao.addEventListener("click", async function () {
+      const corridaId = Number(botao.dataset.corridaId);
+      const totalInscritos = Number(botao.dataset.totalInscritos || 0);
+      await excluirCorrida(corridaId, totalInscritos);
+    });
+  });
+}
+
+async function excluirCorrida(corridaId, totalInscritos) {
+  const mensagemConfirmacao = totalInscritos > 0
+    ? "Esta corrida possui inscritos. Ao excluir, todas as inscrições e disponibilidades vinculadas a esta corrida também serão removidas. O cadastro dos staffs NÃO será apagado. Deseja continuar?"
+    : "Tem certeza que deseja excluir esta corrida? Essa ação também removerá os dias cadastrados para ela.";
+
+  const confirmar = confirm(mensagemConfirmacao);
+
+  if (!confirmar) return;
+
+  const { data: inscricoesVinculadas, error: erroBuscarInscricoes } = await supabaseClient
+    .from("inscricoes")
+    .select("id")
+    .eq("corrida_id", corridaId);
+
+  if (erroBuscarInscricoes) {
+    console.error("Erro ao buscar inscrições vinculadas:", erroBuscarInscricoes);
+    alert("Não foi possível verificar as inscrições vinculadas à corrida.");
+    return;
+  }
+
+  const inscricaoIds = inscricoesVinculadas
+    ? inscricoesVinculadas.map(inscricao => inscricao.id)
+    : [];
+
+  if (inscricaoIds.length > 0) {
+    const { error: erroDisponibilidades } = await supabaseClient
+      .from("inscricao_disponibilidades")
+      .delete()
+      .in("inscricao_id", inscricaoIds);
+
+    if (erroDisponibilidades) {
+      console.error("Erro ao excluir disponibilidades:", erroDisponibilidades);
+      alert("Não foi possível excluir as disponibilidades vinculadas à corrida.");
+      return;
+    }
+
+    const { error: erroInscricoes } = await supabaseClient
+      .from("inscricoes")
+      .delete()
+      .eq("corrida_id", corridaId);
+
+    if (erroInscricoes) {
+      console.error("Erro ao excluir inscrições:", erroInscricoes);
+      alert("Não foi possível excluir as inscrições vinculadas à corrida.");
+      return;
+    }
+  }
+
+  const { error: erroDias } = await supabaseClient
+    .from("corrida_dias")
+    .delete()
+    .eq("corrida_id", corridaId);
+
+  if (erroDias) {
+    console.error("Erro ao excluir dias da corrida:", erroDias);
+    alert("Não foi possível excluir os dias vinculados à corrida.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("corridas")
+    .delete()
+    .eq("id", corridaId);
+
+  if (error) {
+    console.error("Erro ao excluir corrida:", error);
+    alert("Não foi possível excluir a corrida.");
+    return;
+  }
+
+  if (corridaEmEdicaoId === corridaId) {
+    limparFormularioCorrida();
+    formNovaCorrida.classList.add("hidden");
+  }
+
+  alert("Corrida excluída com sucesso.");
+  carregarCorridasAdmin();
 }
 
 // VER INSCRITOS
@@ -730,6 +974,105 @@ async function atualizarStatusInscricao(
   );
 }
 
+
+function adicionarPeriodoCadastro() {
+  if (!novoDiaInicio.value || !novoDiaFim.value) {
+    alert("Informe a data inicial e final do período.");
+    return;
+  }
+
+  const inicio = new Date(`${novoDiaInicio.value}T00:00:00`);
+  const fim = new Date(`${novoDiaFim.value}T00:00:00`);
+
+  if (fim < inicio) {
+    alert("A data final do período não pode ser anterior à data inicial.");
+    return;
+  }
+
+  const tipo = novoDiaTipo.value;
+  const ajuda = novoDiaAjuda.value ? Number(novoDiaAjuda.value) : null;
+  const horarioInicio = novoDiaHorarioInicio.value || null;
+  const horarioFim = novoDiaHorarioFim.value || null;
+
+  const novosDias = [];
+  const dataAtual = new Date(inicio);
+
+  while (dataAtual <= fim) {
+    const dataISO = dataAtual.toISOString().slice(0, 10);
+
+    novosDias.push({
+      nome: `${tipo} - ${obterDiaSemana(dataISO)}`,
+      data_dia: dataISO,
+      horario_inicio: horarioInicio,
+      horario_fim: horarioFim,
+      tipo: tipo,
+      valor_ajuda_custo: ajuda
+    });
+
+    dataAtual.setDate(dataAtual.getDate() + 1);
+  }
+
+  diasCadastroCorrida = [
+    ...diasCadastroCorrida,
+    ...novosDias
+  ].sort((a, b) => a.data_dia.localeCompare(b.data_dia));
+
+  renderizarPreviewDiasCadastro();
+
+  novoDiaInicio.value = "";
+  novoDiaFim.value = "";
+}
+
+function removerDiaCadastro(index) {
+  diasCadastroCorrida.splice(index, 1);
+  renderizarPreviewDiasCadastro();
+}
+
+function renderizarPreviewDiasCadastro() {
+  if (!previewDiasCorrida) return;
+
+  if (diasCadastroCorrida.length === 0) {
+    previewDiasCorrida.innerHTML = "<p>Nenhum dia adicionado ainda.</p>";
+    return;
+  }
+
+previewDiasCorrida.innerHTML = diasCadastroCorrida.map((dia, index) => `
+  <div class="dia-corrida-card">
+    <p><strong>${dia.nome}</strong></p>
+
+    <p>
+      <strong>Data:</strong>
+      ${formatarData(dia.data_dia)}
+    </p>
+
+    <p>
+      <strong>Horário:</strong>
+      ${formatarHorario(dia.horario_inicio)}
+      até
+      ${formatarHorario(dia.horario_fim)}
+    </p>
+
+    <p>
+      <strong>Tipo:</strong>
+      ${dia.tipo || "-"}
+    </p>
+
+    <p>
+      <strong>Ajuda de custo:</strong>
+      ${formatarMoeda(dia.valor_ajuda_custo)}
+    </p>
+
+    <button
+      type="button"
+      class="delete-btn"
+      onclick="removerDiaCadastro(${index})"
+    >
+      Remover
+    </button>
+  </div>
+`).join("");
+}
+
 // CARREGAR DIAS
 async function carregarDiasCorrida(corridaId) {
 
@@ -790,11 +1133,13 @@ async function carregarDiasCorrida(corridaId) {
       </p>
 
       <p>
-        <strong>Vagas:</strong>
-        ${dia.vagas || 0}
+        <strong>Ajuda de custo:</strong>
+        ${formatarMoeda(dia.valor_ajuda_custo)}
       </p>
 
       <button
+        type="button"
+        class="delete-btn"
         onclick="excluirDiaCorrida(${dia.id}, ${corridaId})"
       >
         Excluir dia
@@ -918,16 +1263,32 @@ async function excluirDiaCorrida(
 }
 
 // LIMPAR FORM
+function prepararNovaCorrida() {
+  corridaEmEdicaoId = null;
+  limparFormularioCorrida();
+  salvarCorridaBtn.textContent = "Salvar corrida";
+}
+
 function limparFormularioCorrida() {
+  corridaEmEdicaoId = null;
   corridaNome.value = "";
-  corridaData.value = "";
-  corridaHorario.value = "";
+  corridaDataInicio.value = "";
+  corridaDataFim.value = "";
   corridaCidade.value = "";
   corridaLocal.value = "";
-  corridaDistancia.value = "";
-  corridaAjuda.value = "";
   corridaPrazo.value = "";
-  corridaObservacoes.value = "";
+  corridaVagas.value = "";
+  corridaObservacoes.value = OBSERVACOES_PADRAO;
+
+  novoDiaTipo.value = "Entrega de kit";
+  novoDiaAjuda.value = "";
+  novoDiaInicio.value = "";
+  novoDiaFim.value = "";
+  novoDiaHorarioInicio.value = "";
+  novoDiaHorarioFim.value = "";
+  diasCadastroCorrida = [];
+  renderizarPreviewDiasCadastro();
+  salvarCorridaBtn.textContent = "Salvar corrida";
 }
 
 // FORMATADORES
@@ -960,6 +1321,25 @@ function formatarMoeda(valor) {
       currency: "BRL"
     }
   );
+}
+
+
+function formatarPeriodoCorrida(corrida) {
+  const inicio = corrida.data_inicio || corrida.data_corrida;
+  const fim = corrida.data_fim || corrida.data_corrida;
+
+  if (!inicio && !fim) return "Não informado";
+  if (inicio === fim) return formatarData(fim);
+
+  return `${formatarData(inicio)} até ${formatarData(fim)}`;
+}
+
+function formatarTextoComQuebra(texto) {
+  return String(texto || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>");
 }
 
 function formatarStatusInscricao(status) {
@@ -1405,3 +1785,12 @@ for (let C = 0; C <= 5; ++C) {
 // INICIALIZAÇÃO
 inserirEstilosPrioridadeAdmin();
 carregarCorridasAdmin();
+
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", function () {
+    localStorage.removeItem("staffLogado");
+    window.location.href = "index.html";
+  });
+}

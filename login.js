@@ -8,6 +8,9 @@ const cpf = document.getElementById("cpf");
 const nascimento = document.getElementById("nascimento");
 const loginBtn = document.getElementById("loginBtn");
 
+const adminPasswordField = document.getElementById("adminPasswordField");
+const adminPassword = document.getElementById("adminPassword");
+
 function onlyNumbers(value) {
   return value.replace(/\D/g, "");
 }
@@ -54,6 +57,7 @@ form.addEventListener("submit", async function (event) {
   loginBtn.textContent = "Entrando...";
 
   try {
+
     const dataNascimento = dateToSupabase(nascimento.value);
 
     if (!dataNascimento) {
@@ -68,18 +72,45 @@ form.addEventListener("submit", async function (event) {
       .single();
 
     if (error || !data) {
-      throw new Error("Cadastro não encontrado.");
+      window.location.href = "cadastro.html";
+      return;
     }
 
-localStorage.setItem("staffLogado", JSON.stringify({
-  id: data.id,
-  nome_completo: data.nome_completo,
-  cpf: data.cpf,
-  email: data.email,
-  cidade: data.cidade,
-  foto_url: data.foto_url,
-  is_admin: data.is_admin
-}));
+    if (data.is_admin) {
+
+      adminPasswordField.classList.remove("hidden");
+
+      if (!adminPassword.value) {
+        throw new Error("Digite a senha de administrador.");
+      }
+
+      if (adminPassword.value !== data.admin_password) {
+        throw new Error("Senha de administrador incorreta.");
+      }
+
+      localStorage.setItem("staffLogado", JSON.stringify({
+        id: data.id,
+        nome_completo: data.nome_completo,
+        cpf: data.cpf,
+        email: data.email,
+        cidade: data.cidade,
+        foto_url: data.foto_url,
+        is_admin: data.is_admin
+      }));
+
+      window.location.href = "admin.html";
+      return;
+    }
+
+    localStorage.setItem("staffLogado", JSON.stringify({
+      id: data.id,
+      nome_completo: data.nome_completo,
+      cpf: data.cpf,
+      email: data.email,
+      cidade: data.cidade,
+      foto_url: data.foto_url,
+      is_admin: data.is_admin
+    }));
 
     window.location.href = "corridas.html";
 

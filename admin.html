@@ -14,16 +14,40 @@
 
   <main class="pagina-admin">
 
+    <section id="card-staff" class="card-staff">
+
+  <div class="foto-staff-wrapper">
+    <img id="foto-staff" class="foto-staff" src="" alt="Foto do staff">
+  </div>
+
+  <div class="dados-staff">
+    <p class="label-card">Administrador logado</p>
+
+    <h2 id="nome-staff"></h2>
+
+    <p id="cidade-staff"></p>
+
+    <p id="email-staff"></p>
+  </div>
+
+  <button id="logoutBtn" class="logout-btn">
+    Sair
+  </button>
+
+</section>
+
     <section class="cabecalho-corridas">
       <h1>Painel Administrativo</h1>
       <p>Gerencie corridas e inscrições do sistema.</p>
     </section>
 
-    <section class="admin-acoes">
-      <button id="nova-corrida-btn" class="submit-btn">
-        Nova corrida
-      </button>
-    </section>
+<section class="admin-acoes">
+
+  <button id="nova-corrida-btn" class="submit-btn btn-admin">
+    Nova corrida
+  </button>
+
+</section>
 
     <section id="form-nova-corrida" class="form-admin hidden">
 
@@ -38,47 +62,90 @@
           <div class="field">
             <label>Nome da corrida</label>
             <input type="text" id="corrida-nome">
-          </div>
-
-          <div class="field">
-            <label>Data</label>
-            <input type="date" id="corrida-data">
-          </div>
-
-          <div class="field">
-            <label>Horário</label>
-            <input type="time" id="corrida-horario">
-          </div>
-
-          <div class="field">
-            <label>Cidade</label>
+              <label>Cidade</label>
             <input type="text" id="corrida-cidade">
           </div>
 
           <div class="field">
-            <label>Local</label>
-            <input type="text" id="corrida-local">
+            <label>Início do evento / entrega de kit</label>
+            <input type="date" id="corrida-data-inicio">
           </div>
 
           <div class="field">
-            <label>Distância</label>
-            <input type="text" id="corrida-distancia">
+            <label>Data da corrida / fim do evento</label>
+            <input type="date" id="corrida-data-fim">
           </div>
 
           <div class="field">
-            <label>Ajuda de custo</label>
-            <input type="number" id="corrida-ajuda">
-          </div>
-
-          <div class="field">
-            <label>Prazo de inscrição</label>
+            <labbel>Prazo de inscrição</label>
             <input type="date" id="corrida-prazo">
+          </div>
+
+          <div class="field">
+            <label>Número de vagas</label>
+            <input type="number" id="corrida-vagas" min="1" placeholder="Ex.: 30">
           </div>
 
         </div>
 
         <div class="field">
+          <label>Local completo</label>
+          <textarea id="corrida-local" rows="4" placeholder="Nome do local, endereço completo, portão/acesso e ponto de referência"></textarea>
+        </div>
+
+        <div class="field">
           <label>Observações</label>
+          <textarea id="corrida-observacoes" rows="3">Traje obrigatório: calça jeans ou preta. Não levar mochila grande. Levar documento com foto e chegar com antecedência ao local informado.</textarea>
+        </div>
+
+        <h2 class="section-title">
+          Cadastro de dias da corrida
+        </h2>
+
+        <div class="grid">
+
+          <div class="field">
+            <label>Tipo do período</label>
+            <select id="novo-dia-tipo">
+              <option value="Entrega de kit">Entrega de kit</option>
+              <option value="Corrida">Dia da corrida</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Ajuda de custo do período</label>
+            <input type="number" id="novo-dia-ajuda" min="0" step="0.01" placeholder="Ex.: 120">
+          </div>
+
+          <div class="field">
+            <label>Data inicial</label>
+            <input type="date" id="novo-dia-inicio">
+          </div>
+
+          <div class="field">
+            <label>Data final</label>
+            <input type="date" id="novo-dia-fim">
+          </div>
+
+          <div class="field">
+            <label>Horário início</label>
+            <input type="time" id="novo-dia-horario-inicio">
+          </div>
+
+          <div class="field">
+            <label>Horário fim</label>
+            <input type="time" id="novo-dia-horario-fim">
+          </div>
+
+        </div>
+
+        <button id="adicionar-periodo-btn" class="botao-admin-secundario" type="button">
+          Adicionar período
+        </button>
+
+        <div id="preview-dias-corrida" class="preview-dias-corrida">
+          <p>Nenhum dia adicionado ainda.</p>
+  <label>Observações</label>
           <textarea id="corrida-observacoes"></textarea>
         </div>
 
@@ -104,7 +171,7 @@
     </section>
 
   </main>
-  
+
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <script src="admin.js"></script>
 </body>

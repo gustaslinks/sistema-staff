@@ -1,0 +1,177 @@
+<DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Staffs</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Cadastro Geral de Staffs</h1>
+      <p>Realize seu cadastro apenas uma vez para participar das próximas corridas e eventos. Seus dados ficarão salvos para futuras convocações.</p>
+    </div>
+<form class="form-area" id="staffForm" novalidate>
+
+  <div class="section-title">Dados pessoais</div>
+
+  <div class="field" id="fieldCpf">
+    <label for="cpf">CPF</label>
+
+    <input
+      id="cpf"
+      type="text"
+      placeholder="000.000.000-00"
+      maxlength="14"
+      inputmode="numeric"
+      autocomplete="off"
+      required
+    />
+
+    <div class="error" id="cpfError">
+      CPF inválido.
+    </div>
+
+    <div class="helper">
+      O CPF será salvo como texto para preservar zeros no início.
+    </div>
+
+    <button
+      type="button"
+      id="btnIrLogin"
+      class="login-shortcut hidden"
+    >
+      Já tenho cadastro. Entrar
+    </button>
+
+  </div>
+
+  <div class="field" id="fieldNome">
+    <label for="nome">Nome completo</label>
+
+    <input
+      id="nome"
+      type="text"
+      placeholder="Digite seu nome completo"
+      autocomplete="name"
+      required
+    />
+
+    <div class="error">
+      Digite nome e sobrenome, sem espaços no começo ou no final.
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <div class="field" id="fieldRg">
+      <label for="rg">RG</label>
+
+      <input
+        id="rg"
+        type="text"
+        placeholder="00.000.000-0"
+        maxlength="12"
+        inputmode="text"
+        autocomplete="off"
+        required
+      />
+
+      <div class="error">
+        Preencha o RG. O dígito X é aceito.
+      </div>
+
+      <div class="helper">
+        O RG será salvo como texto para preservar números, pontos e dígito X.
+      </div>
+    </div>
+
+    <div class="field" id="fieldNascimento">
+      <label for="nascimento">Data de nascimento</label>
+
+   
+<input
+  type="text"
+  id="nascimento"
+  placeholder="dd/mm/aaaa"
+  maxlength="10"
+  inputmode="numeric"
+  required
+>
+      <div class="error">
+        Informe uma data válida. Idade mínima: 16 anos.
+      </div>
+    </div>
+
+  </div>
+
+        <div class="field" id="fieldTelefone">
+          <label for="telefone">Telefone / WhatsApp</label>
+          <input id="telefone" type="tel" placeholder="(11) 99999-9999" maxlength="15" inputmode="numeric" autocomplete="tel" required />
+          <div class="error">Digite um telefone válido com DDD.</div>
+        </div>
+
+      <div class="grid">
+        <div class="field" id="fieldEmail">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" placeholder="seuemail@email.com" autocomplete="email" required />
+          <div class="error">Digite um e-mail válido.</div>
+        </div>
+
+        <div class="field" id="fieldCidade">
+          <label for="cidade">Cidade</label>
+          <input id="cidade" type="text" placeholder="Sua cidade" autocomplete="address-level2" required />
+          <div class="error">Digite sua cidade, sem espaços no começo ou no final.</div>
+        </div>
+      </div>
+
+      <div class="field" id="fieldIndicado">
+        <label for="indicado">Quem te indicou?</label>
+        <input id="indicado" type="text" placeholder="Nome da pessoa que indicou você" required />
+        <div class="error">Informe quem te indicou. Caso ninguém tenha indicado, digite "Não tive indicação".</div>
+      </div>
+
+      <div clasection-titleitle">Chave PIX</div>
+
+      <div class="pix-options">
+        <label class="pix-card"><input type="radio" name="pixTipo" value="cpf" checked /><div><strong>CPF</strong><span id="pixCpfPreview">Usar o CPF deste cadastro</span></div></label>
+        <label class="pix-card"><input type="radio" name="pixTipo" value="email" /><div><strong>E-mail</strong><span id="pixEmailPreview">Usar o e-mail deste cadastro</span></div></label>
+        <label class="pix-card"><input type="radio" name="pixTipo" value="telefone" /><div><strong>Telefone</strong><span id="pixTelefonePreview">Usar o telefone deste cadastro</span></div></label>
+      </div>
+
+      <label class="pix-card" style="margin-bottom:18px;"><input type="radio" name="pixTipo" value="outro" /><div><strong>Outra chave PIX</strong><span>Use esta opção se sua chave for diferente dos dados acima.</span></div></label>
+
+      <div class="field hidden" id="fieldPixOutro">
+        <label for="pixOutro">Digite sua chave PIX</label>
+        <input id="pixOutro" type="text" placeholder="CPF, telefone, e-mail ou chave aleatória" autocomplete="off" />
+        <div class="error">Digite uma chave PIX válida.</div>
+      </div>
+
+      <div class="section-title">Foto para cadastro</div>
+
+      <div class="field" id="fieldFoto">
+        <label for="foto">Foto</label>
+        <input id="foto" type="file" accept="image/png, image/jpeg" required />
+        <div class="error">Envie uma foto JPG ou PNG.</div>
+        <div class="file-preview" id="fotoPreview"><img id="fotoPreviewImg" src="" alt="Prévia da foto" /><div><strong>Foto selecionada</strong><br /><span id="fotoPreviewText"></span></div></div>
+      </div>
+
+      <div class="field" id="fieldObservacoes" style="margin-top: 25px;">
+        <label for="observacoes">Observações</label>
+        <textarea id="observacoes" rows="4" placeholder="Alguma informação importante? Caso não tenha, digite: Sem observações" required></textarea>
+        <div class="error">Preencha este campo. Caso não tenha observações, digite "Sem observações".</div>
+      </div>
+
+      <div class="checkbox" id="fieldTermos"><input id="termos" type="checkbox" required /><label for="termos">Declaro que as informações fornecidas são verdadeiras e autorizo o uso dos meus dados para cadastro e convocação em eventos.</label></div>
+
+      <button class="submit-btn" id="submitBtn" type="submit">Finalizar cadastro</button>
+      <div class="success-message" id="successMessage">Cadastro enviado com sucesso. Os dados foram salvos no Supabase.</div>
+      <div class="footer-text">Sistema de cadastro de staffs • Versão integrada ao Supabase</div>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>
