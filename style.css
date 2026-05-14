@@ -1393,8 +1393,10 @@ body {
 }
 
 .form-admin textarea#corrida-observacoes {
-  min-height: 90px;
-  line-height: 1.45;
+  min-height: 180px;
+  line-height: 1.5;
+  resize: vertical;
+  overflow-y: hidden;
 }
 
 @media (max-width: 900px) {
@@ -1505,3 +1507,15 @@ body {
   }
 }
 
+
+
+/* =========================================================
+   ALTURA OBSERVAÇÕES - ADMIN
+========================================================= */
+
+#corrida-observacoes {
+  min-height: 180px !important;
+  line-height: 1.5 !important;
+  resize: vertical;
+  overflow-y: hidden;
+}
