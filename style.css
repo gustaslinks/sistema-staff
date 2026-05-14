@@ -1519,3 +1519,89 @@ body {
   resize: vertical;
   overflow-y: hidden;
 }
+
+/* =========================================================
+   AJUSTES ADMIN - UX CORRIDAS
+========================================================= */
+
+.form-admin .field-spaced {
+  margin-top: 26px !important;
+}
+
+.corrida-status-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid #bbf7d0;
+  background: #dcfce7;
+  color: #14532d;
+}
+
+.corrida-status-card strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.corrida-status-card span {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.corrida-status-card.encerrada {
+  border-color: #fecaca;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.admin-card-footer {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch !important;
+  gap: 12px !important;
+  margin-top: 22px !important;
+}
+
+.admin-card-footer .admin-status {
+  grid-column: 1 / -1;
+  justify-content: center;
+  width: fit-content;
+  margin: 0 0 4px !important;
+}
+
+.admin-card-footer button,
+.admin-card-footer .botao-admin-secundario,
+.admin-card-footer .delete-btn,
+.admin-card-footer .botao-ver-inscritos,
+.admin-card-footer .botao-alterar-status-corrida {
+  width: 100% !important;
+  min-height: 48px;
+  margin: 0 !important;
+  text-align: center;
+}
+
+.botao-toggle-dias {
+  width: 100%;
+  margin-bottom: 16px;
+  background: #111827 !important;
+}
+
+.botao-toggle-dias:hover {
+  background: #374151 !important;
+}
+
+.dias-corrida-container.hidden {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .admin-card-footer {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-card-footer .admin-status {
+    width: 100%;
+  }
+}

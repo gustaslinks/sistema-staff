@@ -16,7 +16,6 @@ const listaCorridasAdmin = document.getElementById("lista-corridas-admin");
 const corridaNome = document.getElementById("corrida-nome");
 const corridaDataInicio = document.getElementById("corrida-data-inicio");
 const corridaDataFim = document.getElementById("corrida-data-fim");
-const corridaCidade = document.getElementById("corrida-cidade");
 const corridaLocal = document.getElementById("corrida-local");
 const corridaPrazo = document.getElementById("corrida-prazo");
 const corridaVagas = document.getElementById("corrida-vagas");
@@ -116,7 +115,7 @@ salvarCorridaBtn.addEventListener("click", async function () {
     data_corrida: corridaDataFim.value,
     data_inicio: corridaDataInicio.value,
     data_fim: corridaDataFim.value,
-    cidade: corridaCidade.value.trim() || null,
+    cidade: null,
     local: corridaLocal.value.trim() || null,
     vagas_total: Number(corridaVagas.value),
     prazo_inscricao: corridaPrazo.value || null,
@@ -205,6 +204,44 @@ salvarCorridaBtn.addEventListener("click", async function () {
   carregarCorridasAdmin();
 });
 
+
+function contarInscritosValidos(inscricoes, corridaId) {
+  if (!inscricoes) return 0;
+
+  return inscricoes.filter(inscricao => {
+    return inscricao.corrida_id === corridaId && inscricao.status !== "cancelado";
+  }).length;
+}
+
+async function encerrarCorridasLotadas(corridas, inscricoes) {
+  const corridasLotadas = (corridas || []).filter(corrida => {
+    const vagasTotal = Number(corrida.vagas_total || 0);
+    const totalInscritos = contarInscritosValidos(inscricoes, corrida.id);
+
+    return corrida.status === "aberta" && vagasTotal > 0 && totalInscritos >= vagasTotal;
+  });
+
+  if (corridasLotadas.length === 0) return;
+
+  const ids = corridasLotadas.map(corrida => corrida.id);
+
+  const { error } = await supabaseClient
+    .from("corridas")
+    .update({ status: "encerrada" })
+    .in("id", ids);
+
+  if (error) {
+    console.error("Erro ao encerrar corridas lotadas:", error);
+    return;
+  }
+
+  corridas.forEach(corrida => {
+    if (ids.includes(corrida.id)) {
+      corrida.status = "encerrada";
+    }
+  });
+}
+
 // LISTAR CORRIDAS
 async function carregarCorridasAdmin() {
   listaCorridasAdmin.innerHTML = `<p>Carregando corridas...</p>`;
@@ -233,7 +270,7 @@ async function carregarCorridasAdmin() {
   const { data: inscricoes, error: erroInscricoes } =
     await supabaseClient
       .from("inscricoes")
-      .select("corrida_id");
+      .select("corrida_id, status");
 
   if (erroInscricoes) {
     console.error(
@@ -242,24 +279,27 @@ async function carregarCorridasAdmin() {
     );
   }
 
+  await encerrarCorridasLotadas(corridas, inscricoes || []);
+
   listaCorridasAdmin.innerHTML = corridas.map(corrida => {
-    const totalInscritos = inscricoes
-      ? inscricoes.filter(
-          inscricao => inscricao.corrida_id === corrida.id
-        ).length
-      : 0;
+    const totalInscritos = contarInscritosValidos(inscricoes || [], corrida.id);
+    const vagasTotal = Number(corrida.vagas_total || 0);
+    const textoVagas = vagasTotal > 0
+      ? `${totalInscritos} de ${vagasTotal} vagas preenchidas`
+      : `${totalInscritos} inscrito(s)`;
 
     return `
       <article class="card-corrida-admin">
 
         <h3>${corrida.nome}</h3>
 
+        <div class="corrida-status-card ${corrida.status}">
+          <strong>${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
+          <span>${textoVagas}</span>
+        </div>
+
         <p><strong>Período:</strong>
           ${formatarPeriodoCorrida(corrida)}
-        </p>
-
-        <p><strong>Cidade:</strong>
-          ${corrida.cidade || "Não informada"}
         </p>
 
         <p><strong>Local:</strong><br>
@@ -267,7 +307,7 @@ async function carregarCorridasAdmin() {
         </p>
 
         <p><strong>Vagas:</strong>
-          ${corrida.vagas_total || "Não informadas"}
+          ${vagasTotal > 0 ? vagasTotal : "Não informadas"}
         </p>
 
         <p><strong>Prazo:</strong>
@@ -283,8 +323,15 @@ async function carregarCorridasAdmin() {
         </p>
 
         <div class="gerenciar-dias">
-          <h4>Dias cadastrados</h4>
-          <div id="dias-corrida-${corrida.id}"></div>
+          <button
+            type="button"
+            class="botao-toggle-dias"
+            data-corrida-id="${corrida.id}"
+          >
+            Mostrar dias cadastrados
+          </button>
+
+          <div id="dias-corrida-${corrida.id}" class="dias-corrida-container hidden"></div>
         </div>
 
         <div class="admin-card-footer">
@@ -354,6 +401,30 @@ ativarBotoesExcluirCorrida();
 ativarBotoesVerInscritos();
 ativarBotoesExportarPlanilha();
 ativarBotoesStatusCorrida();
+ativarBotoesToggleDias();
+}
+
+function ativarBotoesToggleDias() {
+  const botoes = document.querySelectorAll(".botao-toggle-dias");
+
+  botoes.forEach(botao => {
+    botao.addEventListener("click", function () {
+      const corridaId = botao.dataset.corridaId;
+      const container = document.getElementById(`dias-corrida-${corridaId}`);
+
+      if (!container) return;
+
+      const fechado = container.classList.contains("hidden");
+
+      if (fechado) {
+        container.classList.remove("hidden");
+        botao.textContent = "Ocultar dias cadastrados";
+      } else {
+        container.classList.add("hidden");
+        botao.textContent = "Mostrar dias cadastrados";
+      }
+    });
+  });
 }
 
 // EDITAR CORRIDA
@@ -397,7 +468,6 @@ async function carregarCorridaParaEdicao(corridaId) {
   corridaNome.value = corrida.nome || "";
   corridaDataInicio.value = corrida.data_inicio || corrida.data_corrida || "";
   corridaDataFim.value = corrida.data_fim || corrida.data_corrida || "";
-  corridaCidade.value = corrida.cidade || "";
   corridaLocal.value = corrida.local || "";
   corridaPrazo.value = corrida.prazo_inscricao || "";
   corridaVagas.value = corrida.vagas_total || "";
@@ -1274,7 +1344,6 @@ function limparFormularioCorrida() {
   corridaNome.value = "";
   corridaDataInicio.value = "";
   corridaDataFim.value = "";
-  corridaCidade.value = "";
   corridaLocal.value = "";
   corridaPrazo.value = "";
   corridaVagas.value = "";

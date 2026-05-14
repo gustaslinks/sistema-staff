@@ -59,6 +59,29 @@ botaoAdmin.addEventListener("click", function () {
 // CORRIDAS DISPONÍVEIS
 // =========================================================
 
+async function encerrarCorridasLotadas(corridas, inscritosPorCorrida) {
+  const corridasLotadas = (corridas || []).filter(corrida => {
+    const vagasTotal = Number(corrida.vagas_total || 0);
+    const totalInscritos = inscritosPorCorrida[corrida.id] || 0;
+
+    return corrida.status === "aberta" && vagasTotal > 0 && totalInscritos >= vagasTotal;
+  });
+
+  if (corridasLotadas.length === 0) return;
+
+  const ids = corridasLotadas.map(corrida => corrida.id);
+
+  const { error } = await supabaseClient
+    .from("corridas")
+    .update({ status: "encerrada" })
+    .in("id", ids);
+
+  if (error) {
+    console.error("Erro ao encerrar corridas lotadas:", error);
+  }
+}
+
+
 async function carregarCorridas() {
   listaCorridas.innerHTML = `<p>Carregando corridas...</p>`;
 
@@ -166,6 +189,8 @@ async function carregarCorridas() {
         (inscritosPorCorrida[inscricao.corrida_id] || 0) + 1;
     });
   }
+
+  await encerrarCorridasLotadas(corridasDisponiveis, inscritosPorCorrida);
 
   const corridasComVaga = corridasDisponiveis.filter(corrida => {
     const vagasTotal = Number(corrida.vagas_total || 0);
@@ -286,6 +311,11 @@ async function carregarCorridas() {
 
         <h2>${corrida.nome}</h2>
 
+        <div class="corrida-status-card aberta">
+          <strong>Inscrições abertas</strong>
+          <span>${textoVagas} vagas preenchidas</span>
+        </div>
+
         <p><strong>Período:</strong>
           ${dataFormatada}
         </p>
@@ -296,10 +326,6 @@ async function carregarCorridas() {
 
         <p><strong>Local:</strong><br>
           ${formatarTextoComQuebra(corrida.local || "Não informado")}
-        </p>
-
-        <p><strong>Cidade:</strong>
-          ${corrida.cidade || "Não informada"}
         </p>
 
         <p><strong>Vagas:</strong>
