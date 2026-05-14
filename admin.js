@@ -381,6 +381,14 @@ async function carregarCorridasAdmin() {
           </button>
 
           <button
+            class="botao-excluir-corrida delete-btn"
+            data-corrida-id="${corrida.id}"
+            data-total-inscritos="${totalInscritos}"
+          >
+            Excluir corrida
+          </button>
+
+          <button
             class="botao-exportar-planilha botao-admin-secundario botao-exportar-admin botao-exportar-pdf"
             data-corrida-id="${corrida.id}"
             data-formato-exportacao="pdf"
@@ -394,14 +402,6 @@ async function carregarCorridasAdmin() {
             data-formato-exportacao="excel"
           >
             Exportar Excel
-          </button>
-
-          <button
-            class="botao-excluir-corrida delete-btn"
-            data-corrida-id="${corrida.id}"
-            data-total-inscritos="${totalInscritos}"
-          >
-            Excluir corrida
           </button>
 
         </div>

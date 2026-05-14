@@ -2370,3 +2370,65 @@ body {
     grid-template-columns: 1fr !important;
   }
 }
+
+
+/* =========================================================
+   AJUSTE V116 - BOTÕES DOS CARDS DE CORRIDA MAIS COMPACTOS
+   ========================================================= */
+.admin-card-footer {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  margin-top: 18px !important;
+}
+
+.admin-card-footer .botao-ver-inscritos {
+  grid-column: 1 / -1;
+}
+
+.admin-card-footer button,
+.admin-card-footer .botao-admin-secundario,
+.admin-card-footer .delete-btn,
+.admin-card-footer .botao-ver-inscritos {
+  width: 100% !important;
+  min-height: 44px !important;
+  padding: 10px 12px !important;
+  margin: 0 !important;
+  border-radius: 13px !important;
+  font-size: 14px !important;
+  line-height: 1.15 !important;
+}
+
+.gerenciar-dias {
+  margin-top: 16px !important;
+}
+
+.gerenciar-dias .botao-toggle-dias {
+  width: 100% !important;
+  min-height: 44px !important;
+  padding: 10px 12px !important;
+  border-radius: 13px !important;
+}
+
+@media (max-width: 700px) {
+  .admin-card-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin-top: 16px !important;
+  }
+
+  .admin-card-footer .botao-ver-inscritos {
+    grid-column: 1 / -1;
+  }
+
+  .admin-card-footer button,
+  .admin-card-footer .botao-admin-secundario,
+  .admin-card-footer .delete-btn,
+  .admin-card-footer .botao-ver-inscritos,
+  .gerenciar-dias .botao-toggle-dias {
+    min-height: 42px !important;
+    padding: 9px 10px !important;
+    font-size: 13px !important;
+  }
+}
