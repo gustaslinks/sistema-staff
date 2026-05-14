@@ -16,7 +16,6 @@ const listaCorridasAdmin = document.getElementById("lista-corridas-admin");
 const corridaNome = document.getElementById("corrida-nome");
 const corridaDataInicio = document.getElementById("corrida-data-inicio");
 const corridaDataFim = document.getElementById("corrida-data-fim");
-const corridaCidade = document.getElementById("corrida-cidade");
 const corridaLocal = document.getElementById("corrida-local");
 const corridaPrazo = document.getElementById("corrida-prazo");
 const corridaVagas = document.getElementById("corrida-vagas");
@@ -29,6 +28,7 @@ const novoDiaInicio = document.getElementById("novo-dia-inicio");
 const novoDiaFim = document.getElementById("novo-dia-fim");
 const novoDiaHorarioInicio = document.getElementById("novo-dia-horario-inicio");
 const novoDiaHorarioFim = document.getElementById("novo-dia-horario-fim");
+const novoDiaAteUltimo = document.getElementById("novo-dia-ate-ultimo");
 const adicionarPeriodoBtn = document.getElementById("adicionar-periodo-btn");
 const previewDiasCorrida = document.getElementById("preview-dias-corrida");
 
@@ -83,6 +83,17 @@ adicionarPeriodoBtn.addEventListener("click", function () {
   adicionarPeriodoCadastro();
 });
 
+if (novoDiaAteUltimo) {
+  novoDiaAteUltimo.addEventListener("change", function () {
+    if (novoDiaAteUltimo.checked) {
+      novoDiaHorarioFim.value = "";
+      novoDiaHorarioFim.disabled = true;
+    } else {
+      novoDiaHorarioFim.disabled = false;
+    }
+  });
+}
+
 // SALVAR / ATUALIZAR CORRIDA
 salvarCorridaBtn.addEventListener("click", async function () {
   if (!corridaNome.value || !corridaDataInicio.value || !corridaDataFim.value) {
@@ -116,7 +127,7 @@ salvarCorridaBtn.addEventListener("click", async function () {
     data_corrida: corridaDataFim.value,
     data_inicio: corridaDataInicio.value,
     data_fim: corridaDataFim.value,
-    cidade: corridaCidade ? corridaCidade.value.trim() || null : null,
+    cidade: null,
     local: corridaLocal.value.trim() || null,
     vagas_total: Number(corridaVagas.value),
     prazo_inscricao: corridaPrazo.value || null,
@@ -205,6 +216,44 @@ salvarCorridaBtn.addEventListener("click", async function () {
   carregarCorridasAdmin();
 });
 
+
+function contarInscritosValidos(inscricoes, corridaId) {
+  if (!inscricoes) return 0;
+
+  return inscricoes.filter(inscricao => {
+    return inscricao.corrida_id === corridaId && inscricao.status !== "cancelado";
+  }).length;
+}
+
+async function encerrarCorridasLotadas(corridas, inscricoes) {
+  const corridasLotadas = (corridas || []).filter(corrida => {
+    const vagasTotal = Number(corrida.vagas_total || 0);
+    const totalInscritos = contarInscritosValidos(inscricoes, corrida.id);
+
+    return corrida.status === "aberta" && vagasTotal > 0 && totalInscritos >= vagasTotal;
+  });
+
+  if (corridasLotadas.length === 0) return;
+
+  const ids = corridasLotadas.map(corrida => corrida.id);
+
+  const { error } = await supabaseClient
+    .from("corridas")
+    .update({ status: "encerrada" })
+    .in("id", ids);
+
+  if (error) {
+    console.error("Erro ao encerrar corridas lotadas:", error);
+    return;
+  }
+
+  corridas.forEach(corrida => {
+    if (ids.includes(corrida.id)) {
+      corrida.status = "encerrada";
+    }
+  });
+}
+
 // LISTAR CORRIDAS
 async function carregarCorridasAdmin() {
   listaCorridasAdmin.innerHTML = `<p>Carregando corridas...</p>`;
@@ -233,7 +282,7 @@ async function carregarCorridasAdmin() {
   const { data: inscricoes, error: erroInscricoes } =
     await supabaseClient
       .from("inscricoes")
-      .select("corrida_id");
+      .select("corrida_id, status");
 
   if (erroInscricoes) {
     console.error(
@@ -242,29 +291,35 @@ async function carregarCorridasAdmin() {
     );
   }
 
+  await encerrarCorridasLotadas(corridas, inscricoes || []);
+
   listaCorridasAdmin.innerHTML = corridas.map(corrida => {
-    const totalInscritos = inscricoes
-      ? inscricoes.filter(
-          inscricao => inscricao.corrida_id === corrida.id
-        ).length
-      : 0;
+    const totalInscritos = contarInscritosValidos(inscricoes || [], corrida.id);
+    const vagasTotal = Number(corrida.vagas_total || 0);
+    const textoVagas = vagasTotal > 0
+      ? `${totalInscritos} de ${vagasTotal} vagas preenchidas`
+      : `${totalInscritos} inscrito(s)`;
 
     return `
       <article class="card-corrida-admin">
 
         <h3>${corrida.nome}</h3>
 
+        <div class="corrida-status-card ${corrida.status}">
+          <strong>${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
+          <span>${textoVagas}</span>
+        </div>
+
         <p><strong>Período:</strong>
           ${formatarPeriodoCorrida(corrida)}
         </p>
-
 
         <p><strong>Local:</strong><br>
           ${formatarTextoComQuebra(corrida.local || "Não informado")}
         </p>
 
         <p><strong>Vagas:</strong>
-          ${corrida.vagas_total || "Não informadas"}
+          ${vagasTotal > 0 ? vagasTotal : "Não informadas"}
         </p>
 
         <p><strong>Prazo:</strong>
@@ -280,8 +335,15 @@ async function carregarCorridasAdmin() {
         </p>
 
         <div class="gerenciar-dias">
-          <h4>Dias cadastrados</h4>
-          <div id="dias-corrida-${corrida.id}"></div>
+          <button
+            type="button"
+            class="botao-toggle-dias"
+            data-corrida-id="${corrida.id}"
+          >
+            Mostrar dias cadastrados
+          </button>
+
+          <div id="dias-corrida-${corrida.id}" class="dias-corrida-container hidden"></div>
         </div>
 
         <div class="admin-card-footer">
@@ -351,6 +413,30 @@ ativarBotoesExcluirCorrida();
 ativarBotoesVerInscritos();
 ativarBotoesExportarPlanilha();
 ativarBotoesStatusCorrida();
+ativarBotoesToggleDias();
+}
+
+function ativarBotoesToggleDias() {
+  const botoes = document.querySelectorAll(".botao-toggle-dias");
+
+  botoes.forEach(botao => {
+    botao.addEventListener("click", function () {
+      const corridaId = botao.dataset.corridaId;
+      const container = document.getElementById(`dias-corrida-${corridaId}`);
+
+      if (!container) return;
+
+      const fechado = container.classList.contains("hidden");
+
+      if (fechado) {
+        container.classList.remove("hidden");
+        botao.textContent = "Ocultar dias cadastrados";
+      } else {
+        container.classList.add("hidden");
+        botao.textContent = "Mostrar dias cadastrados";
+      }
+    });
+  });
 }
 
 // EDITAR CORRIDA
@@ -394,7 +480,6 @@ async function carregarCorridaParaEdicao(corridaId) {
   corridaNome.value = corrida.nome || "";
   corridaDataInicio.value = corrida.data_inicio || corrida.data_corrida || "";
   corridaDataFim.value = corrida.data_fim || corrida.data_corrida || "";
-  if (corridaCidade) corridaCidade.value = corrida.cidade || "";
   corridaLocal.value = corrida.local || "";
   corridaPrazo.value = corrida.prazo_inscricao || "";
   corridaVagas.value = corrida.vagas_total || "";
@@ -973,13 +1058,14 @@ async function atualizarStatusInscricao(
 
 
 function adicionarPeriodoCadastro() {
-  if (!novoDiaInicio.value || !novoDiaFim.value) {
-    alert("Informe a data inicial e final do período.");
+  if (!novoDiaInicio.value) {
+    alert("Informe a data inicial do período.");
     return;
   }
 
+  const dataFinalInformada = novoDiaFim.value || novoDiaInicio.value;
   const inicio = new Date(`${novoDiaInicio.value}T00:00:00`);
-  const fim = new Date(`${novoDiaFim.value}T00:00:00`);
+  const fim = new Date(`${dataFinalInformada}T00:00:00`);
 
   if (fim < inicio) {
     alert("A data final do período não pode ser anterior à data inicial.");
@@ -989,7 +1075,7 @@ function adicionarPeriodoCadastro() {
   const tipo = novoDiaTipo.value;
   const ajuda = novoDiaAjuda.value ? Number(novoDiaAjuda.value) : null;
   const horarioInicio = novoDiaHorarioInicio.value || null;
-  const horarioFim = novoDiaHorarioFim.value || null;
+  const horarioFim = novoDiaAteUltimo && novoDiaAteUltimo.checked ? null : (novoDiaHorarioFim.value || null);
 
   const novosDias = [];
   const dataAtual = new Date(inicio);
@@ -1018,6 +1104,11 @@ function adicionarPeriodoCadastro() {
 
   novoDiaInicio.value = "";
   novoDiaFim.value = "";
+  novoDiaHorarioFim.value = "";
+  if (novoDiaAteUltimo) {
+    novoDiaAteUltimo.checked = false;
+    novoDiaHorarioFim.disabled = false;
+  }
 }
 
 function removerDiaCadastro(index) {
@@ -1044,9 +1135,7 @@ previewDiasCorrida.innerHTML = diasCadastroCorrida.map((dia, index) => `
 
     <p>
       <strong>Horário:</strong>
-      ${formatarHorario(dia.horario_inicio)}
-      até
-      ${formatarHorario(dia.horario_fim)}
+      ${formatarHorarioPeriodo(dia.horario_inicio, dia.horario_fim)}
     </p>
 
     <p>
@@ -1119,9 +1208,7 @@ async function carregarDiasCorrida(corridaId) {
 
       <p>
         <strong>Horário:</strong>
-        ${formatarHorario(dia.horario_inicio)}
-        até
-        ${formatarHorario(dia.horario_fim)}
+        ${formatarHorarioPeriodo(dia.horario_inicio, dia.horario_fim)}
       </p>
 
       <p>
@@ -1271,7 +1358,6 @@ function limparFormularioCorrida() {
   corridaNome.value = "";
   corridaDataInicio.value = "";
   corridaDataFim.value = "";
-  corridaCidade.value = "";
   corridaLocal.value = "";
   corridaPrazo.value = "";
   corridaVagas.value = "";
@@ -1283,6 +1369,8 @@ function limparFormularioCorrida() {
   novoDiaFim.value = "";
   novoDiaHorarioInicio.value = "";
   novoDiaHorarioFim.value = "";
+  novoDiaHorarioFim.disabled = false;
+  if (novoDiaAteUltimo) novoDiaAteUltimo.checked = false;
   diasCadastroCorrida = [];
   renderizarPreviewDiasCadastro();
   salvarCorridaBtn.textContent = "Salvar corrida";
@@ -1303,6 +1391,13 @@ function formatarHorario(horario) {
   if (!horario) return "Não informado";
 
   return horario.slice(0, 5);
+}
+
+function formatarHorarioPeriodo(inicio, fim) {
+  if (!inicio && !fim) return "Não informado";
+  if (inicio && fim) return `${formatarHorario(inicio)} até ${formatarHorario(fim)}`;
+  if (inicio && !fim) return `${formatarHorario(inicio)} até o último atleta chegar`;
+  return `Até ${formatarHorario(fim)}`;
 }
 
 function formatarMoeda(valor) {
@@ -1501,6 +1596,7 @@ function obterDiaSemana(dataISO) {
   return diasSemana[data.getDay()];
 }
 
+
 function ativarBotoesExportarPlanilha() {
 
   const botoes = document.querySelectorAll(
@@ -1509,71 +1605,52 @@ function ativarBotoesExportarPlanilha() {
 
   botoes.forEach(botao => {
 
-    botao.addEventListener("click", () => {
+    botao.addEventListener("click", async () => {
 
       const corridaId = Number(
         botao.dataset.corridaId
       );
 
-      abrirModalExportacao(corridaId);
+      await abrirFluxoExportacao(corridaId);
     });
   });
 }
 
-function abrirModalExportacao(corridaId) {
-  fecharModalExportacao();
+async function abrirFluxoExportacao(corridaId) {
+  const formato = prompt(
+    "Exportar em qual formato?\n\n1 - Excel (.xlsx)\n2 - PDF (.pdf)",
+    "1"
+  );
 
-  const modal = document.createElement("div");
-  modal.id = "modal-exportacao-planilha";
-  modal.className = "modal-exportacao-backdrop";
+  if (formato === null) return;
 
-  modal.innerHTML = `
-    <div class="modal-exportacao-card">
-      <h3>Exportar lista</h3>
-      <p>Escolha o formato do arquivo.</p>
+  const filtro = prompt(
+    "Escolha o filtro de exportação:\n\n1 - Todos em ordem alfabética\n2 - Por prioridade\n3 - Por dia\n4 - Por tipo (Entrega de kit / Dia da corrida)",
+    "1"
+  );
 
-      <div class="modal-exportacao-acoes">
-        <button type="button" class="botao-admin-secundario" id="exportar-xlsx-btn">
-          Excel (.xlsx)
-        </button>
+  if (filtro === null) return;
 
-        <button type="button" class="botao-admin-secundario" id="exportar-pdf-btn">
-          PDF (.pdf)
-        </button>
+  const formatoNormalizado = String(formato).trim();
+  const filtroNormalizado = String(filtro).trim();
 
-        <button type="button" class="delete-btn" id="cancelar-exportacao-btn">
-          Cancelar
-        </button>
-      </div>
-    </div>
-  `;
+  if (!["1", "2"].includes(formatoNormalizado)) {
+    alert("Formato inválido.");
+    return;
+  }
 
-  document.body.appendChild(modal);
+  if (!["1", "2", "3", "4"].includes(filtroNormalizado)) {
+    alert("Filtro inválido.");
+    return;
+  }
 
-  document.getElementById("exportar-xlsx-btn").addEventListener("click", async () => {
-    fecharModalExportacao();
-    await exportarPlanilhaCorrida(corridaId, "xlsx");
-  });
-
-  document.getElementById("exportar-pdf-btn").addEventListener("click", async () => {
-    fecharModalExportacao();
-    await exportarPlanilhaCorrida(corridaId, "pdf");
-  });
-
-  document.getElementById("cancelar-exportacao-btn").addEventListener("click", fecharModalExportacao);
-
-  modal.addEventListener("click", event => {
-    if (event.target === modal) fecharModalExportacao();
+  await exportarInscritosCorrida(corridaId, {
+    formato: formatoNormalizado === "2" ? "pdf" : "excel",
+    filtro: filtroNormalizado
   });
 }
 
-function fecharModalExportacao() {
-  const modal = document.getElementById("modal-exportacao-planilha");
-  if (modal) modal.remove();
-}
-
-async function exportarPlanilhaCorrida(corridaId, formato = "xlsx") {
-
+async function buscarDadosExportacao(corridaId) {
   const { data: corrida, error: erroCorrida } =
     await supabaseClient
       .from("corridas")
@@ -1582,362 +1659,434 @@ async function exportarPlanilhaCorrida(corridaId, formato = "xlsx") {
       .single();
 
   if (erroCorrida || !corrida) {
-    alert("Erro ao buscar corrida.");
-    return;
+    throw new Error("Erro ao buscar corrida.");
   }
 
-  const { data: inscricoes, error } =
+  const { data: diasCorrida, error: erroDias } = await supabaseClient
+    .from("corrida_dias")
+    .select("id, nome, data_dia, tipo, horario_inicio, horario_fim")
+    .eq("corrida_id", corridaId)
+    .order("data_dia", { ascending: true });
+
+  if (erroDias) {
+    throw new Error("Erro ao buscar dias da corrida.");
+  }
+
+  const { data: inscricoes, error: erroInscricoes } =
     await supabaseClient
       .from("inscricoes")
       .select(`
+        id,
         status,
+        created_at,
         staffs (
           nome_completo,
           cpf,
           rg,
           telefone,
+          cidade,
           chave_pix
         )
       `)
       .eq("corrida_id", corridaId)
       .neq("status", "cancelado");
 
-  if (error) {
-    console.error(error);
-
-    alert("Erro ao gerar planilha.");
-
-    return;
+  if (erroInscricoes) {
+    throw new Error("Erro ao buscar inscritos.");
   }
 
-  const inscritosOrdenados = inscricoes
-    .map(item => item.staffs)
-    .sort((a, b) =>
-      a.nome_completo.localeCompare(
-        b.nome_completo,
-        "pt-BR"
-      )
+  const inscricaoIds = (inscricoes || []).map(inscricao => inscricao.id);
+
+  let disponibilidades = [];
+
+  if (inscricaoIds.length > 0) {
+    const { data, error } = await supabaseClient
+      .from("inscricao_disponibilidades")
+      .select(`
+        inscricao_id,
+        disponivel,
+        corrida_dias (
+          id,
+          nome,
+          data_dia,
+          tipo,
+          horario_inicio,
+          horario_fim
+        )
+      `)
+      .in("inscricao_id", inscricaoIds);
+
+    if (error) {
+      throw new Error("Erro ao buscar disponibilidades.");
+    }
+
+    disponibilidades = data || [];
+  }
+
+  const disponibilidadesPorInscricao = {};
+
+  disponibilidades.forEach(item => {
+    if (item.disponivel === false || !item.corrida_dias) return;
+
+    if (!disponibilidadesPorInscricao[item.inscricao_id]) {
+      disponibilidadesPorInscricao[item.inscricao_id] = [];
+    }
+
+    disponibilidadesPorInscricao[item.inscricao_id].push(item.corrida_dias);
+  });
+
+  const totalDiasCorrida = (diasCorrida || []).length;
+
+  const inscritos = (inscricoes || []).map(inscricao => {
+    const diasDisponiveis = removerDiasDuplicados(
+      disponibilidadesPorInscricao[inscricao.id] || []
     );
 
-  const dados = inscritosOrdenados.map(staff => ({
-    Nome: staff.nome_completo || "",
-    CPF: staff.cpf || "",
-    RG: staff.rg || "",
-    "Celular/Whatsapp": staff.telefone || "",
-    "Chave PIX": staff.chave_pix || "",
-    Assinatura: ""
-  }));
+    const prioridade = calcularPrioridadeInscricao(
+      diasDisponiveis.length,
+      totalDiasCorrida
+    );
 
-  if (formato === "pdf") {
-    exportarPDFCorrida(corrida, dados);
-    return;
-  }
-
-  const workbook = XLSX.utils.book_new();
-
-  const worksheet = XLSX.utils.json_to_sheet(dados, {
-    origin: "A3"
+    return {
+      inscricao_id: inscricao.id,
+      status: inscricao.status,
+      created_at: inscricao.created_at,
+      staff: inscricao.staffs || {},
+      diasDisponiveis,
+      quantidadeDiasDisponiveis: diasDisponiveis.length,
+      prioridade
+    };
   });
 
-  XLSX.utils.sheet_add_aoa(
-    worksheet,
-    [[corrida.nome]],
-    { origin: "A1" }
-  );
-
-  worksheet["!merges"] = [
-    {
-      s: { r: 0, c: 0 },
-      e: { r: 0, c: 5 }
-    }
-  ];
-
-  worksheet["!cols"] = [
-    { wch: 40 },
-    { wch: 18 },
-    { wch: 18 },
-    { wch: 22 },
-    { wch: 28 },
-    { wch: 24 }
-  ];
-  worksheet["!rows"] = [];
-
-for (let i = 0; i <= dados.length + 3; i++) {
-  worksheet["!rows"].push({
-    hpx: 30
-  });
+  return {
+    corrida,
+    diasCorrida: diasCorrida || [],
+    inscritos
+  };
 }
 
-  const range = XLSX.utils.decode_range(
-    worksheet["!ref"]
+async function exportarInscritosCorrida(corridaId, opcoes) {
+  try {
+    const dadosExportacao = await buscarDadosExportacao(corridaId);
+    const secoes = montarSecoesExportacao(dadosExportacao, opcoes.filtro);
+
+    if (secoes.every(secao => secao.inscritos.length === 0)) {
+      alert("Não há inscritos para exportar.");
+      return;
+    }
+
+    if (opcoes.formato === "pdf") {
+      exportarPDFCorrida(dadosExportacao.corrida, secoes, opcoes.filtro);
+    } else {
+      exportarExcelCorrida(dadosExportacao.corrida, secoes, opcoes.filtro);
+    }
+  } catch (error) {
+    console.error(error);
+    alert(error.message || "Erro ao exportar inscritos.");
+  }
+}
+
+function ordenarInscritosAlfabetico(inscritos) {
+  return [...inscritos].sort((a, b) =>
+    (a.staff.nome_completo || "").localeCompare(
+      b.staff.nome_completo || "",
+      "pt-BR"
+    )
   );
+}
 
-  for (let C = range.s.c; C <= range.e.c; ++C) {
-
-    const cellAddress =
-      XLSX.utils.encode_cell({
-        r: 2,
-        c: C
-      });
-
-    if (!worksheet[cellAddress]) continue;
-
-worksheet[cellAddress].s = {
-  fill: {
-    fgColor: { rgb: "2F6B58" }
-  },
-  font: {
-    bold: true,
-    color: { rgb: "FFFFFF" }
-  },
-  alignment: {
-    horizontal: "center",
-    vertical: "center"
-  }
-};
-  }
-
-worksheet["A1"].s = {
-  font: {
-    bold: true,
-    sz: 18
-  },
-  alignment: {
-    horizontal: "center",
-    vertical: "center"
-  }
-};
-
-  worksheet["!autofilter"] = {
-    ref: `A3:F${dados.length + 3}`
+function ordenarInscritosPrioridade(inscritos) {
+  const pesos = {
+    "Prioridade alta": 1,
+    "Prioridade média": 2,
+    "Prioridade baixa": 3,
+    "Sem disponibilidade": 4,
+    "Sem dias cadastrados": 5
   };
 
-const rangeCompleto = XLSX.utils.decode_range(
-  worksheet["!ref"]
-);
+  return [...inscritos].sort((a, b) => {
+    const pesoA = pesos[a.prioridade.texto] || 99;
+    const pesoB = pesos[b.prioridade.texto] || 99;
 
-for (
-  let R = rangeCompleto.s.r;
-  R <= rangeCompleto.e.r;
-  ++R
-) {
+    if (pesoA !== pesoB) return pesoA - pesoB;
 
-  for (
-    let C = rangeCompleto.s.c;
-    C <= rangeCompleto.e.c;
-    ++C
-  ) {
-
-    const cellAddress =
-      XLSX.utils.encode_cell({
-        r: R,
-        c: C
-      });
-
-    if (!worksheet[cellAddress]) continue;
-
-    if (!worksheet[cellAddress].s) {
-      worksheet[cellAddress].s = {};
+    if (b.quantidadeDiasDisponiveis !== a.quantidadeDiasDisponiveis) {
+      return b.quantidadeDiasDisponiveis - a.quantidadeDiasDisponiveis;
     }
 
-    if (R >= 3) {
-      worksheet[cellAddress].s.font = {
-        sz: 12
-      };
-    }
+    return (a.staff.nome_completo || "").localeCompare(
+      b.staff.nome_completo || "",
+      "pt-BR"
+    );
+  });
+}
 
-    worksheet[cellAddress].s.alignment = {
-      vertical: "center"
+function montarSecoesExportacao(dadosExportacao, filtro) {
+  const inscritos = dadosExportacao.inscritos || [];
+  const diasCorrida = dadosExportacao.diasCorrida || [];
+
+  if (filtro === "2") {
+    return [{
+      titulo: "Inscritos por prioridade",
+      inscritos: ordenarInscritosPrioridade(inscritos)
+    }];
+  }
+
+  if (filtro === "3") {
+    return diasCorrida.map(dia => ({
+      titulo: `${dia.nome} - ${formatarData(dia.data_dia)}`,
+      inscritos: ordenarInscritosAlfabetico(
+        inscritos.filter(inscrito =>
+          inscrito.diasDisponiveis.some(d => d.id === dia.id)
+        )
+      )
+    }));
+  }
+
+  if (filtro === "4") {
+    const tipos = [...new Set(diasCorrida.map(dia => dia.tipo || "Sem tipo"))];
+
+    return tipos.map(tipo => ({
+      titulo: tipo,
+      inscritos: ordenarInscritosAlfabetico(
+        inscritos.filter(inscrito =>
+          inscrito.diasDisponiveis.some(dia => (dia.tipo || "Sem tipo") === tipo)
+        )
+      )
+    }));
+  }
+
+  return [{
+    titulo: "Todos os inscritos",
+    inscritos: ordenarInscritosAlfabetico(inscritos)
+  }];
+}
+
+function montarLinhasExportacao(inscritos, incluirPrioridade = false) {
+  return inscritos.map(inscrito => {
+    const staff = inscrito.staff || {};
+    const dias = removerDiasDuplicados(inscrito.diasDisponiveis || [])
+      .map(dia => dia.nome)
+      .join("; ");
+
+    const linha = {
+      Nome: staff.nome_completo || "",
+      CPF: staff.cpf || "",
+      RG: staff.rg || "",
+      "Celular/Whatsapp": staff.telefone || "",
+      "Chave PIX": staff.chave_pix || "",
+      "Dias disponíveis": dias
     };
-  }
-}
 
-for (
-  let R = rangeCompleto.s.r;
-  R <= rangeCompleto.e.r;
-  ++R
-) {
-
-  for (
-    let C = rangeCompleto.s.c;
-    C <= rangeCompleto.e.c;
-    ++C
-  ) {
-
-    const cellAddress =
-      XLSX.utils.encode_cell({
-        r: R,
-        c: C
-      });
-
-    if (!worksheet[cellAddress]) continue;
-
-    if (!worksheet[cellAddress].s) {
-      worksheet[cellAddress].s = {};
+    if (incluirPrioridade) {
+      linha.Prioridade = inscrito.prioridade.texto;
     }
 
-worksheet[cellAddress].s.alignment = {
-  vertical: "center"
-};
+    linha.Assinatura = "";
 
-worksheet[cellAddress].s.font = {
-  sz: 12
-};
-  }
+    return linha;
+  });
 }
 
-worksheet["A1"].s = {
-  font: {
-    bold: true,
-    sz: 18
-  },
-  alignment: {
-    horizontal: "center",
-    vertical: "center"
-  }
-};
+function nomeArquivoSeguro(nome) {
+  return String(nome || "corrida")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9_-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "") || "corrida";
+}
 
-for (let C = 0; C <= 5; ++C) {
+function exportarExcelCorrida(corrida, secoes, filtro) {
+  const workbook = XLSX.utils.book_new();
+  const incluirPrioridade = filtro === "2";
 
-  const cellAddress =
-    XLSX.utils.encode_cell({
-      r: 2,
-      c: C
+  secoes.forEach((secao, index) => {
+    const dados = montarLinhasExportacao(secao.inscritos, incluirPrioridade);
+    const headers = [
+      "Nome",
+      "CPF",
+      "RG",
+      "Celular/Whatsapp",
+      "Chave PIX",
+      "Dias disponíveis",
+      ...(incluirPrioridade ? ["Prioridade"] : []),
+      "Assinatura"
+    ];
+    const worksheet = XLSX.utils.json_to_sheet(dados, {
+      header: headers,
+      origin: "A4"
+    });
+    const ultimaColuna = headers.length - 1;
+
+    XLSX.utils.sheet_add_aoa(
+      worksheet,
+      [[corrida.nome], [secao.titulo]],
+      { origin: "A1" }
+    );
+
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: ultimaColuna } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: ultimaColuna } }
+    ];
+
+    worksheet["!cols"] = headers.map(header => {
+      const larguras = {
+        Nome: 40,
+        CPF: 18,
+        RG: 16,
+        "Celular/Whatsapp": 22,
+        "Chave PIX": 28,
+        "Dias disponíveis": 42,
+        Assinatura: 24,
+        Prioridade: 20
+      };
+
+      return { wch: larguras[header] || 20 };
     });
 
-  if (!worksheet[cellAddress]) continue;
+    worksheet["!rows"] = [];
 
-  worksheet[cellAddress].s = {
-    fill: {
-      fgColor: { rgb: "2F6B58" }
-    },
-    font: {
-      bold: true,
-      color: { rgb: "FFFFFF" },
-      sz: 12
-    },
-    alignment: {
-      horizontal: "center",
-      vertical: "center"
+    for (let i = 0; i <= dados.length + 5; i++) {
+      worksheet["!rows"].push({ hpx: i === 0 ? 34 : 30 });
     }
-  };
+
+    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!worksheet[cellAddress]) continue;
+
+        worksheet[cellAddress].s = worksheet[cellAddress].s || {};
+        worksheet[cellAddress].s.alignment = {
+          horizontal: R >= 3 ? "center" : "center",
+          vertical: "center",
+          wrapText: true
+        };
+        worksheet[cellAddress].s.font = { sz: R === 0 ? 18 : 12, bold: R <= 3 };
+
+        if (R === 3) {
+          worksheet[cellAddress].s.fill = { fgColor: { rgb: "2F6B58" } };
+          worksheet[cellAddress].s.font = {
+            bold: true,
+            color: { rgb: "FFFFFF" },
+            sz: 12
+          };
+        }
+      }
+    }
+
+    worksheet["!autofilter"] = {
+      ref: `A4:${XLSX.utils.encode_col(ultimaColuna)}${dados.length + 4}`
+    };
+
+    const nomeAba = (secao.titulo || `Lista ${index + 1}`)
+      .replace(/[\\/?*\[\]:]/g, " ")
+      .slice(0, 31) || `Lista ${index + 1}`;
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, nomeAba);
+  });
+
+  XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)}.xlsx`);
 }
 
-  XLSX.utils.book_append_sheet(
-    workbook,
-    worksheet,
-    "Inscritos"
-  );
+function exportarPDFCorrida(corrida, secoes, filtro) {
+  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
 
-  XLSX.writeFile(
-    workbook,
-    `${corrida.nome}.xlsx`
-  );
-}
-
-function exportarPDFCorrida(corrida, dados) {
-  if (!window.jspdf || !window.jspdf.jsPDF) {
-    alert("Biblioteca de PDF não carregada. Verifique os scripts do jsPDF no admin.html.");
+  if (!jsPDFConstructor) {
+    alert("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
     return;
   }
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({
+  const doc = new jsPDFConstructor({
     orientation: "landscape",
     unit: "mm",
     format: "a4"
   });
 
-  const larguraPagina = doc.internal.pageSize.getWidth();
-  const titulo = corrida.nome || "Lista de inscritos";
+  const incluirPrioridade = filtro === "2";
+  const headers = incluirPrioridade
+    ? ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Prioridade", "Assinatura"]
+    : ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Assinatura"];
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text(titulo, larguraPagina / 2, 16, { align: "center" });
+  const pageWidth = doc.internal.pageSize.getWidth();
 
-  const cabecalho = [[
-    "Nome",
-    "CPF",
-    "RG",
-    "Celular/Whatsapp",
-    "Chave PIX",
-    "Assinatura"
-  ]];
+  secoes.forEach((secao, index) => {
+    if (index > 0) doc.addPage();
 
-  const corpo = dados.map(item => [
-    item.Nome,
-    item.CPF,
-    item.RG,
-    item["Celular/Whatsapp"],
-    item["Chave PIX"],
-    item.Assinatura
-  ]);
+    doc.setFontSize(18);
+    doc.setFont(undefined, "bold");
+    doc.text(corrida.nome || "Corrida", pageWidth / 2, 16, { align: "center" });
 
-  const larguraTabela = 275;
-  const margemEsquerda = (larguraPagina - larguraTabela) / 2;
+    doc.setFontSize(11);
+    doc.setFont(undefined, "normal");
+    doc.text(secao.titulo || "Inscritos", pageWidth / 2, 23, { align: "center" });
 
-  doc.autoTable({
-    head: cabecalho,
-    body: corpo,
-    startY: 25,
-    theme: "grid",
-    tableWidth: larguraTabela,
-    margin: {
-      left: margemEsquerda,
-      right: margemEsquerda
-    },
-    styles: {
-      font: "helvetica",
-      fontSize: 9,
-      cellPadding: 2,
-      minCellHeight: 8,
-      valign: "middle",
-      halign: "center",
-      lineWidth: 0.15,
-      lineColor: [180, 180, 180]
-    },
-    headStyles: {
-      fillColor: [47, 107, 88],
-      textColor: [255, 255, 255],
-      fontStyle: "bold",
-      fontSize: 10,
-      halign: "center",
-      valign: "middle",
-      minCellHeight: 8
-    },
-    bodyStyles: {
-      minCellHeight: 8,
-      valign: "middle"
-    },
-    columnStyles: {
-      0: { cellWidth: 65, halign: "left" },
-      1: { cellWidth: 30 },
-      2: { cellWidth: 25 },
-      3: { cellWidth: 40 },
-      4: { cellWidth: 60 },
-      5: { cellWidth: 55 }
-    },
-    didDrawPage: function () {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      const pagina = doc.internal.getNumberOfPages();
-      doc.text(`Página ${pagina}`, larguraPagina - 12, 202, { align: "right" });
-    }
+    const body = secao.inscritos.map(inscrito => {
+      const staff = inscrito.staff || {};
+      const base = [
+        staff.nome_completo || "",
+        staff.cpf || "",
+        staff.rg || "",
+        staff.telefone || "",
+        staff.chave_pix || ""
+      ];
+
+      if (incluirPrioridade) {
+        base.push(inscrito.prioridade.texto || "");
+      }
+
+      base.push("");
+      return base;
+    });
+
+    doc.autoTable({
+      head: [headers],
+      body,
+      startY: 30,
+      theme: "grid",
+      margin: { left: 8, right: 8 },
+      tableWidth: "auto",
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        minCellHeight: 8,
+        halign: "center",
+        valign: "middle",
+        overflow: "linebreak"
+      },
+      headStyles: {
+        fillColor: [47, 107, 88],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        halign: "center",
+        valign: "middle"
+      },
+      columnStyles: {
+        0: { cellWidth: 54, halign: "left" },
+        1: { cellWidth: 28 },
+        2: { cellWidth: 24 },
+        3: { cellWidth: 32 },
+        4: { cellWidth: 48 },
+        5: { cellWidth: incluirPrioridade ? 30 : 52 },
+        6: { cellWidth: 44 }
+      },
+      didDrawPage: function () {
+        const pageHeight = doc.internal.pageSize.getHeight();
+        doc.setFontSize(8);
+        doc.text(
+          `Página ${doc.internal.getCurrentPageInfo().pageNumber}`,
+          pageWidth - 12,
+          pageHeight - 6,
+          { align: "right" }
+        );
+      }
+    });
   });
 
-  const nomeArquivo = sanitizarNomeArquivo(titulo) + ".pdf";
-  doc.save(nomeArquivo);
+  doc.save(`${nomeArquivoSeguro(corrida.nome)}.pdf`);
 }
-
-function sanitizarNomeArquivo(nome) {
-  return String(nome || "arquivo")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9-_ ]/g, "")
-    .trim()
-    .replace(/\s+/g, "_") || "arquivo";
-}
-
 
 // INICIALIZAÇÃO
 inserirEstilosPrioridadeAdmin();

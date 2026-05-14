@@ -59,6 +59,29 @@ botaoAdmin.addEventListener("click", function () {
 // CORRIDAS DISPONÍVEIS
 // =========================================================
 
+async function encerrarCorridasLotadas(corridas, inscritosPorCorrida) {
+  const corridasLotadas = (corridas || []).filter(corrida => {
+    const vagasTotal = Number(corrida.vagas_total || 0);
+    const totalInscritos = inscritosPorCorrida[corrida.id] || 0;
+
+    return corrida.status === "aberta" && vagasTotal > 0 && totalInscritos >= vagasTotal;
+  });
+
+  if (corridasLotadas.length === 0) return;
+
+  const ids = corridasLotadas.map(corrida => corrida.id);
+
+  const { error } = await supabaseClient
+    .from("corridas")
+    .update({ status: "encerrada" })
+    .in("id", ids);
+
+  if (error) {
+    console.error("Erro ao encerrar corridas lotadas:", error);
+  }
+}
+
+
 async function carregarCorridas() {
   listaCorridas.innerHTML = `<p>Carregando corridas...</p>`;
 
@@ -167,6 +190,8 @@ async function carregarCorridas() {
     });
   }
 
+  await encerrarCorridasLotadas(corridasDisponiveis, inscritosPorCorrida);
+
   const corridasComVaga = corridasDisponiveis.filter(corrida => {
     const vagasTotal = Number(corrida.vagas_total || 0);
     const totalInscritos = inscritosPorCorrida[corrida.id] || 0;
@@ -252,9 +277,11 @@ async function carregarCorridas() {
                     }
 
                     ${
-                      dia.horario_fim
-                        ? ` às ${formatarHorario(dia.horario_fim)}`
-                        : ""
+                      dia.horario_inicio && !dia.horario_fim
+                        ? " até o último atleta chegar"
+                        : dia.horario_fim
+                          ? ` às ${formatarHorario(dia.horario_fim)}`
+                          : ""
                     }
 
                     ${
@@ -286,6 +313,11 @@ async function carregarCorridas() {
 
         <h2>${corrida.nome}</h2>
 
+        <div class="corrida-status-card aberta">
+          <strong>Inscrições abertas</strong>
+          <span>${textoVagas} vagas preenchidas</span>
+        </div>
+
         <p><strong>Período:</strong>
           ${dataFormatada}
         </p>
@@ -296,10 +328,6 @@ async function carregarCorridas() {
 
         <p><strong>Local:</strong><br>
           ${formatarTextoComQuebra(corrida.local || "Não informado")}
-        </p>
-
-        <p><strong>Cidade:</strong>
-          ${corrida.cidade || "Não informada"}
         </p>
 
         <p><strong>Vagas:</strong>
@@ -563,18 +591,8 @@ async function carregarMinhasInscricoes() {
             </p>
 
             <p>
-              <strong>Horário:</strong>
-              ${formatarHorario(corrida.horario)}
-            </p>
-
-            <p>
               <strong>Local:</strong>
               ${formatarTextoComQuebra(corrida.local || "Não informado")}
-            </p>
-
-            <p>
-              <strong>Cidade:</strong>
-              ${corrida.cidade || "Não informada"}
             </p>
 
             <div class="minha-disponibilidade">

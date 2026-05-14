@@ -72,6 +72,7 @@ form.addEventListener("submit", async function (event) {
       .single();
 
     if (error || !data) {
+      alert("CPF não encontrado. Faça seu cadastro para continuar.");
       window.location.href = "cadastro.html";
       return;
     }
