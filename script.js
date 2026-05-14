@@ -35,7 +35,13 @@ try {
   staffLogadoEdicao = null;
 }
 const staffIdUrlEdicao = paramsCadastro.get('id');
-const staffIdEdicao = staffIdUrlEdicao || (staffLogadoEdicao && staffLogadoEdicao.id ? staffLogadoEdicao.id : null);
+// Segurança do fluxo de edição:
+// - staff comum SEMPRE edita apenas o próprio cadastro salvo no localStorage;
+// - id pela URL só é aceito quando o usuário logado é admin.
+const isAdminEdicao = staffLogadoEdicao && staffLogadoEdicao.is_admin === true;
+const staffIdEdicao = modoEdicao
+  ? (isAdminEdicao && staffIdUrlEdicao ? staffIdUrlEdicao : (staffLogadoEdicao && staffLogadoEdicao.id ? staffLogadoEdicao.id : null))
+  : null;
 let fotoAtualUrl = '';
 
 
@@ -389,7 +395,7 @@ form.addEventListener('submit',async function(event){
 
     const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value,foto_url:fotoUrlFinal};
     const salvarCadastro = modoEdicao
-      ? await supabaseClient.from('staffs').update(dadosCadastro).eq('id', staffIdEdicao).select().single()
+      ? await supabaseClient.from('staffs').update(dadosCadastro).eq('id', staffIdEdicao).select().maybeSingle()
       : await supabaseClient.from('staffs').insert([dadosCadastro]);
     if (salvarCadastro.error) {
   const mensagemErro = salvarCadastro.error.message.toLowerCase();
@@ -407,8 +413,12 @@ form.addEventListener('submit',async function(event){
   throw salvarCadastro.error;
 }
 
+    if (modoEdicao && !salvarCadastro.data) {
+      throw new Error('Não foi possível localizar este cadastro para atualizar. Faça login novamente.');
+    }
+
     successMessage.textContent = modoEdicao ? 'Cadastro atualizado com sucesso.' : 'Cadastro enviado com sucesso. Os dados foram salvos no Supabase.';
-    if (modoEdicao && salvarCadastro.data) {
+    if (modoEdicao && salvarCadastro.data && staffLogadoEdicao && String(salvarCadastro.data.id) === String(staffLogadoEdicao.id)) {
       localStorage.setItem('staffLogado', JSON.stringify(salvarCadastro.data));
     }
     successMessage.style.display='block';
@@ -474,10 +484,10 @@ async function iniciarModoEdicao(){
     .from('staffs')
     .select('*')
     .eq('id', staffIdEdicao)
-    .single();
+    .maybeSingle();
 
-  if(error){
-    alert('Não foi possível carregar seus dados para edição.');
+  if(error || !data){
+    alert('Não foi possível carregar seus dados para edição. Faça login novamente.');
     console.error(error);
     return;
   }

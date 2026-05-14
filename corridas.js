@@ -57,7 +57,7 @@ botaoAdmin.addEventListener("click", function () {
 });
 
 botaoEditarCadastro.addEventListener("click", function () {
-  window.location.href = `cadastro.html?editar=1&id=${encodeURIComponent(staffLogado.id)}`;
+  window.location.href = 'cadastro.html?editar=1';
 });
 
 // =========================================================
