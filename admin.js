@@ -1618,14 +1618,14 @@ function ativarBotoesExportarPlanilha() {
 
 async function abrirFluxoExportacao(corridaId) {
   const formato = prompt(
-    "Exportar em qual formato?\n\n1 - Excel (.xlsx)\n2 - PDF (.pdf)",
+    "Exportar em qual formato?\n\n1 - PDF (.pdf)\n2 - Excel (.xlsx)",
     "1"
   );
 
   if (formato === null) return;
 
   const filtro = prompt(
-    "Escolha o filtro de exportação:\n\n1 - Todos em ordem alfabética\n2 - Por prioridade\n3 - Por dia\n4 - Por tipo (Entrega de kit / Dia da corrida)",
+    "Escolha o filtro de exportação:\n\n1 - Lista completa\n2 - Por dia\n3 - Por tipo (Entrega de kit / Dia da corrida)",
     "1"
   );
 
@@ -1639,13 +1639,13 @@ async function abrirFluxoExportacao(corridaId) {
     return;
   }
 
-  if (!["1", "2", "3", "4"].includes(filtroNormalizado)) {
+  if (!["1", "2", "3"].includes(filtroNormalizado)) {
     alert("Filtro inválido.");
     return;
   }
 
   await exportarInscritosCorrida(corridaId, {
-    formato: formatoNormalizado === "2" ? "pdf" : "excel",
+    formato: formatoNormalizado === "1" ? "pdf" : "excel",
     filtro: filtroNormalizado
   });
 }
@@ -1826,13 +1826,6 @@ function montarSecoesExportacao(dadosExportacao, filtro) {
   const diasCorrida = dadosExportacao.diasCorrida || [];
 
   if (filtro === "2") {
-    return [{
-      titulo: "Inscritos por prioridade",
-      inscritos: ordenarInscritosPrioridade(inscritos)
-    }];
-  }
-
-  if (filtro === "3") {
     return diasCorrida.map(dia => ({
       titulo: `${dia.nome} - ${formatarData(dia.data_dia)}`,
       inscritos: ordenarInscritosAlfabetico(
@@ -1843,7 +1836,7 @@ function montarSecoesExportacao(dadosExportacao, filtro) {
     }));
   }
 
-  if (filtro === "4") {
+  if (filtro === "3") {
     const tipos = [...new Set(diasCorrida.map(dia => dia.tipo || "Sem tipo"))];
 
     return tipos.map(tipo => ({
@@ -1857,7 +1850,7 @@ function montarSecoesExportacao(dadosExportacao, filtro) {
   }
 
   return [{
-    titulo: "Todos os inscritos",
+    titulo: "Lista completa",
     inscritos: ordenarInscritosAlfabetico(inscritos)
   }];
 }
@@ -1897,12 +1890,21 @@ function nomeArquivoSeguro(nome) {
     .replace(/^-|-$/g, "") || "corrida";
 }
 
+function obterRotuloFiltroExportacao(filtro) {
+  const rotulos = {
+    "1": "Lista Completa",
+    "2": "Por Dia",
+    "3": "Por Tipo"
+  };
+
+  return rotulos[String(filtro)] || "Lista Completa";
+}
+
 function exportarExcelCorrida(corrida, secoes, filtro) {
   const workbook = XLSX.utils.book_new();
-  const incluirPrioridade = filtro === "2";
 
   secoes.forEach((secao, index) => {
-    const dados = montarLinhasExportacao(secao.inscritos, incluirPrioridade);
+    const dados = montarLinhasExportacao(secao.inscritos, false);
     const headers = [
       "Nome",
       "CPF",
@@ -1910,7 +1912,6 @@ function exportarExcelCorrida(corrida, secoes, filtro) {
       "Celular/Whatsapp",
       "Chave PIX",
       "Dias disponíveis",
-      ...(incluirPrioridade ? ["Prioridade"] : []),
       "Assinatura"
     ];
     const worksheet = XLSX.utils.json_to_sheet(dados, {
@@ -1938,8 +1939,7 @@ function exportarExcelCorrida(corrida, secoes, filtro) {
         "Celular/Whatsapp": 22,
         "Chave PIX": 28,
         "Dias disponíveis": 42,
-        Assinatura: 24,
-        Prioridade: 20
+        Assinatura: 24
       };
 
       return { wch: larguras[header] || 20 };
@@ -1960,7 +1960,7 @@ function exportarExcelCorrida(corrida, secoes, filtro) {
 
         worksheet[cellAddress].s = worksheet[cellAddress].s || {};
         worksheet[cellAddress].s.alignment = {
-          horizontal: R >= 3 ? "center" : "center",
+          horizontal: "center",
           vertical: "center",
           wrapText: true
         };
@@ -1982,13 +1982,14 @@ function exportarExcelCorrida(corrida, secoes, filtro) {
     };
 
     const nomeAba = (secao.titulo || `Lista ${index + 1}`)
-      .replace(/[\\/?*\[\]:]/g, " ")
+      .replace(/[\/?*\[\]:]/g, " ")
       .slice(0, 31) || `Lista ${index + 1}`;
 
     XLSX.utils.book_append_sheet(workbook, worksheet, nomeAba);
   });
 
-  XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)}.xlsx`);
+  const rotuloFiltro = obterRotuloFiltroExportacao(filtro);
+  XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)} - ${rotuloFiltro}.xlsx`);
 }
 
 function exportarPDFCorrida(corrida, secoes, filtro) {
@@ -2005,15 +2006,23 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
     format: "a4"
   });
 
-  const incluirPrioridade = filtro === "2";
-  const headers = incluirPrioridade
-    ? ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Prioridade", "Assinatura"]
-    : ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Assinatura"];
+  const headers = ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Assinatura"];
+  const columnWidths = {
+    0: 58,
+    1: 30,
+    2: 26,
+    3: 34,
+    4: 50,
+    5: 50
+  };
 
   const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const tableWidth = Object.values(columnWidths).reduce((total, width) => total + width, 0);
+  const sideMargin = Math.max(8, (pageWidth - tableWidth) / 2);
 
   secoes.forEach((secao, index) => {
-    if (index > 0) doc.addPage();
+    if (index > 0) doc.addPage("a4", "landscape");
 
     doc.setFontSize(18);
     doc.setFont(undefined, "bold");
@@ -2025,20 +2034,15 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
 
     const body = secao.inscritos.map(inscrito => {
       const staff = inscrito.staff || {};
-      const base = [
+
+      return [
         staff.nome_completo || "",
         staff.cpf || "",
         staff.rg || "",
         staff.telefone || "",
-        staff.chave_pix || ""
+        staff.chave_pix || "",
+        ""
       ];
-
-      if (incluirPrioridade) {
-        base.push(inscrito.prioridade.texto || "");
-      }
-
-      base.push("");
-      return base;
     });
 
     doc.autoTable({
@@ -2046,8 +2050,8 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
       body,
       startY: 30,
       theme: "grid",
-      margin: { left: 8, right: 8 },
-      tableWidth: "auto",
+      margin: { left: sideMargin, right: sideMargin },
+      tableWidth,
       styles: {
         fontSize: 8,
         cellPadding: 2,
@@ -2064,16 +2068,14 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
         valign: "middle"
       },
       columnStyles: {
-        0: { cellWidth: 54, halign: "left" },
-        1: { cellWidth: 28 },
-        2: { cellWidth: 24 },
-        3: { cellWidth: 32 },
-        4: { cellWidth: 48 },
-        5: { cellWidth: incluirPrioridade ? 30 : 52 },
-        6: { cellWidth: 44 }
+        0: { cellWidth: columnWidths[0], halign: "left" },
+        1: { cellWidth: columnWidths[1] },
+        2: { cellWidth: columnWidths[2] },
+        3: { cellWidth: columnWidths[3] },
+        4: { cellWidth: columnWidths[4] },
+        5: { cellWidth: columnWidths[5] }
       },
       didDrawPage: function () {
-        const pageHeight = doc.internal.pageSize.getHeight();
         doc.setFontSize(8);
         doc.text(
           `Página ${doc.internal.getCurrentPageInfo().pageNumber}`,
@@ -2085,7 +2087,8 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
     });
   });
 
-  doc.save(`${nomeArquivoSeguro(corrida.nome)}.pdf`);
+  const rotuloFiltro = obterRotuloFiltroExportacao(filtro);
+  doc.save(`${nomeArquivoSeguro(corrida.nome)} - ${rotuloFiltro}.pdf`);
 }
 
 // INICIALIZAÇÃO

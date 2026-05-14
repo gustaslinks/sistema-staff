@@ -1640,3 +1640,45 @@ body {
   color: #6b7280 !important;
   cursor: not-allowed;
 }
+
+
+/* Ajuste visual do checkbox "Até o último atleta chegar" */
+.form-admin .checkbox-admin-linha {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  width: fit-content !important;
+  margin: 12px 0 0 0 !important;
+  padding: 0 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  color: #374151 !important;
+}
+
+.form-admin .checkbox-admin-linha input[type="checkbox"] {
+  flex: 0 0 22px !important;
+  display: inline-block !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  max-width: 22px !important;
+  max-height: 22px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 5px !important;
+  box-sizing: border-box !important;
+  transform: none !important;
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+}
+
+.form-admin .checkbox-admin-linha span {
+  display: inline-block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.25 !important;
+}
