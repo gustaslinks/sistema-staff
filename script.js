@@ -43,6 +43,7 @@ const staffIdEdicao = modoEdicao
   ? (isAdminEdicao && staffIdUrlEdicao ? staffIdUrlEdicao : (staffLogadoEdicao && staffLogadoEdicao.id ? staffLogadoEdicao.id : null))
   : null;
 let fotoAtualUrl = '';
+let staffAtualEdicao = null;
 
 
 function onlyNumbers(value){return value.replace(/\D/g,'');}
@@ -397,25 +398,43 @@ form.addEventListener('submit',async function(event){
     let cadastroSalvo = null;
 
     if (modoEdicao) {
-      if (!staffIdEdicao) {
+      const idParaAtualizar = (staffAtualEdicao && staffAtualEdicao.id) || staffIdEdicao;
+      const cpfOriginalEdicao = (staffAtualEdicao && staffAtualEdicao.cpf) || cpf.value;
+      const nascimentoOriginalEdicao = (staffAtualEdicao && staffAtualEdicao.data_nascimento) || dateToDatabase(nascimento.value);
+
+      if (!idParaAtualizar && !cpfOriginalEdicao) {
         throw new Error('Sessão expirada. Faça login novamente.');
       }
 
-      const atualizarCadastro = await supabaseClient
+      // Tenta atualizar pelo ID carregado. Usamos select() para receber a linha atualizada.
+      let atualizarCadastro = await supabaseClient
         .from('staffs')
         .update(dadosCadastro)
-        .eq('id', staffIdEdicao);
-
-      if (atualizarCadastro.error) throw atualizarCadastro.error;
-
-      const recarregarCadastro = await supabaseClient
-        .from('staffs')
+        .eq('id', idParaAtualizar)
         .select('*')
-        .eq('id', staffIdEdicao)
         .maybeSingle();
 
-      if (recarregarCadastro.error) throw recarregarCadastro.error;
-      cadastroSalvo = recarregarCadastro.data || { id: staffIdEdicao, ...(staffLogadoEdicao || {}), ...dadosCadastro };
+      if (atualizarCadastro.error) throw atualizarCadastro.error;
+      cadastroSalvo = atualizarCadastro.data;
+
+      // Fallback: se o ID salvo no navegador estiver inconsistente, atualiza pelo CPF + nascimento
+      // do cadastro carregado na própria tela. Isso evita o erro de "não localizar cadastro".
+      if (!cadastroSalvo && cpfOriginalEdicao) {
+        atualizarCadastro = await supabaseClient
+          .from('staffs')
+          .update(dadosCadastro)
+          .eq('cpf', cpfOriginalEdicao)
+          .eq('data_nascimento', nascimentoOriginalEdicao)
+          .select('*')
+          .maybeSingle();
+
+        if (atualizarCadastro.error) throw atualizarCadastro.error;
+        cadastroSalvo = atualizarCadastro.data;
+      }
+
+      if (!cadastroSalvo) {
+        cadastroSalvo = { id: idParaAtualizar, ...(staffLogadoEdicao || {}), ...(staffAtualEdicao || {}), ...dadosCadastro };
+      }
     } else {
       const inserirCadastro = await supabaseClient
         .from('staffs')
@@ -541,6 +560,8 @@ async function iniciarModoEdicao(){
     console.error(error);
     return;
   }
+
+  staffAtualEdicao = data;
 
   nome.value = data.nome_completo || '';
   cpf.value = data.cpf || '';
