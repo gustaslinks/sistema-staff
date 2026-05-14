@@ -28,7 +28,14 @@ const submitBtn = document.getElementById('submitBtn');
 const touchedFields = new Set();
 const paramsCadastro = new URLSearchParams(window.location.search);
 const modoEdicao = paramsCadastro.get('editar') === '1';
-const staffLogadoEdicao = JSON.parse(localStorage.getItem('staffLogado') || 'null');
+let staffLogadoEdicao = null;
+try {
+  staffLogadoEdicao = JSON.parse(localStorage.getItem('staffLogado') || 'null');
+} catch (error) {
+  staffLogadoEdicao = null;
+}
+const staffIdUrlEdicao = paramsCadastro.get('id');
+const staffIdEdicao = staffIdUrlEdicao || (staffLogadoEdicao && staffLogadoEdicao.id ? staffLogadoEdicao.id : null);
 let fotoAtualUrl = '';
 
 
@@ -155,7 +162,30 @@ function getValidationState(showAll=false){
 }
 
 function isFormValid(showAll=false){return Object.values(getValidationState(showAll)).every(Boolean);}
-function refreshSubmitState(){submitBtn.disabled=!isFormValid(false);}
+
+function liberarBotaoEdicao(){
+  if (!modoEdicao || !submitBtn) return;
+  submitBtn.disabled = false;
+  submitBtn.removeAttribute('disabled');
+  submitBtn.classList.remove('disabled');
+  submitBtn.style.pointerEvents = 'auto';
+}
+
+function refreshSubmitState(){
+  if (!submitBtn) return;
+
+  // No modo edição, o botão não deve ficar preso à validação em tempo real.
+  // A validação completa continua acontecendo no submit, antes de salvar.
+  if (modoEdicao) {
+    submitBtn.disabled = false;
+    submitBtn.removeAttribute('disabled');
+    submitBtn.classList.remove('disabled');
+    submitBtn.style.pointerEvents = 'auto';
+    return;
+  }
+
+  submitBtn.disabled = !isFormValid(false);
+}
 function cleanTextField(input,shouldCapitalize=true){input.value=shouldCapitalize ? capitalizeName(input.value) : removeExtraSpaces(input.value);}
 
 nome.addEventListener('input',()=>{nome.value=nome.value.replace(/^\s+/,'').replace(/\s{2,}/g,' ');markTouched('fieldNome');refreshSubmitState();});
@@ -304,6 +334,14 @@ nascimento.addEventListener('input', () => {
 });
 
 
+form.addEventListener('input', () => {
+  if (modoEdicao) refreshSubmitState();
+});
+
+form.addEventListener('change', () => {
+  if (modoEdicao) refreshSubmitState();
+});
+
 form.addEventListener('submit',async function(event){
   event.preventDefault();
   successMessage.style.display='none';
@@ -319,7 +357,7 @@ form.addEventListener('submit',async function(event){
   if(!isFormValid(true)){alert('Revise os campos destacados antes de finalizar o cadastro.');return;}
 
   submitBtn.disabled=true;
-  submitBtn.textContent='Enviando cadastro...';
+  submitBtn.textContent = modoEdicao ? 'Salvando alterações...' : 'Enviando cadastro...';
 
   try{
     if(SUPABASE_URL==='COLE_AQUI_PROJECT_URL' || SUPABASE_ANON_KEY==='COLE_AQUI_PUBLISHABLE_KEY'){
@@ -351,7 +389,7 @@ form.addEventListener('submit',async function(event){
 
     const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value,foto_url:fotoUrlFinal};
     const salvarCadastro = modoEdicao
-      ? await supabaseClient.from('staffs').update(dadosCadastro).eq('id', staffLogadoEdicao.id).select().single()
+      ? await supabaseClient.from('staffs').update(dadosCadastro).eq('id', staffIdEdicao).select().single()
       : await supabaseClient.from('staffs').insert([dadosCadastro]);
     if (salvarCadastro.error) {
   const mensagemErro = salvarCadastro.error.message.toLowerCase();
@@ -415,7 +453,7 @@ function selecionarPixPorValor(staff){
 
 async function iniciarModoEdicao(){
   if(!modoEdicao) return;
-  if(!staffLogadoEdicao || !staffLogadoEdicao.id){
+  if(!staffIdEdicao){
     window.location.href = 'index.html';
     return;
   }
@@ -426,6 +464,7 @@ async function iniciarModoEdicao(){
   if(titulo) titulo.textContent = 'Editar cadastro';
   if(subtitulo) subtitulo.textContent = 'Atualize seus dados de staff. O CPF fica bloqueado para manter o vínculo com suas inscrições.';
   submitBtn.textContent = 'Salvar alterações';
+  liberarBotaoEdicao();
   cpf.disabled = true;
   foto.required = false;
   const helperFoto = document.querySelector('#fieldFoto .error');
@@ -434,7 +473,7 @@ async function iniciarModoEdicao(){
   const { data, error } = await supabaseClient
     .from('staffs')
     .select('*')
-    .eq('id', staffLogadoEdicao.id)
+    .eq('id', staffIdEdicao)
     .single();
 
   if(error){
@@ -467,9 +506,18 @@ async function iniciarModoEdicao(){
 
   updatePixPreviews();
   refreshSubmitState();
+  liberarBotaoEdicao();
 }
 
-iniciarModoEdicao();
+
+iniciarModoEdicao().finally(() => {
+  if (modoEdicao) {
+    refreshSubmitState();
+    liberarBotaoEdicao();
+    setTimeout(liberarBotaoEdicao, 50);
+    setTimeout(liberarBotaoEdicao, 300);
+  }
+});
 
 updatePixPreviews();
 refreshSubmitState();
