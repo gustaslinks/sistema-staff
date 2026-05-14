@@ -1641,44 +1641,280 @@ body {
   cursor: not-allowed;
 }
 
-
-/* Ajuste visual do checkbox "Até o último atleta chegar" */
-.form-admin .checkbox-admin-linha {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 10px !important;
-  width: fit-content !important;
-  margin: 12px 0 0 0 !important;
-  padding: 0 !important;
-  font-size: 15px !important;
-  font-weight: 700 !important;
-  line-height: 1.2 !important;
-  color: #374151 !important;
+/* Painel compacto de inscritos */
+.admin-inscritos-painel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.form-admin .checkbox-admin-linha input[type="checkbox"] {
-  flex: 0 0 22px !important;
-  display: inline-block !important;
-  width: 22px !important;
-  height: 22px !important;
-  min-width: 22px !important;
-  min-height: 22px !important;
-  max-width: 22px !important;
-  max-height: 22px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border-radius: 5px !important;
-  box-sizing: border-box !important;
-  transform: none !important;
-  appearance: auto !important;
-  -webkit-appearance: checkbox !important;
+.admin-inscritos-resumo {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(110px, 1fr));
+  gap: 10px;
 }
 
-.form-admin .checkbox-admin-linha span {
-  display: inline-block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1.25 !important;
+.admin-inscritos-resumo > div {
+  padding: 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.admin-inscritos-resumo strong {
+  display: block;
+  font-size: 22px;
+  color: #111827;
+}
+
+.admin-inscritos-resumo span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-inscritos-acoes-massa,
+.admin-inscritos-filtros,
+.admin-filtros-status,
+.admin-contador-selecao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.botao-admin-batch,
+.admin-filtro-inscrito {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.botao-admin-batch {
+  background: #111827;
+  color: #ffffff;
+}
+
+.botao-confirmar-reservar {
+  background: #2563eb;
+}
+
+.admin-filtro-inscrito {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-filtro-inscrito.ativo {
+  background: #111827;
+  color: #ffffff;
+  border-color: #111827;
+}
+
+.admin-busca-inscrito {
+  min-width: 240px;
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.admin-contador-selecao {
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-lista-compacta-inscritos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.linha-inscrito-admin {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.linha-inscrito-principal {
+  display: grid;
+  grid-template-columns: auto auto minmax(180px, 1fr) auto auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+}
+
+.linha-inscrito-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.linha-inscrito-check input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.botao-expandir-inscrito {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 9px;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.linha-inscrito-nome strong,
+.linha-inscrito-nome small {
+  display: block;
+}
+
+.linha-inscrito-nome strong {
+  font-size: 15px;
+  color: #111827;
+}
+
+.linha-inscrito-nome small {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.admin-status-inscricao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.admin-status-inscricao.pendente,
+.admin-status-inscricao.inscrito {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.admin-status-inscricao.confirmado {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.admin-status-inscricao.reserva {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.admin-status-inscricao.cancelado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.linha-inscrito-acoes {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.linha-inscrito-acoes button {
+  padding: 8px 10px;
+  border: none;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.botao-reserva-inscrito {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.linha-inscrito-acoes button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.linha-inscrito-detalhes {
+  padding: 12px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.detalhes-inscrito-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 8px 14px;
+  margin-bottom: 12px;
+}
+
+.detalhes-inscrito-grid p {
+  margin: 0;
+  font-size: 13px;
+  color: #374151;
+}
+
+@media (max-width: 900px) {
+  .admin-inscritos-resumo {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .linha-inscrito-principal {
+    grid-template-columns: auto auto 1fr;
+  }
+
+  .linha-inscrito-principal .admin-badge-prioridade,
+  .linha-inscrito-principal .admin-status-inscricao,
+  .linha-inscrito-acoes {
+    grid-column: 1 / -1;
+  }
+
+  .linha-inscrito-acoes {
+    justify-content: stretch;
+  }
+
+  .linha-inscrito-acoes button,
+  .botao-admin-batch,
+  .admin-filtro-inscrito {
+    flex: 1;
+  }
+
+  .detalhes-inscrito-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-inscritos-resumo {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-busca-inscrito,
+  .botao-admin-batch,
+  .admin-filtro-inscrito {
+    width: 100%;
+  }
 }

@@ -221,7 +221,7 @@ function contarInscritosValidos(inscricoes, corridaId) {
   if (!inscricoes) return 0;
 
   return inscricoes.filter(inscricao => {
-    return inscricao.corrida_id === corridaId && inscricao.status !== "cancelado";
+    return inscricao.corrida_id === corridaId && inscricao.status !== "cancelado" && inscricao.status !== "reserva";
   }).length;
 }
 
@@ -697,11 +697,23 @@ async function carregarInscritosDaCorrida(
   areaInscritos.innerHTML =
     `<p>Carregando inscritos...</p>`;
 
+  const corridaIdNumerico = Number(corridaId);
+
+  const { data: corridaAtual } = await supabaseClient
+    .from("corridas")
+    .select("id, nome, vagas")
+    .eq("id", corridaIdNumerico)
+    .single();
+
+  const totalVagasCorrida = corridaAtual && corridaAtual.vagas
+    ? Number(corridaAtual.vagas)
+    : 0;
+
   const { data: diasCorrida, error: erroDiasCorrida } =
     await supabaseClient
       .from("corrida_dias")
       .select("id")
-      .eq("corrida_id", corridaId);
+      .eq("corrida_id", corridaIdNumerico);
 
   if (erroDiasCorrida) {
     console.error(
@@ -733,9 +745,9 @@ async function carregarInscritosDaCorrida(
             foto_url
           )
       `)
-      .eq("corrida_id", corridaId)
+      .eq("corrida_id", corridaIdNumerico)
       .order("created_at", {
-        ascending: false
+        ascending: true
       });
 
   if (error) {
@@ -816,6 +828,7 @@ async function carregarInscritosDaCorrida(
 
     return {
       ...inscricao,
+      statusNormalizado: normalizarStatusInscricao(inscricao.status),
       diasDisponiveis,
       quantidadeDiasDisponiveis: diasDisponiveis.length,
       prioridade
@@ -835,163 +848,417 @@ async function carregarInscritosDaCorrida(
       new Date(b.created_at);
   });
 
-  areaInscritos.innerHTML = inscricoesComPrioridade.map(inscricao => {
+  let vagasPreSelecionadas = 0;
 
-    const staff = inscricao.staffs;
+  inscricoesComPrioridade.forEach(inscricao => {
+    const status = inscricao.statusNormalizado;
+    const prioridadeAlta =
+      totalDiasCorrida > 0 &&
+      inscricao.quantidadeDiasDisponiveis >= totalDiasCorrida;
 
-    const diasDisponiveis =
-      inscricao.diasDisponiveis || [];
+    const jaConfirmado = status === "confirmado";
+    const podePreSelecionar =
+      status !== "cancelado" &&
+      status !== "reserva" &&
+      (jaConfirmado || prioridadeAlta);
 
-    const textoQuantidadeDias = formatarQuantidadeDiasDisponiveis(
-      inscricao.quantidadeDiasDisponiveis,
-      totalDiasCorrida
-    );
+    if (podePreSelecionar && (!totalVagasCorrida || vagasPreSelecionadas < totalVagasCorrida)) {
+      inscricao.preSelecionado = true;
+      vagasPreSelecionadas += 1;
+    } else {
+      inscricao.preSelecionado = false;
+    }
+  });
 
-    return `
-      <article class="card-inscrito-admin">
+  const resumo = gerarResumoInscricoes(inscricoesComPrioridade, totalVagasCorrida);
 
-        <img
-          class="foto-inscrito-admin"
-          src="${
-            staff.foto_url ||
-            "https://placehold.co/80x80?text=Foto"
-          }"
-          alt="Foto de ${staff.nome_completo}"
+  areaInscritos.innerHTML = `
+    <div class="admin-inscritos-painel" data-corrida-id="${corridaIdNumerico}">
+
+      <div class="admin-inscritos-resumo">
+        <div>
+          <strong>${resumo.total}</strong>
+          <span>inscritos</span>
+        </div>
+        <div>
+          <strong>${resumo.confirmados}</strong>
+          <span>confirmados</span>
+        </div>
+        <div>
+          <strong>${resumo.pendentes}</strong>
+          <span>pendentes</span>
+        </div>
+        <div>
+          <strong>${resumo.reserva}</strong>
+          <span>reserva</span>
+        </div>
+        <div>
+          <strong>${totalVagasCorrida ? `${resumo.confirmados}/${totalVagasCorrida}` : resumo.confirmados}</strong>
+          <span>vagas</span>
+        </div>
+      </div>
+
+      <div class="admin-inscritos-acoes-massa">
+        <button type="button" class="botao-admin-batch botao-selecionar-prioridade">
+          Selecionar prioridades altas
+        </button>
+        <button type="button" class="botao-admin-batch botao-confirmar-selecionados">
+          Confirmar selecionados
+        </button>
+        <button type="button" class="botao-admin-batch botao-confirmar-reservar">
+          Confirmar selecionados e reservar restantes
+        </button>
+      </div>
+
+      <div class="admin-inscritos-filtros">
+        <input
+          type="search"
+          class="admin-busca-inscrito"
+          placeholder="Buscar por nome..."
         >
-
-        <div class="dados-inscrito-admin">
-
-          <div class="admin-inscrito-topo">
-
-            <h4>${staff.nome_completo}</h4>
-
-            <span class="admin-badge-prioridade ${inscricao.prioridade.classe}">
-              ${inscricao.prioridade.texto}
-            </span>
-
-          </div>
-
-          <p>
-            <strong>Dias disponíveis:</strong>
-            ${textoQuantidadeDias}
-          </p>
-
-          <p>
-            <strong>Cidade:</strong>
-            ${staff.cidade || "Não informada"}
-          </p>
-
-          <p>
-            <strong>Telefone:</strong>
-            ${staff.telefone || "Não informado"}
-          </p>
-
-          <p>
-            <strong>E-mail:</strong>
-            ${staff.email || "Não informado"}
-          </p>
-
-          <p>
-            <strong>Status:</strong>
-            ${formatarStatusInscricao(inscricao.status)}
-          </p>
-
-          <div class="admin-disponibilidade-staff">
-
-            <p>
-              <strong>Disponibilidade:</strong>
-            </p>
-
-            <div class="admin-tags-disponibilidade">
-
-              ${diasDisponiveis.length > 0
-                ? diasDisponiveis.map(dia => `
-                  <span class="admin-tag-disponibilidade">
-                    ${dia.nome}
-                  </span>
-                `).join("")
-                : `<span class="admin-tag-disponibilidade sem-disponibilidade">
-                    Nenhum dia selecionado
-                  </span>`
-              }
-
-            </div>
-
-          </div>
-
+        <div class="admin-filtros-status">
+          <button type="button" class="admin-filtro-inscrito ativo" data-filtro="todos">Todos</button>
+          <button type="button" class="admin-filtro-inscrito" data-filtro="pendente">Pendentes</button>
+          <button type="button" class="admin-filtro-inscrito" data-filtro="confirmado">Confirmados</button>
+          <button type="button" class="admin-filtro-inscrito" data-filtro="reserva">Reserva</button>
+          <button type="button" class="admin-filtro-inscrito" data-filtro="sem-disponibilidade">Sem disponibilidade</button>
         </div>
+      </div>
 
-        <div class="acoes-inscrito-admin">
+      <div class="admin-contador-selecao">
+        <span class="admin-selecao-texto">${vagasPreSelecionadas} selecionado(s)</span>
+        ${totalVagasCorrida ? `<span>Limite: ${totalVagasCorrida} vaga(s)</span>` : ""}
+      </div>
 
-          <button
-            class="botao-confirmar-inscrito ${
-              inscricao.status === "confirmado"
-                ? "ativo-confirmado"
-                : ""
-            }"
-            data-inscricao-id="${inscricao.id}"
-            data-corrida-id="${corridaId}"
-            ${
-              inscricao.status === "confirmado"
-                ? "disabled"
-                : ""
-            }
-          >
-            ${
-              inscricao.status === "confirmado"
-                ? "Confirmado"
-                : "Confirmar"
-            }
-          </button>
+      <div class="admin-lista-compacta-inscritos">
+        ${inscricoesComPrioridade.map(inscricao => gerarLinhaInscritoAdmin(
+          inscricao,
+          corridaIdNumerico,
+          totalDiasCorrida
+        )).join("")}
+      </div>
+    </div>
+  `;
 
-          <button
-            class="botao-cancelar-inscrito ${
-              inscricao.status === "cancelado"
-                ? "ativo-cancelado"
-                : ""
-            }"
-            data-inscricao-id="${inscricao.id}"
-            data-corrida-id="${corridaId}"
-            ${
-              inscricao.status === "cancelado"
-                ? "disabled"
-                : ""
-            }
-          >
-            ${
-              inscricao.status === "cancelado"
-                ? "Cancelado"
-                : "Cancelar"
-            }
-          </button>
-
-        </div>
-
-      </article>
-    `;
-  }).join("");
-
-  ativarBotoesStatusInscricao();
+  ativarControlesInscritosAdmin(areaInscritos, corridaIdNumerico, totalVagasCorrida);
 }
 
-// BOTÕES CONFIRMAR / CANCELAR
-function ativarBotoesStatusInscricao() {
+function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
+  const staff = inscricao.staffs || {};
+  const diasDisponiveis = inscricao.diasDisponiveis || [];
+  const status = inscricao.statusNormalizado;
+  const textoQuantidadeDias = formatarQuantidadeDiasDisponiveis(
+    inscricao.quantidadeDiasDisponiveis,
+    totalDiasCorrida
+  );
+  const nomeBusca = String(staff.nome_completo || "").toLowerCase();
+  const semDisponibilidade = inscricao.quantidadeDiasDisponiveis <= 0;
 
-  const botoesConfirmar =
-    document.querySelectorAll(
-      ".botao-confirmar-inscrito"
-    );
+  return `
+    <article
+      class="linha-inscrito-admin"
+      data-inscricao-id="${inscricao.id}"
+      data-corrida-id="${corridaId}"
+      data-status="${status}"
+      data-prioridade="${inscricao.prioridade.classe}"
+      data-sem-disponibilidade="${semDisponibilidade ? "true" : "false"}"
+      data-nome="${escapeHtml(nomeBusca)}"
+    >
+      <div class="linha-inscrito-principal">
+        <label class="linha-inscrito-check">
+          <input
+            type="checkbox"
+            class="checkbox-inscrito-batch"
+            data-inscricao-id="${inscricao.id}"
+            ${inscricao.preSelecionado ? "checked" : ""}
+            ${status === "cancelado" ? "disabled" : ""}
+          >
+          <span></span>
+        </label>
 
-  const botoesCancelar =
-    document.querySelectorAll(
-      ".botao-cancelar-inscrito"
-    );
+        <button type="button" class="botao-expandir-inscrito" aria-label="Ver detalhes">
+          ▸
+        </button>
+
+        <div class="linha-inscrito-nome">
+          <strong>${escapeHtml(staff.nome_completo || "Nome não informado")}</strong>
+          <small>${textoQuantidadeDias}</small>
+        </div>
+
+        <span class="admin-badge-prioridade ${inscricao.prioridade.classe}">
+          ${inscricao.prioridade.texto}
+        </span>
+
+        <span class="admin-status-inscricao ${status}">
+          ${formatarStatusInscricao(status)}
+        </span>
+
+        <div class="linha-inscrito-acoes">
+          <button
+            type="button"
+            class="botao-confirmar-inscrito"
+            data-inscricao-id="${inscricao.id}"
+            data-corrida-id="${corridaId}"
+            ${status === "confirmado" ? "disabled" : ""}
+          >
+            Confirmar
+          </button>
+
+          <button
+            type="button"
+            class="botao-reserva-inscrito"
+            data-inscricao-id="${inscricao.id}"
+            data-corrida-id="${corridaId}"
+            ${status === "reserva" ? "disabled" : ""}
+          >
+            Reserva
+          </button>
+
+          <button
+            type="button"
+            class="botao-cancelar-inscrito"
+            data-inscricao-id="${inscricao.id}"
+            data-corrida-id="${corridaId}"
+            ${status === "cancelado" ? "disabled" : ""}
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+
+      <div class="linha-inscrito-detalhes hidden">
+        <div class="detalhes-inscrito-grid">
+          <p><strong>Cidade:</strong> ${escapeHtml(staff.cidade || "Não informada")}</p>
+          <p><strong>Telefone:</strong> ${escapeHtml(staff.telefone || "Não informado")}</p>
+          <p><strong>E-mail:</strong> ${escapeHtml(staff.email || "Não informado")}</p>
+          <p><strong>CPF:</strong> ${escapeHtml(staff.cpf || "Não informado")}</p>
+          <p><strong>RG:</strong> ${escapeHtml(staff.rg || "Não informado")}</p>
+          <p><strong>PIX:</strong> ${escapeHtml(staff.chave_pix || "Não informado")}</p>
+        </div>
+
+        <div class="admin-tags-disponibilidade">
+          ${diasDisponiveis.length > 0
+            ? diasDisponiveis.map(dia => `
+              <span class="admin-tag-disponibilidade">
+                ${escapeHtml(dia.nome || formatarData(dia.data_dia))}
+              </span>
+            `).join("")
+            : `<span class="admin-tag-disponibilidade sem-disponibilidade">
+                Nenhum dia selecionado
+              </span>`
+          }
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function ativarControlesInscritosAdmin(areaInscritos, corridaId, totalVagasCorrida) {
+  ativarBotoesStatusInscricao(areaInscritos);
+  atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
+
+  const busca = areaInscritos.querySelector(".admin-busca-inscrito");
+  const filtros = areaInscritos.querySelectorAll(".admin-filtro-inscrito");
+  const checkboxes = areaInscritos.querySelectorAll(".checkbox-inscrito-batch");
+  const botoesExpandir = areaInscritos.querySelectorAll(".botao-expandir-inscrito");
+
+  if (busca) {
+    busca.addEventListener("input", () => filtrarInscritosAdmin(areaInscritos));
+  }
+
+  filtros.forEach(botao => {
+    botao.addEventListener("click", () => {
+      filtros.forEach(item => item.classList.remove("ativo"));
+      botao.classList.add("ativo");
+      filtrarInscritosAdmin(areaInscritos);
+    });
+  });
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked && totalVagasCorrida > 0) {
+        const selecionados = areaInscritos.querySelectorAll(
+          ".checkbox-inscrito-batch:checked"
+        ).length;
+
+        if (selecionados > totalVagasCorrida) {
+          checkbox.checked = false;
+          alert(`Limite de ${totalVagasCorrida} vaga(s) atingido.`);
+        }
+      }
+
+      atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
+    });
+  });
+
+  botoesExpandir.forEach(botao => {
+    botao.addEventListener("click", () => {
+      const linha = botao.closest(".linha-inscrito-admin");
+      const detalhes = linha.querySelector(".linha-inscrito-detalhes");
+      detalhes.classList.toggle("hidden");
+      botao.textContent = detalhes.classList.contains("hidden") ? "▸" : "▾";
+    });
+  });
+
+  const botaoSelecionarPrioridade = areaInscritos.querySelector(".botao-selecionar-prioridade");
+  if (botaoSelecionarPrioridade) {
+    botaoSelecionarPrioridade.addEventListener("click", () => {
+      let selecionados = 0;
+      areaInscritos.querySelectorAll(".linha-inscrito-admin").forEach(linha => {
+        const checkbox = linha.querySelector(".checkbox-inscrito-batch");
+        if (!checkbox || checkbox.disabled) return;
+
+        const prioridadeAlta = linha.dataset.prioridade === "prioridade-alta";
+        const status = linha.dataset.status;
+
+        if (prioridadeAlta && status !== "reserva" && status !== "cancelado" && (!totalVagasCorrida || selecionados < totalVagasCorrida)) {
+          checkbox.checked = true;
+          selecionados += 1;
+        } else if (status !== "confirmado") {
+          checkbox.checked = false;
+        }
+      });
+      atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
+    });
+  }
+
+  const botaoConfirmar = areaInscritos.querySelector(".botao-confirmar-selecionados");
+  if (botaoConfirmar) {
+    botaoConfirmar.addEventListener("click", async () => {
+      await confirmarSelecionadosEmLote(areaInscritos, corridaId, false);
+    });
+  }
+
+  const botaoConfirmarReservar = areaInscritos.querySelector(".botao-confirmar-reservar");
+  if (botaoConfirmarReservar) {
+    botaoConfirmarReservar.addEventListener("click", async () => {
+      await confirmarSelecionadosEmLote(areaInscritos, corridaId, true);
+    });
+  }
+}
+
+function filtrarInscritosAdmin(areaInscritos) {
+  const busca = areaInscritos.querySelector(".admin-busca-inscrito");
+  const filtroAtivo = areaInscritos.querySelector(".admin-filtro-inscrito.ativo");
+  const termo = busca ? busca.value.trim().toLowerCase() : "";
+  const filtro = filtroAtivo ? filtroAtivo.dataset.filtro : "todos";
+
+  areaInscritos.querySelectorAll(".linha-inscrito-admin").forEach(linha => {
+    const nome = linha.dataset.nome || "";
+    const status = linha.dataset.status || "";
+    const semDisponibilidade = linha.dataset.semDisponibilidade === "true";
+
+    const passaBusca = !termo || nome.includes(termo);
+    const passaFiltro =
+      filtro === "todos" ||
+      filtro === status ||
+      (filtro === "pendente" && (status === "inscrito" || status === "pendente")) ||
+      (filtro === "sem-disponibilidade" && semDisponibilidade);
+
+    linha.classList.toggle("hidden", !(passaBusca && passaFiltro));
+  });
+}
+
+function atualizarContadorSelecao(areaInscritos, totalVagasCorrida) {
+  const texto = areaInscritos.querySelector(".admin-selecao-texto");
+  const selecionados = areaInscritos.querySelectorAll(
+    ".checkbox-inscrito-batch:checked"
+  ).length;
+
+  if (texto) {
+    texto.textContent = `${selecionados} selecionado(s)`;
+  }
+}
+
+async function confirmarSelecionadosEmLote(areaInscritos, corridaId, reservarRestantes) {
+  const linhas = Array.from(areaInscritos.querySelectorAll(".linha-inscrito-admin"));
+  const idsSelecionados = linhas
+    .filter(linha => {
+      const checkbox = linha.querySelector(".checkbox-inscrito-batch");
+      return checkbox && checkbox.checked && !checkbox.disabled;
+    })
+    .map(linha => Number(linha.dataset.inscricaoId));
+
+  if (idsSelecionados.length === 0) {
+    alert("Selecione pelo menos uma pessoa para confirmar.");
+    return;
+  }
+
+  const mensagem = reservarRestantes
+    ? `Confirmar ${idsSelecionados.length} selecionado(s) e colocar os demais pendentes em reserva?`
+    : `Confirmar ${idsSelecionados.length} selecionado(s)?`;
+
+  if (!confirm(mensagem)) {
+    return;
+  }
+
+  const { error: erroConfirmar } = await supabaseClient
+    .from("inscricoes")
+    .update({ status: "confirmado" })
+    .in("id", idsSelecionados);
+
+  if (erroConfirmar) {
+    console.error("Erro ao confirmar selecionados:", erroConfirmar);
+    alert("Não foi possível confirmar os selecionados.");
+    return;
+  }
+
+  if (reservarRestantes) {
+    const idsReserva = linhas
+      .filter(linha => {
+        const id = Number(linha.dataset.inscricaoId);
+        const status = linha.dataset.status;
+        return !idsSelecionados.includes(id) && status !== "confirmado" && status !== "cancelado";
+      })
+      .map(linha => Number(linha.dataset.inscricaoId));
+
+    if (idsReserva.length > 0) {
+      const { error: erroReserva } = await supabaseClient
+        .from("inscricoes")
+        .update({ status: "reserva" })
+        .in("id", idsReserva);
+
+      if (erroReserva) {
+        console.error("Erro ao colocar em reserva:", erroReserva);
+        alert("Selecionados confirmados, mas não foi possível colocar os demais em reserva.");
+      }
+    }
+  }
+
+  await carregarInscritosDaCorrida(corridaId, areaInscritos);
+}
+
+// BOTÕES CONFIRMAR / CANCELAR / RESERVA
+function ativarBotoesStatusInscricao(contexto) {
+
+  const raiz = contexto || document;
+
+  const botoesConfirmar = raiz.querySelectorAll(
+    ".botao-confirmar-inscrito"
+  );
+
+  const botoesReserva = raiz.querySelectorAll(
+    ".botao-reserva-inscrito"
+  );
+
+  const botoesCancelar = raiz.querySelectorAll(
+    ".botao-cancelar-inscrito"
+  );
 
   botoesConfirmar.forEach(botao => {
     botao.addEventListener("click", async function () {
       await atualizarStatusInscricao(
         botao,
         "confirmado"
+      );
+    });
+  });
+
+  botoesReserva.forEach(botao => {
+    botao.addEventListener("click", async function () {
+      await atualizarStatusInscricao(
+        botao,
+        "reserva"
       );
     });
   });
@@ -1054,6 +1321,42 @@ async function atualizarStatusInscricao(
     corridaId,
     areaInscritos
   );
+}
+
+function gerarResumoInscricoes(inscricoes, totalVagasCorrida) {
+  const resumo = {
+    total: inscricoes.length,
+    confirmados: 0,
+    pendentes: 0,
+    reserva: 0,
+    cancelados: 0
+  };
+
+  inscricoes.forEach(inscricao => {
+    const status = normalizarStatusInscricao(inscricao.status);
+
+    if (status === "confirmado") resumo.confirmados += 1;
+    else if (status === "reserva") resumo.reserva += 1;
+    else if (status === "cancelado") resumo.cancelados += 1;
+    else resumo.pendentes += 1;
+  });
+
+  return resumo;
+}
+
+function normalizarStatusInscricao(status) {
+  if (!status) return "pendente";
+  if (status === "inscrito") return "pendente";
+  return status;
+}
+
+function escapeHtml(valor) {
+  return String(valor || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 
@@ -1437,8 +1740,10 @@ function formatarTextoComQuebra(texto) {
 function formatarStatusInscricao(status) {
 
   const statusFormatados = {
-    inscrito: "Inscrito",
+    inscrito: "Pendente",
+    pendente: "Pendente",
     confirmado: "Confirmado",
+    reserva: "Reserva",
     cancelado: "Cancelado"
   };
 
@@ -1618,14 +1923,14 @@ function ativarBotoesExportarPlanilha() {
 
 async function abrirFluxoExportacao(corridaId) {
   const formato = prompt(
-    "Exportar em qual formato?\n\n1 - PDF (.pdf)\n2 - Excel (.xlsx)",
+    "Exportar em qual formato?\n\n1 - Excel (.xlsx)\n2 - PDF (.pdf)",
     "1"
   );
 
   if (formato === null) return;
 
   const filtro = prompt(
-    "Escolha o filtro de exportação:\n\n1 - Lista completa\n2 - Por dia\n3 - Por tipo (Entrega de kit / Dia da corrida)",
+    "Escolha o filtro de exportação:\n\n1 - Todos em ordem alfabética\n2 - Por prioridade\n3 - Por dia\n4 - Por tipo (Entrega de kit / Dia da corrida)",
     "1"
   );
 
@@ -1639,13 +1944,13 @@ async function abrirFluxoExportacao(corridaId) {
     return;
   }
 
-  if (!["1", "2", "3"].includes(filtroNormalizado)) {
+  if (!["1", "2", "3", "4"].includes(filtroNormalizado)) {
     alert("Filtro inválido.");
     return;
   }
 
   await exportarInscritosCorrida(corridaId, {
-    formato: formatoNormalizado === "1" ? "pdf" : "excel",
+    formato: formatoNormalizado === "2" ? "pdf" : "excel",
     filtro: filtroNormalizado
   });
 }
@@ -1826,6 +2131,13 @@ function montarSecoesExportacao(dadosExportacao, filtro) {
   const diasCorrida = dadosExportacao.diasCorrida || [];
 
   if (filtro === "2") {
+    return [{
+      titulo: "Inscritos por prioridade",
+      inscritos: ordenarInscritosPrioridade(inscritos)
+    }];
+  }
+
+  if (filtro === "3") {
     return diasCorrida.map(dia => ({
       titulo: `${dia.nome} - ${formatarData(dia.data_dia)}`,
       inscritos: ordenarInscritosAlfabetico(
@@ -1836,7 +2148,7 @@ function montarSecoesExportacao(dadosExportacao, filtro) {
     }));
   }
 
-  if (filtro === "3") {
+  if (filtro === "4") {
     const tipos = [...new Set(diasCorrida.map(dia => dia.tipo || "Sem tipo"))];
 
     return tipos.map(tipo => ({
@@ -1850,7 +2162,7 @@ function montarSecoesExportacao(dadosExportacao, filtro) {
   }
 
   return [{
-    titulo: "Lista completa",
+    titulo: "Todos os inscritos",
     inscritos: ordenarInscritosAlfabetico(inscritos)
   }];
 }
@@ -1890,21 +2202,12 @@ function nomeArquivoSeguro(nome) {
     .replace(/^-|-$/g, "") || "corrida";
 }
 
-function obterRotuloFiltroExportacao(filtro) {
-  const rotulos = {
-    "1": "Lista Completa",
-    "2": "Por Dia",
-    "3": "Por Tipo"
-  };
-
-  return rotulos[String(filtro)] || "Lista Completa";
-}
-
 function exportarExcelCorrida(corrida, secoes, filtro) {
   const workbook = XLSX.utils.book_new();
+  const incluirPrioridade = filtro === "2";
 
   secoes.forEach((secao, index) => {
-    const dados = montarLinhasExportacao(secao.inscritos, false);
+    const dados = montarLinhasExportacao(secao.inscritos, incluirPrioridade);
     const headers = [
       "Nome",
       "CPF",
@@ -1912,6 +2215,7 @@ function exportarExcelCorrida(corrida, secoes, filtro) {
       "Celular/Whatsapp",
       "Chave PIX",
       "Dias disponíveis",
+      ...(incluirPrioridade ? ["Prioridade"] : []),
       "Assinatura"
     ];
     const worksheet = XLSX.utils.json_to_sheet(dados, {
@@ -1939,7 +2243,8 @@ function exportarExcelCorrida(corrida, secoes, filtro) {
         "Celular/Whatsapp": 22,
         "Chave PIX": 28,
         "Dias disponíveis": 42,
-        Assinatura: 24
+        Assinatura: 24,
+        Prioridade: 20
       };
 
       return { wch: larguras[header] || 20 };
@@ -1960,7 +2265,7 @@ function exportarExcelCorrida(corrida, secoes, filtro) {
 
         worksheet[cellAddress].s = worksheet[cellAddress].s || {};
         worksheet[cellAddress].s.alignment = {
-          horizontal: "center",
+          horizontal: R >= 3 ? "center" : "center",
           vertical: "center",
           wrapText: true
         };
@@ -1982,14 +2287,13 @@ function exportarExcelCorrida(corrida, secoes, filtro) {
     };
 
     const nomeAba = (secao.titulo || `Lista ${index + 1}`)
-      .replace(/[\/?*\[\]:]/g, " ")
+      .replace(/[\\/?*\[\]:]/g, " ")
       .slice(0, 31) || `Lista ${index + 1}`;
 
     XLSX.utils.book_append_sheet(workbook, worksheet, nomeAba);
   });
 
-  const rotuloFiltro = obterRotuloFiltroExportacao(filtro);
-  XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)} - ${rotuloFiltro}.xlsx`);
+  XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)}.xlsx`);
 }
 
 function exportarPDFCorrida(corrida, secoes, filtro) {
@@ -2006,23 +2310,15 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
     format: "a4"
   });
 
-  const headers = ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Assinatura"];
-  const columnWidths = {
-    0: 58,
-    1: 30,
-    2: 26,
-    3: 34,
-    4: 50,
-    5: 50
-  };
+  const incluirPrioridade = filtro === "2";
+  const headers = incluirPrioridade
+    ? ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Prioridade", "Assinatura"]
+    : ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Assinatura"];
 
   const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const tableWidth = Object.values(columnWidths).reduce((total, width) => total + width, 0);
-  const sideMargin = Math.max(8, (pageWidth - tableWidth) / 2);
 
   secoes.forEach((secao, index) => {
-    if (index > 0) doc.addPage("a4", "landscape");
+    if (index > 0) doc.addPage();
 
     doc.setFontSize(18);
     doc.setFont(undefined, "bold");
@@ -2034,15 +2330,20 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
 
     const body = secao.inscritos.map(inscrito => {
       const staff = inscrito.staff || {};
-
-      return [
+      const base = [
         staff.nome_completo || "",
         staff.cpf || "",
         staff.rg || "",
         staff.telefone || "",
-        staff.chave_pix || "",
-        ""
+        staff.chave_pix || ""
       ];
+
+      if (incluirPrioridade) {
+        base.push(inscrito.prioridade.texto || "");
+      }
+
+      base.push("");
+      return base;
     });
 
     doc.autoTable({
@@ -2050,8 +2351,8 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
       body,
       startY: 30,
       theme: "grid",
-      margin: { left: sideMargin, right: sideMargin },
-      tableWidth,
+      margin: { left: 8, right: 8 },
+      tableWidth: "auto",
       styles: {
         fontSize: 8,
         cellPadding: 2,
@@ -2068,14 +2369,16 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
         valign: "middle"
       },
       columnStyles: {
-        0: { cellWidth: columnWidths[0], halign: "left" },
-        1: { cellWidth: columnWidths[1] },
-        2: { cellWidth: columnWidths[2] },
-        3: { cellWidth: columnWidths[3] },
-        4: { cellWidth: columnWidths[4] },
-        5: { cellWidth: columnWidths[5] }
+        0: { cellWidth: 54, halign: "left" },
+        1: { cellWidth: 28 },
+        2: { cellWidth: 24 },
+        3: { cellWidth: 32 },
+        4: { cellWidth: 48 },
+        5: { cellWidth: incluirPrioridade ? 30 : 52 },
+        6: { cellWidth: 44 }
       },
       didDrawPage: function () {
+        const pageHeight = doc.internal.pageSize.getHeight();
         doc.setFontSize(8);
         doc.text(
           `Página ${doc.internal.getCurrentPageInfo().pageNumber}`,
@@ -2087,8 +2390,7 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
     });
   });
 
-  const rotuloFiltro = obterRotuloFiltroExportacao(filtro);
-  doc.save(`${nomeArquivoSeguro(corrida.nome)} - ${rotuloFiltro}.pdf`);
+  doc.save(`${nomeArquivoSeguro(corrida.nome)}.pdf`);
 }
 
 // INICIALIZAÇÃO

@@ -183,7 +183,7 @@ async function carregarCorridas() {
 
   if (contagemInscricoes) {
     contagemInscricoes.forEach(inscricao => {
-      if (inscricao.status === "cancelado") return;
+      if (inscricao.status === "cancelado" || inscricao.status === "reserva") return;
 
       inscritosPorCorrida[inscricao.corrida_id] =
         (inscritosPorCorrida[inscricao.corrida_id] || 0) + 1;
@@ -673,8 +673,10 @@ function formatarTextoComQuebra(texto) {
 
 function formatarStatusInscricao(status) {
   const statusFormatados = {
-    inscrito: "Inscrito",
+    inscrito: "Pendente",
+    pendente: "Pendente",
     confirmado: "Confirmado",
+    reserva: "Reserva",
     cancelado: "Cancelado"
   };
 
