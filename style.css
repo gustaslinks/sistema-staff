@@ -2071,3 +2071,123 @@ body {
     font-size: 13px;
   }
 }
+
+
+/* Ajuste: resumo compacto dos inscritos */
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.admin-inscritos-resumo-compacto .resumo-dupla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-inscritos-resumo-compacto .resumo-card {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.admin-inscritos-resumo-compacto .resumo-card-total {
+  padding: 12px;
+}
+
+.admin-inscritos-resumo-compacto .resumo-card strong {
+  display: block;
+  font-size: 22px;
+  line-height: 1.05;
+  color: #111827;
+}
+
+.admin-inscritos-resumo-compacto .resumo-card-total strong {
+  font-size: 28px;
+}
+
+.admin-inscritos-resumo-compacto .resumo-card span {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.15;
+  color: #6b7280;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+}
+
+@media (max-width: 520px) {
+  .admin-inscritos-resumo.admin-inscritos-resumo-compacto {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-inscritos-resumo-compacto .resumo-dupla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-inscritos-resumo-compacto .resumo-card {
+    padding: 9px 8px;
+  }
+
+  .admin-inscritos-resumo-compacto .resumo-card-total {
+    padding: 11px 8px;
+  }
+}
+
+
+/* FIX FINAL v111: resumo compacto real no mobile e desktop */
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto > .resumo-card,
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto > .resumo-dupla {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto > .resumo-dupla {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto .resumo-card {
+  min-height: 72px !important;
+  padding: 9px 8px !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto .resumo-card-total {
+  min-height: 78px !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto .resumo-card strong {
+  font-size: 24px !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto .resumo-card-total strong {
+  font-size: 30px !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto .resumo-card span {
+  font-size: 11px !important;
+  line-height: 1.15 !important;
+  margin-top: 5px !important;
+}
