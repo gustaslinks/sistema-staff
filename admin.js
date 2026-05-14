@@ -851,6 +851,8 @@ async function carregarInscritosDaCorrida(
       new Date(b.created_at);
   });
 
+  let vagasPreSelecionadas = 0;
+
   inscricoesComPrioridade.forEach(inscricao => {
     inscricao.preSelecionado = false;
   });
