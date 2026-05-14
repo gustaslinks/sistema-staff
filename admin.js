@@ -221,7 +221,7 @@ function contarInscritosValidos(inscricoes, corridaId) {
   if (!inscricoes) return 0;
 
   return inscricoes.filter(inscricao => {
-    return inscricao.corrida_id === corridaId && inscricao.status !== "cancelado" && inscricao.status !== "reserva";
+    return inscricao.corrida_id === corridaId && inscricao.status !== "cancelado" && inscricao.status !== "lista_espera";
   }).length;
 }
 
@@ -784,7 +784,8 @@ async function carregarInscritosDaCorrida(
       corrida_dias (
         id,
         nome,
-        data_dia
+        data_dia,
+        tipo
       )
     `)
     .in("inscricao_id", inscricaoIds);
@@ -859,7 +860,7 @@ async function carregarInscritosDaCorrida(
     const jaConfirmado = status === "confirmado";
     const podePreSelecionar =
       status !== "cancelado" &&
-      status !== "reserva" &&
+      status !== "lista_espera" &&
       (jaConfirmado || prioridadeAlta);
 
     if (podePreSelecionar && (!totalVagasCorrida || vagasPreSelecionadas < totalVagasCorrida)) {
@@ -889,8 +890,8 @@ async function carregarInscritosDaCorrida(
           <span>pendentes</span>
         </div>
         <div>
-          <strong>${resumo.reserva}</strong>
-          <span>reserva</span>
+          <strong>${resumo.listaEspera}</strong>
+          <span>lista de espera</span>
         </div>
         <div>
           <strong>${totalVagasCorrida ? `${resumo.confirmados}/${totalVagasCorrida}` : resumo.confirmados}</strong>
@@ -899,14 +900,17 @@ async function carregarInscritosDaCorrida(
       </div>
 
       <div class="admin-inscritos-acoes-massa">
-        <button type="button" class="botao-admin-batch botao-selecionar-prioridade">
-          Selecionar prioridades altas
+        <button type="button" class="botao-admin-batch botao-selecionar-filtrados">
+          Selecionar filtrados
+        </button>
+        <button type="button" class="botao-admin-batch botao-desselecionar-todos">
+          Desselecionar todos
         </button>
         <button type="button" class="botao-admin-batch botao-confirmar-selecionados">
           Confirmar selecionados
         </button>
         <button type="button" class="botao-admin-batch botao-confirmar-reservar">
-          Confirmar selecionados e reservar restantes
+          Confirmar selecionados e colocar restantes em lista de espera
         </button>
       </div>
 
@@ -920,8 +924,10 @@ async function carregarInscritosDaCorrida(
           <button type="button" class="admin-filtro-inscrito ativo" data-filtro="todos">Todos</button>
           <button type="button" class="admin-filtro-inscrito" data-filtro="pendente">Pendentes</button>
           <button type="button" class="admin-filtro-inscrito" data-filtro="confirmado">Confirmados</button>
-          <button type="button" class="admin-filtro-inscrito" data-filtro="reserva">Reserva</button>
-          <button type="button" class="admin-filtro-inscrito" data-filtro="sem-disponibilidade">Sem disponibilidade</button>
+          <button type="button" class="admin-filtro-inscrito" data-filtro="lista_espera">Lista de espera</button>
+          <button type="button" class="admin-filtro-inscrito" data-filtro="prioridade-alta">Prioridade alta</button>
+          <button type="button" class="admin-filtro-inscrito" data-filtro="prioridade-media">Prioridade média</button>
+          <button type="button" class="admin-filtro-inscrito" data-filtro="prioridade-baixa">Prioridade baixa</button>
         </div>
       </div>
 
@@ -952,7 +958,9 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
     totalDiasCorrida
   );
   const nomeBusca = String(staff.nome_completo || "").toLowerCase();
-  const semDisponibilidade = inscricao.quantidadeDiasDisponiveis <= 0;
+  const possuiEntregaKit = diasDisponiveis.some(dia => ehTipoEntregaKit(dia.tipo || dia.nome));
+  const possuiDiaCorrida = diasDisponiveis.some(dia => ehTipoDiaCorrida(dia.tipo || dia.nome));
+  const fotoUrl = staff.foto_url || "";
 
   return `
     <article
@@ -961,11 +969,10 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
       data-corrida-id="${corridaId}"
       data-status="${status}"
       data-prioridade="${inscricao.prioridade.classe}"
-      data-sem-disponibilidade="${semDisponibilidade ? "true" : "false"}"
       data-nome="${escapeHtml(nomeBusca)}"
     >
       <div class="linha-inscrito-principal">
-        <label class="linha-inscrito-check">
+        <label class="linha-inscrito-check" title="Selecionar para ação em lote">
           <input
             type="checkbox"
             class="checkbox-inscrito-batch"
@@ -985,48 +992,65 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
           <small>${textoQuantidadeDias}</small>
         </div>
 
-        <span class="admin-badge-prioridade ${inscricao.prioridade.classe}">
-          ${inscricao.prioridade.texto}
-        </span>
+        <div class="linha-inscrito-icones" aria-label="Tipos de disponibilidade">
+          <span class="icone-tipo-dia ${possuiEntregaKit ? "ativo" : "inativo"}" title="Entrega de kit">📦</span>
+          <span class="icone-tipo-dia ${possuiDiaCorrida ? "ativo" : "inativo"}" title="Dia da corrida">🏁</span>
+        </div>
 
         <span class="admin-status-inscricao ${status}">
           ${formatarStatusInscricao(status)}
         </span>
-
-        <div class="linha-inscrito-acoes">
-          <button
-            type="button"
-            class="botao-confirmar-inscrito"
-            data-inscricao-id="${inscricao.id}"
-            data-corrida-id="${corridaId}"
-            ${status === "confirmado" ? "disabled" : ""}
-          >
-            Confirmar
-          </button>
-
-          <button
-            type="button"
-            class="botao-reserva-inscrito"
-            data-inscricao-id="${inscricao.id}"
-            data-corrida-id="${corridaId}"
-            ${status === "reserva" ? "disabled" : ""}
-          >
-            Reserva
-          </button>
-
-          <button
-            type="button"
-            class="botao-cancelar-inscrito"
-            data-inscricao-id="${inscricao.id}"
-            data-corrida-id="${corridaId}"
-            ${status === "cancelado" ? "disabled" : ""}
-          >
-            Cancelar
-          </button>
-        </div>
       </div>
 
       <div class="linha-inscrito-detalhes hidden">
+        <div class="detalhes-inscrito-header">
+          <div class="foto-inscrito-admin">
+            ${fotoUrl
+              ? `<img src="${escapeHtml(fotoUrl)}" alt="Foto de ${escapeHtml(staff.nome_completo || "staff")}">`
+              : `<div class="foto-inscrito-placeholder">Sem foto</div>`
+            }
+          </div>
+
+          <div class="detalhes-inscrito-info-principal">
+            <strong>${escapeHtml(staff.nome_completo || "Nome não informado")}</strong>
+            <span class="admin-badge-prioridade ${inscricao.prioridade.classe}">
+              ${inscricao.prioridade.texto}
+            </span>
+          </div>
+
+          <div class="linha-inscrito-acoes">
+            <button
+              type="button"
+              class="botao-confirmar-inscrito"
+              data-inscricao-id="${inscricao.id}"
+              data-corrida-id="${corridaId}"
+              ${status === "confirmado" ? "disabled" : ""}
+            >
+              Confirmar
+            </button>
+
+            <button
+              type="button"
+              class="botao-lista-espera-inscrito"
+              data-inscricao-id="${inscricao.id}"
+              data-corrida-id="${corridaId}"
+              ${status === "lista_espera" ? "disabled" : ""}
+            >
+              Lista de espera
+            </button>
+
+            <button
+              type="button"
+              class="botao-cancelar-inscrito"
+              data-inscricao-id="${inscricao.id}"
+              data-corrida-id="${corridaId}"
+              ${status === "cancelado" ? "disabled" : ""}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+
         <div class="detalhes-inscrito-grid">
           <p><strong>Cidade:</strong> ${escapeHtml(staff.cidade || "Não informada")}</p>
           <p><strong>Telefone:</strong> ${escapeHtml(staff.telefone || "Não informado")}</p>
@@ -1037,16 +1061,11 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
         </div>
 
         <div class="admin-tags-disponibilidade">
-          ${diasDisponiveis.length > 0
-            ? diasDisponiveis.map(dia => `
-              <span class="admin-tag-disponibilidade">
-                ${escapeHtml(dia.nome || formatarData(dia.data_dia))}
-              </span>
-            `).join("")
-            : `<span class="admin-tag-disponibilidade sem-disponibilidade">
-                Nenhum dia selecionado
-              </span>`
-          }
+          ${diasDisponiveis.map(dia => `
+            <span class="admin-tag-disponibilidade">
+              ${escapeHtml(dia.nome || formatarData(dia.data_dia))}
+            </span>
+          `).join("")}
         </div>
       </div>
     </article>
@@ -1100,23 +1119,35 @@ function ativarControlesInscritosAdmin(areaInscritos, corridaId, totalVagasCorri
     });
   });
 
-  const botaoSelecionarPrioridade = areaInscritos.querySelector(".botao-selecionar-prioridade");
-  if (botaoSelecionarPrioridade) {
-    botaoSelecionarPrioridade.addEventListener("click", () => {
-      let selecionados = 0;
-      areaInscritos.querySelectorAll(".linha-inscrito-admin").forEach(linha => {
+  const botaoSelecionarFiltrados = areaInscritos.querySelector(".botao-selecionar-filtrados");
+  if (botaoSelecionarFiltrados) {
+    botaoSelecionarFiltrados.addEventListener("click", () => {
+      let selecionados = areaInscritos.querySelectorAll(
+        ".checkbox-inscrito-batch:checked"
+      ).length;
+
+      areaInscritos.querySelectorAll(".linha-inscrito-admin:not(.hidden)").forEach(linha => {
         const checkbox = linha.querySelector(".checkbox-inscrito-batch");
-        if (!checkbox || checkbox.disabled) return;
+        if (!checkbox || checkbox.disabled || checkbox.checked) return;
 
-        const prioridadeAlta = linha.dataset.prioridade === "prioridade-alta";
         const status = linha.dataset.status;
+        if (status === "cancelado") return;
 
-        if (prioridadeAlta && status !== "reserva" && status !== "cancelado" && (!totalVagasCorrida || selecionados < totalVagasCorrida)) {
-          checkbox.checked = true;
-          selecionados += 1;
-        } else if (status !== "confirmado") {
-          checkbox.checked = false;
-        }
+        if (totalVagasCorrida > 0 && selecionados >= totalVagasCorrida) return;
+
+        checkbox.checked = true;
+        selecionados += 1;
+      });
+
+      atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
+    });
+  }
+
+  const botaoDesselecionarTodos = areaInscritos.querySelector(".botao-desselecionar-todos");
+  if (botaoDesselecionarTodos) {
+    botaoDesselecionarTodos.addEventListener("click", () => {
+      areaInscritos.querySelectorAll(".checkbox-inscrito-batch").forEach(checkbox => {
+        if (!checkbox.disabled) checkbox.checked = false;
       });
       atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
     });
@@ -1146,14 +1177,14 @@ function filtrarInscritosAdmin(areaInscritos) {
   areaInscritos.querySelectorAll(".linha-inscrito-admin").forEach(linha => {
     const nome = linha.dataset.nome || "";
     const status = linha.dataset.status || "";
-    const semDisponibilidade = linha.dataset.semDisponibilidade === "true";
+    const prioridade = linha.dataset.prioridade || "";
 
     const passaBusca = !termo || nome.includes(termo);
     const passaFiltro =
       filtro === "todos" ||
       filtro === status ||
-      (filtro === "pendente" && (status === "inscrito" || status === "pendente")) ||
-      (filtro === "sem-disponibilidade" && semDisponibilidade);
+      filtro === prioridade ||
+      (filtro === "pendente" && (status === "inscrito" || status === "pendente"));
 
     linha.classList.toggle("hidden", !(passaBusca && passaFiltro));
   });
@@ -1185,7 +1216,7 @@ async function confirmarSelecionadosEmLote(areaInscritos, corridaId, reservarRes
   }
 
   const mensagem = reservarRestantes
-    ? `Confirmar ${idsSelecionados.length} selecionado(s) e colocar os demais pendentes em reserva?`
+    ? `Confirmar ${idsSelecionados.length} selecionado(s) e colocar os demais pendentes em lista de espera?`
     : `Confirmar ${idsSelecionados.length} selecionado(s)?`;
 
   if (!confirm(mensagem)) {
@@ -1215,12 +1246,12 @@ async function confirmarSelecionadosEmLote(areaInscritos, corridaId, reservarRes
     if (idsReserva.length > 0) {
       const { error: erroReserva } = await supabaseClient
         .from("inscricoes")
-        .update({ status: "reserva" })
+        .update({ status: "lista_espera" })
         .in("id", idsReserva);
 
       if (erroReserva) {
-        console.error("Erro ao colocar em reserva:", erroReserva);
-        alert("Selecionados confirmados, mas não foi possível colocar os demais em reserva.");
+        console.error("Erro ao colocar em lista de espera:", erroReserva);
+        alert("Selecionados confirmados, mas não foi possível colocar os demais em lista de espera. Rode o SQL de ajuste do status no Supabase.");
       }
     }
   }
@@ -1237,8 +1268,8 @@ function ativarBotoesStatusInscricao(contexto) {
     ".botao-confirmar-inscrito"
   );
 
-  const botoesReserva = raiz.querySelectorAll(
-    ".botao-reserva-inscrito"
+  const botoesListaEspera = raiz.querySelectorAll(
+    ".botao-lista-espera-inscrito"
   );
 
   const botoesCancelar = raiz.querySelectorAll(
@@ -1254,11 +1285,11 @@ function ativarBotoesStatusInscricao(contexto) {
     });
   });
 
-  botoesReserva.forEach(botao => {
+  botoesListaEspera.forEach(botao => {
     botao.addEventListener("click", async function () {
       await atualizarStatusInscricao(
         botao,
-        "reserva"
+        "lista_espera"
       );
     });
   });
@@ -1308,7 +1339,7 @@ async function atualizarStatusInscricao(
     );
 
     alert(
-      "Não foi possível atualizar o status."
+      "Não foi possível atualizar o status. Se for Lista de espera, rode o SQL de ajuste do status no Supabase."
     );
 
     botao.disabled = false;
@@ -1328,7 +1359,7 @@ function gerarResumoInscricoes(inscricoes, totalVagasCorrida) {
     total: inscricoes.length,
     confirmados: 0,
     pendentes: 0,
-    reserva: 0,
+    listaEspera: 0,
     cancelados: 0
   };
 
@@ -1336,7 +1367,7 @@ function gerarResumoInscricoes(inscricoes, totalVagasCorrida) {
     const status = normalizarStatusInscricao(inscricao.status);
 
     if (status === "confirmado") resumo.confirmados += 1;
-    else if (status === "reserva") resumo.reserva += 1;
+    else if (status === "lista_espera") resumo.listaEspera += 1;
     else if (status === "cancelado") resumo.cancelados += 1;
     else resumo.pendentes += 1;
   });
@@ -1347,6 +1378,7 @@ function gerarResumoInscricoes(inscricoes, totalVagasCorrida) {
 function normalizarStatusInscricao(status) {
   if (!status) return "pendente";
   if (status === "inscrito") return "pendente";
+  if (status === "reserva") return "lista_espera";
   return status;
 }
 
@@ -1737,13 +1769,30 @@ function formatarTextoComQuebra(texto) {
     .replace(/\n/g, "<br>");
 }
 
+
+function normalizarTextoTipoDia(valor) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function ehTipoEntregaKit(valor) {
+  const texto = normalizarTextoTipoDia(valor);
+  return texto.includes("kit") || texto.includes("entrega");
+}
+
+function ehTipoDiaCorrida(valor) {
+  const texto = normalizarTextoTipoDia(valor);
+  return texto.includes("corrida") || texto.includes("evento");
+}
 function formatarStatusInscricao(status) {
 
   const statusFormatados = {
     inscrito: "Pendente",
     pendente: "Pendente",
     confirmado: "Confirmado",
-    reserva: "Reserva",
+    lista_espera: "Lista de espera",
     cancelado: "Cancelado"
   };
 

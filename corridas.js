@@ -183,7 +183,7 @@ async function carregarCorridas() {
 
   if (contagemInscricoes) {
     contagemInscricoes.forEach(inscricao => {
-      if (inscricao.status === "cancelado" || inscricao.status === "reserva") return;
+      if (inscricao.status === "cancelado" || inscricao.status === "reserva" || inscricao.status === "lista_espera") return;
 
       inscritosPorCorrida[inscricao.corrida_id] =
         (inscritosPorCorrida[inscricao.corrida_id] || 0) + 1;
@@ -676,7 +676,8 @@ function formatarStatusInscricao(status) {
     inscrito: "Pendente",
     pendente: "Pendente",
     confirmado: "Confirmado",
-    reserva: "Reserva",
+    reserva: "Lista de espera",
+    lista_espera: "Lista de espera",
     cancelado: "Cancelado"
   };
 
