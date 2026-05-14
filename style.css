@@ -2451,3 +2451,251 @@ body {
     font-size: 13px !important;
   }
 }
+
+/* =========================================================
+   AJUSTE V125 - BOTÕES FLUTUANTES: CALENDÁRIO ADMIN + WHATSAPP STAFF
+   ========================================================= */
+.floating-calendar-btn,
+.floating-whatsapp {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9990;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.22);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.floating-calendar-btn:hover,
+.floating-whatsapp:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.28);
+  filter: brightness(1.03);
+}
+
+.floating-calendar-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.floating-whatsapp {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.floating-whatsapp-icon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.floating-calendar-modal.hidden {
+  display: none !important;
+}
+
+.floating-calendar-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.floating-calendar-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.floating-calendar-box {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  padding: 20px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.35);
+}
+
+.floating-calendar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.floating-calendar-label {
+  margin: 0 0 4px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.floating-calendar-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.floating-calendar-close {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.floating-calendar-controls,
+.floating-calendar-selects {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.floating-calendar-selects {
+  grid-template-columns: minmax(0, 1fr) 110px;
+}
+
+.floating-calendar-controls button,
+.floating-calendar-selects select,
+.floating-calendar-selects input {
+  min-height: 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.floating-calendar-controls button {
+  cursor: pointer;
+}
+
+.floating-calendar-today {
+  background: #dbeafe !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+.floating-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.floating-calendar-weekdays {
+  margin-top: 14px;
+  margin-bottom: 6px;
+}
+
+.floating-calendar-weekday {
+  padding: 8px 4px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.floating-calendar-day {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+button.floating-calendar-day {
+  cursor: default;
+}
+
+.floating-calendar-day.muted {
+  background: #f8fafc;
+  color: #cbd5e1;
+}
+
+.floating-calendar-day.today {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+}
+
+@media (max-width: 700px) {
+  .floating-calendar-btn,
+  .floating-whatsapp {
+    right: 14px;
+    bottom: 14px;
+    min-height: 50px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .floating-calendar-modal {
+    align-items: flex-end;
+    padding: 10px;
+  }
+
+  .floating-calendar-box {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .floating-calendar-header h2 {
+    font-size: 21px;
+  }
+
+  .floating-calendar-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .floating-calendar-today {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .floating-calendar-day {
+    min-height: 40px;
+    border-radius: 11px;
+    font-size: 13px;
+  }
+}
