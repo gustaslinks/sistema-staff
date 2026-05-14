@@ -928,6 +928,8 @@ async function carregarInscritosDaCorrida(
           <button type="button" class="admin-filtro-inscrito" data-filtro="prioridade-alta">Prioridade alta</button>
           <button type="button" class="admin-filtro-inscrito" data-filtro="prioridade-media">Prioridade média</button>
           <button type="button" class="admin-filtro-inscrito" data-filtro="prioridade-baixa">Prioridade baixa</button>
+          <button type="button" class="admin-filtro-inscrito" data-filtro="somente-kit">Somente entrega de kit</button>
+          <button type="button" class="admin-filtro-inscrito" data-filtro="somente-corrida">Somente dia da corrida</button>
         </div>
       </div>
 
@@ -960,6 +962,14 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
   const nomeBusca = String(staff.nome_completo || "").toLowerCase();
   const possuiEntregaKit = diasDisponiveis.some(dia => ehTipoEntregaKit(dia.tipo || dia.nome));
   const possuiDiaCorrida = diasDisponiveis.some(dia => ehTipoDiaCorrida(dia.tipo || dia.nome));
+  const tipoDisponibilidadeFiltro =
+    possuiEntregaKit && !possuiDiaCorrida
+      ? "somente-kit"
+      : possuiDiaCorrida && !possuiEntregaKit
+        ? "somente-corrida"
+        : possuiEntregaKit && possuiDiaCorrida
+          ? "kit-e-corrida"
+          : "sem-tipo";
   const fotoUrl = staff.foto_url || "";
 
   return `
@@ -969,6 +979,7 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
       data-corrida-id="${corridaId}"
       data-status="${status}"
       data-prioridade="${inscricao.prioridade.classe}"
+      data-tipo-disponibilidade="${tipoDisponibilidadeFiltro}"
       data-nome="${escapeHtml(nomeBusca)}"
     >
       <div class="linha-inscrito-principal">
@@ -988,13 +999,16 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
         </button>
 
         <div class="linha-inscrito-nome">
-          <strong>${escapeHtml(staff.nome_completo || "Nome não informado")}</strong>
-          <small>${textoQuantidadeDias}</small>
-        </div>
+          <div class="linha-inscrito-nome-topo">
+            <strong>${escapeHtml(staff.nome_completo || "Nome não informado")}</strong>
 
-        <div class="linha-inscrito-icones" aria-label="Tipos de disponibilidade">
-          <span class="icone-tipo-dia ${possuiEntregaKit ? "ativo" : "inativo"}" title="Entrega de kit">📦</span>
-          <span class="icone-tipo-dia ${possuiDiaCorrida ? "ativo" : "inativo"}" title="Dia da corrida">🏁</span>
+            <div class="linha-inscrito-icones" aria-label="Tipos de disponibilidade">
+              <span class="icone-tipo-dia ${possuiEntregaKit ? "ativo" : "inativo"}" title="Entrega de kit">📦</span>
+              <span class="icone-tipo-dia ${possuiDiaCorrida ? "ativo" : "inativo"}" title="Dia da corrida">🏁</span>
+            </div>
+          </div>
+
+          <small>${textoQuantidadeDias}</small>
         </div>
 
         <span class="admin-status-inscricao ${status}">
@@ -1178,12 +1192,14 @@ function filtrarInscritosAdmin(areaInscritos) {
     const nome = linha.dataset.nome || "";
     const status = linha.dataset.status || "";
     const prioridade = linha.dataset.prioridade || "";
+    const tipoDisponibilidade = linha.dataset.tipoDisponibilidade || "";
 
     const passaBusca = !termo || nome.includes(termo);
     const passaFiltro =
       filtro === "todos" ||
       filtro === status ||
       filtro === prioridade ||
+      filtro === tipoDisponibilidade ||
       (filtro === "pendente" && (status === "inscrito" || status === "pendente"));
 
     linha.classList.toggle("hidden", !(passaBusca && passaFiltro));

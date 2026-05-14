@@ -2026,3 +2026,48 @@ body {
     width: 100%;
   }
 }
+
+
+.linha-inscrito-principal {
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.linha-inscrito-nome {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.linha-inscrito-nome-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.linha-inscrito-nome-topo strong {
+  flex: 1;
+}
+
+.linha-inscrito-icones {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+@media (max-width: 640px) {
+  .linha-inscrito-principal {
+    gap: 8px;
+  }
+
+  .linha-inscrito-nome-topo {
+    gap: 8px;
+  }
+
+  .icone-tipo-dia {
+    width: 26px;
+    height: 26px;
+    font-size: 13px;
+  }
+}
