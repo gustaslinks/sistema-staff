@@ -6,7 +6,7 @@
 
   <title>Painel Admin | Sistema Staff</title>
 
-  <link rel="stylesheet" href="style.css?v=104">
+  <link rel="stylesheet" href="style.css?v=103">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -64,6 +64,7 @@
             <input type="text" id="corrida-nome">
           </div>
 
+
           <div class="field">
             <label for="corrida-data-inicio">Início do evento / entrega de kit</label>
             <input type="date" id="corrida-data-inicio">
@@ -84,10 +85,7 @@
             <input type="number" id="corrida-vagas" min="1" placeholder="Ex.: 30">
           </div>
 
-
-        </div>
-
-        <div class="field field-spaced">
+          <div class="field">
           <label for="corrida-local">Local completo</label>
           <textarea id="corrida-local" rows="4" placeholder="Nome do local, endereço completo, portão/acesso e ponto de referência"></textarea>
         </div>
@@ -170,6 +168,8 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

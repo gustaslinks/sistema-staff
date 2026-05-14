@@ -16,6 +16,7 @@ const listaCorridasAdmin = document.getElementById("lista-corridas-admin");
 const corridaNome = document.getElementById("corrida-nome");
 const corridaDataInicio = document.getElementById("corrida-data-inicio");
 const corridaDataFim = document.getElementById("corrida-data-fim");
+const corridaCidade = document.getElementById("corrida-cidade");
 const corridaLocal = document.getElementById("corrida-local");
 const corridaPrazo = document.getElementById("corrida-prazo");
 const corridaVagas = document.getElementById("corrida-vagas");
@@ -115,7 +116,7 @@ salvarCorridaBtn.addEventListener("click", async function () {
     data_corrida: corridaDataFim.value,
     data_inicio: corridaDataInicio.value,
     data_fim: corridaDataFim.value,
-    cidade: null,
+    cidade: corridaCidade ? corridaCidade.value.trim() || null : null,
     local: corridaLocal.value.trim() || null,
     vagas_total: Number(corridaVagas.value),
     prazo_inscricao: corridaPrazo.value || null,
@@ -204,44 +205,6 @@ salvarCorridaBtn.addEventListener("click", async function () {
   carregarCorridasAdmin();
 });
 
-
-function contarInscritosValidos(inscricoes, corridaId) {
-  if (!inscricoes) return 0;
-
-  return inscricoes.filter(inscricao => {
-    return inscricao.corrida_id === corridaId && inscricao.status !== "cancelado";
-  }).length;
-}
-
-async function encerrarCorridasLotadas(corridas, inscricoes) {
-  const corridasLotadas = (corridas || []).filter(corrida => {
-    const vagasTotal = Number(corrida.vagas_total || 0);
-    const totalInscritos = contarInscritosValidos(inscricoes, corrida.id);
-
-    return corrida.status === "aberta" && vagasTotal > 0 && totalInscritos >= vagasTotal;
-  });
-
-  if (corridasLotadas.length === 0) return;
-
-  const ids = corridasLotadas.map(corrida => corrida.id);
-
-  const { error } = await supabaseClient
-    .from("corridas")
-    .update({ status: "encerrada" })
-    .in("id", ids);
-
-  if (error) {
-    console.error("Erro ao encerrar corridas lotadas:", error);
-    return;
-  }
-
-  corridas.forEach(corrida => {
-    if (ids.includes(corrida.id)) {
-      corrida.status = "encerrada";
-    }
-  });
-}
-
 // LISTAR CORRIDAS
 async function carregarCorridasAdmin() {
   listaCorridasAdmin.innerHTML = `<p>Carregando corridas...</p>`;
@@ -270,7 +233,7 @@ async function carregarCorridasAdmin() {
   const { data: inscricoes, error: erroInscricoes } =
     await supabaseClient
       .from("inscricoes")
-      .select("corrida_id, status");
+      .select("corrida_id");
 
   if (erroInscricoes) {
     console.error(
@@ -279,35 +242,29 @@ async function carregarCorridasAdmin() {
     );
   }
 
-  await encerrarCorridasLotadas(corridas, inscricoes || []);
-
   listaCorridasAdmin.innerHTML = corridas.map(corrida => {
-    const totalInscritos = contarInscritosValidos(inscricoes || [], corrida.id);
-    const vagasTotal = Number(corrida.vagas_total || 0);
-    const textoVagas = vagasTotal > 0
-      ? `${totalInscritos} de ${vagasTotal} vagas preenchidas`
-      : `${totalInscritos} inscrito(s)`;
+    const totalInscritos = inscricoes
+      ? inscricoes.filter(
+          inscricao => inscricao.corrida_id === corrida.id
+        ).length
+      : 0;
 
     return `
       <article class="card-corrida-admin">
 
         <h3>${corrida.nome}</h3>
 
-        <div class="corrida-status-card ${corrida.status}">
-          <strong>${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
-          <span>${textoVagas}</span>
-        </div>
-
         <p><strong>Período:</strong>
           ${formatarPeriodoCorrida(corrida)}
         </p>
+
 
         <p><strong>Local:</strong><br>
           ${formatarTextoComQuebra(corrida.local || "Não informado")}
         </p>
 
         <p><strong>Vagas:</strong>
-          ${vagasTotal > 0 ? vagasTotal : "Não informadas"}
+          ${corrida.vagas_total || "Não informadas"}
         </p>
 
         <p><strong>Prazo:</strong>
@@ -323,15 +280,8 @@ async function carregarCorridasAdmin() {
         </p>
 
         <div class="gerenciar-dias">
-          <button
-            type="button"
-            class="botao-toggle-dias"
-            data-corrida-id="${corrida.id}"
-          >
-            Mostrar dias cadastrados
-          </button>
-
-          <div id="dias-corrida-${corrida.id}" class="dias-corrida-container hidden"></div>
+          <h4>Dias cadastrados</h4>
+          <div id="dias-corrida-${corrida.id}"></div>
         </div>
 
         <div class="admin-card-footer">
@@ -401,30 +351,6 @@ ativarBotoesExcluirCorrida();
 ativarBotoesVerInscritos();
 ativarBotoesExportarPlanilha();
 ativarBotoesStatusCorrida();
-ativarBotoesToggleDias();
-}
-
-function ativarBotoesToggleDias() {
-  const botoes = document.querySelectorAll(".botao-toggle-dias");
-
-  botoes.forEach(botao => {
-    botao.addEventListener("click", function () {
-      const corridaId = botao.dataset.corridaId;
-      const container = document.getElementById(`dias-corrida-${corridaId}`);
-
-      if (!container) return;
-
-      const fechado = container.classList.contains("hidden");
-
-      if (fechado) {
-        container.classList.remove("hidden");
-        botao.textContent = "Ocultar dias cadastrados";
-      } else {
-        container.classList.add("hidden");
-        botao.textContent = "Mostrar dias cadastrados";
-      }
-    });
-  });
 }
 
 // EDITAR CORRIDA
@@ -468,6 +394,7 @@ async function carregarCorridaParaEdicao(corridaId) {
   corridaNome.value = corrida.nome || "";
   corridaDataInicio.value = corrida.data_inicio || corrida.data_corrida || "";
   corridaDataFim.value = corrida.data_fim || corrida.data_corrida || "";
+  if (corridaCidade) corridaCidade.value = corrida.cidade || "";
   corridaLocal.value = corrida.local || "";
   corridaPrazo.value = corrida.prazo_inscricao || "";
   corridaVagas.value = corrida.vagas_total || "";
@@ -1344,6 +1271,7 @@ function limparFormularioCorrida() {
   corridaNome.value = "";
   corridaDataInicio.value = "";
   corridaDataFim.value = "";
+  corridaCidade.value = "";
   corridaLocal.value = "";
   corridaPrazo.value = "";
   corridaVagas.value = "";
@@ -1581,18 +1509,70 @@ function ativarBotoesExportarPlanilha() {
 
   botoes.forEach(botao => {
 
-    botao.addEventListener("click", async () => {
+    botao.addEventListener("click", () => {
 
       const corridaId = Number(
         botao.dataset.corridaId
       );
 
-      await exportarPlanilhaCorrida(corridaId);
+      abrirModalExportacao(corridaId);
     });
   });
 }
 
-async function exportarPlanilhaCorrida(corridaId) {
+function abrirModalExportacao(corridaId) {
+  fecharModalExportacao();
+
+  const modal = document.createElement("div");
+  modal.id = "modal-exportacao-planilha";
+  modal.className = "modal-exportacao-backdrop";
+
+  modal.innerHTML = `
+    <div class="modal-exportacao-card">
+      <h3>Exportar lista</h3>
+      <p>Escolha o formato do arquivo.</p>
+
+      <div class="modal-exportacao-acoes">
+        <button type="button" class="botao-admin-secundario" id="exportar-xlsx-btn">
+          Excel (.xlsx)
+        </button>
+
+        <button type="button" class="botao-admin-secundario" id="exportar-pdf-btn">
+          PDF (.pdf)
+        </button>
+
+        <button type="button" class="delete-btn" id="cancelar-exportacao-btn">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById("exportar-xlsx-btn").addEventListener("click", async () => {
+    fecharModalExportacao();
+    await exportarPlanilhaCorrida(corridaId, "xlsx");
+  });
+
+  document.getElementById("exportar-pdf-btn").addEventListener("click", async () => {
+    fecharModalExportacao();
+    await exportarPlanilhaCorrida(corridaId, "pdf");
+  });
+
+  document.getElementById("cancelar-exportacao-btn").addEventListener("click", fecharModalExportacao);
+
+  modal.addEventListener("click", event => {
+    if (event.target === modal) fecharModalExportacao();
+  });
+}
+
+function fecharModalExportacao() {
+  const modal = document.getElementById("modal-exportacao-planilha");
+  if (modal) modal.remove();
+}
+
+async function exportarPlanilhaCorrida(corridaId, formato = "xlsx") {
 
   const { data: corrida, error: erroCorrida } =
     await supabaseClient
@@ -1647,6 +1627,11 @@ async function exportarPlanilhaCorrida(corridaId) {
     "Chave PIX": staff.chave_pix || "",
     Assinatura: ""
   }));
+
+  if (formato === "pdf") {
+    exportarPDFCorrida(corrida, dados);
+    return;
+  }
 
   const workbook = XLSX.utils.book_new();
 
@@ -1848,6 +1833,109 @@ for (let C = 0; C <= 5; ++C) {
     workbook,
     `${corrida.nome}.xlsx`
   );
+}
+
+function exportarPDFCorrida(corrida, dados) {
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert("Biblioteca de PDF não carregada. Verifique os scripts do jsPDF no admin.html.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: "landscape",
+    unit: "mm",
+    format: "a4"
+  });
+
+  const larguraPagina = doc.internal.pageSize.getWidth();
+  const titulo = corrida.nome || "Lista de inscritos";
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.text(titulo, larguraPagina / 2, 16, { align: "center" });
+
+  const cabecalho = [[
+    "Nome",
+    "CPF",
+    "RG",
+    "Celular/Whatsapp",
+    "Chave PIX",
+    "Assinatura"
+  ]];
+
+  const corpo = dados.map(item => [
+    item.Nome,
+    item.CPF,
+    item.RG,
+    item["Celular/Whatsapp"],
+    item["Chave PIX"],
+    item.Assinatura
+  ]);
+
+  const larguraTabela = 275;
+  const margemEsquerda = (larguraPagina - larguraTabela) / 2;
+
+  doc.autoTable({
+    head: cabecalho,
+    body: corpo,
+    startY: 25,
+    theme: "grid",
+    tableWidth: larguraTabela,
+    margin: {
+      left: margemEsquerda,
+      right: margemEsquerda
+    },
+    styles: {
+      font: "helvetica",
+      fontSize: 9,
+      cellPadding: 2,
+      minCellHeight: 8,
+      valign: "middle",
+      halign: "center",
+      lineWidth: 0.15,
+      lineColor: [180, 180, 180]
+    },
+    headStyles: {
+      fillColor: [47, 107, 88],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      fontSize: 10,
+      halign: "center",
+      valign: "middle",
+      minCellHeight: 8
+    },
+    bodyStyles: {
+      minCellHeight: 8,
+      valign: "middle"
+    },
+    columnStyles: {
+      0: { cellWidth: 65, halign: "left" },
+      1: { cellWidth: 30 },
+      2: { cellWidth: 25 },
+      3: { cellWidth: 40 },
+      4: { cellWidth: 60 },
+      5: { cellWidth: 55 }
+    },
+    didDrawPage: function () {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      const pagina = doc.internal.getNumberOfPages();
+      doc.text(`Página ${pagina}`, larguraPagina - 12, 202, { align: "right" });
+    }
+  });
+
+  const nomeArquivo = sanitizarNomeArquivo(titulo) + ".pdf";
+  doc.save(nomeArquivo);
+}
+
+function sanitizarNomeArquivo(nome) {
+  return String(nome || "arquivo")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9-_ ]/g, "")
+    .trim()
+    .replace(/\s+/g, "_") || "arquivo";
 }
 
 
