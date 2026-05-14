@@ -69,7 +69,7 @@ form.addEventListener("submit", async function (event) {
       .select("*")
       .eq("cpf", cpf.value)
       .eq("data_nascimento", dataNascimento)
-      .single();
+      .maybeSingle();
 
     if (error || !data) {
       alert("CPF não encontrado. Faça seu cadastro para continuar.");

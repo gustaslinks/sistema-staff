@@ -394,39 +394,89 @@ form.addEventListener('submit',async function(event){
     if(pixTipo==='outro') chavePixFinal=pixOutro.value;
 
     const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value,foto_url:fotoUrlFinal};
-    const salvarCadastro = modoEdicao
-      ? await supabaseClient.from('staffs').update(dadosCadastro).eq('id', staffIdEdicao).select().maybeSingle()
-      : await supabaseClient.from('staffs').insert([dadosCadastro]);
-    if (salvarCadastro.error) {
-  const mensagemErro = salvarCadastro.error.message.toLowerCase();
+    let cadastroSalvo = null;
 
-  if (
-    mensagemErro.includes('duplicate') ||
-    mensagemErro.includes('unique') ||
-    mensagemErro.includes('cpf')
-  ) {
-    throw new Error(
-      'Este CPF já está cadastrado. Use a área de login para participar das próximas corridas.'
-    );
-  }
+    if (modoEdicao) {
+      if (!staffIdEdicao) {
+        throw new Error('Sessão expirada. Faça login novamente.');
+      }
 
-  throw salvarCadastro.error;
-}
+      const atualizarCadastro = await supabaseClient
+        .from('staffs')
+        .update(dadosCadastro)
+        .eq('id', staffIdEdicao);
 
-    if (modoEdicao && !salvarCadastro.data) {
-      throw new Error('Não foi possível localizar este cadastro para atualizar. Faça login novamente.');
+      if (atualizarCadastro.error) throw atualizarCadastro.error;
+
+      const recarregarCadastro = await supabaseClient
+        .from('staffs')
+        .select('*')
+        .eq('id', staffIdEdicao)
+        .maybeSingle();
+
+      if (recarregarCadastro.error) throw recarregarCadastro.error;
+      cadastroSalvo = recarregarCadastro.data || { id: staffIdEdicao, ...(staffLogadoEdicao || {}), ...dadosCadastro };
+    } else {
+      const inserirCadastro = await supabaseClient
+        .from('staffs')
+        .insert([dadosCadastro])
+        .select('*')
+        .maybeSingle();
+
+      if (inserirCadastro.error) {
+        const mensagemErro = inserirCadastro.error.message.toLowerCase();
+
+        if (
+          mensagemErro.includes('duplicate') ||
+          mensagemErro.includes('unique') ||
+          mensagemErro.includes('cpf')
+        ) {
+          throw new Error('Este CPF já está cadastrado. Use a área de login para participar das próximas corridas.');
+        }
+
+        throw inserirCadastro.error;
+      }
+
+      cadastroSalvo = inserirCadastro.data;
+
+      if (!cadastroSalvo) {
+        const buscarCadastro = await supabaseClient
+          .from('staffs')
+          .select('*')
+          .eq('cpf', cpf.value)
+          .eq('data_nascimento', dateToDatabase(nascimento.value))
+          .maybeSingle();
+
+        if (buscarCadastro.error) throw buscarCadastro.error;
+        cadastroSalvo = buscarCadastro.data;
+      }
     }
 
-    successMessage.textContent = modoEdicao ? 'Cadastro atualizado com sucesso.' : 'Cadastro enviado com sucesso. Os dados foram salvos no Supabase.';
-    if (modoEdicao && salvarCadastro.data && staffLogadoEdicao && String(salvarCadastro.data.id) === String(staffLogadoEdicao.id)) {
-      localStorage.setItem('staffLogado', JSON.stringify(salvarCadastro.data));
+    if (!cadastroSalvo) {
+      throw new Error('Cadastro salvo, mas não foi possível carregar os dados de acesso. Tente fazer login.');
     }
+
+    localStorage.setItem('staffLogado', JSON.stringify({
+      id: cadastroSalvo.id,
+      nome_completo: cadastroSalvo.nome_completo,
+      cpf: cadastroSalvo.cpf,
+      email: cadastroSalvo.email,
+      cidade: cadastroSalvo.cidade,
+      foto_url: cadastroSalvo.foto_url,
+      is_admin: cadastroSalvo.is_admin === true
+    }));
+
+    successMessage.textContent = modoEdicao ? 'Cadastro atualizado com sucesso.' : 'Cadastro enviado com sucesso. Redirecionando para as corridas...';
     successMessage.style.display='block';
     successMessage.scrollIntoView({behavior:'smooth',block:'center'});
+
     if (!modoEdicao) {
-      form.reset();
-      document.getElementById('fotoPreview').style.display='none';
+      setTimeout(() => {
+        window.location.href = 'corridas.html';
+      }, 600);
+      return;
     }
+
     touchedFields.clear();
     updatePixPreviews();
   }catch(error){
