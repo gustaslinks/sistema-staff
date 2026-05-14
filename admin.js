@@ -876,26 +876,32 @@ async function carregarInscritosDaCorrida(
   areaInscritos.innerHTML = `
     <div class="admin-inscritos-painel" data-corrida-id="${corridaIdNumerico}">
 
-      <div class="admin-inscritos-resumo">
-        <div>
+      <div class="admin-inscritos-resumo admin-inscritos-resumo-compacto">
+        <div class="resumo-card resumo-card-total">
           <strong>${resumo.total}</strong>
           <span>inscritos</span>
         </div>
-        <div>
-          <strong>${resumo.confirmados}</strong>
-          <span>confirmados</span>
+
+        <div class="resumo-dupla">
+          <div class="resumo-card">
+            <strong>${totalVagasCorrida || 0}</strong>
+            <span>vagas</span>
+          </div>
+          <div class="resumo-card">
+            <strong>${resumo.confirmados}</strong>
+            <span>confirmados</span>
+          </div>
         </div>
-        <div>
-          <strong>${resumo.pendentes}</strong>
-          <span>pendentes</span>
-        </div>
-        <div>
-          <strong>${resumo.listaEspera}</strong>
-          <span>lista de espera</span>
-        </div>
-        <div>
-          <strong>${totalVagasCorrida ? `${resumo.confirmados}/${totalVagasCorrida}` : resumo.confirmados}</strong>
-          <span>vagas</span>
+
+        <div class="resumo-dupla">
+          <div class="resumo-card">
+            <strong>${resumo.pendentes}</strong>
+            <span>pendentes</span>
+          </div>
+          <div class="resumo-card">
+            <strong>${resumo.listaEspera}</strong>
+            <span>lista de espera</span>
+          </div>
         </div>
       </div>
 
