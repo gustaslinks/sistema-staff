@@ -6,7 +6,7 @@
 
   <title>Painel Admin | Sistema Staff</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=103">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -57,39 +57,42 @@
           Cadastro de corrida
         </h2>
 
-        <div class="grid">
+        <div class="grid grid-cadastro-corrida">
 
           <div class="field">
-            <label>Nome da corrida</label>
+            <label for="corrida-nome">Nome da corrida</label>
             <input type="text" id="corrida-nome">
-              <label>Cidade</label>
+          </div>
+
+          <div class="field">
+            <label for="corrida-cidade">Cidade</label>
             <input type="text" id="corrida-cidade">
           </div>
 
           <div class="field">
-            <label>Início do evento / entrega de kit</label>
+            <label for="corrida-data-inicio">Início do evento / entrega de kit</label>
             <input type="date" id="corrida-data-inicio">
           </div>
 
           <div class="field">
-            <label>Data da corrida / fim do evento</label>
+            <label for="corrida-data-fim">Data da corrida / fim do evento</label>
             <input type="date" id="corrida-data-fim">
           </div>
 
           <div class="field">
-            <labbel>Prazo de inscrição</label>
+            <label for="corrida-prazo">Prazo de inscrição</label>
             <input type="date" id="corrida-prazo">
           </div>
 
           <div class="field">
-            <label>Número de vagas</label>
+            <label for="corrida-vagas">Número de vagas</label>
             <input type="number" id="corrida-vagas" min="1" placeholder="Ex.: 30">
           </div>
 
         </div>
 
         <div class="field">
-          <label>Local completo</label>
+          <label for="corrida-local">Local completo</label>
           <textarea id="corrida-local" rows="4" placeholder="Nome do local, endereço completo, portão/acesso e ponto de referência"></textarea>
         </div>
 
@@ -145,8 +148,6 @@
 
         <div id="preview-dias-corrida" class="preview-dias-corrida">
           <p>Nenhum dia adicionado ainda.</p>
-  <label>Observações</label>
-          <textarea id="corrida-observacoes"></textarea>
         </div>
 
         <button id="salvar-corrida-btn" class="submit-btn">
