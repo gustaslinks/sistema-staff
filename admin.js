@@ -334,6 +334,24 @@ async function carregarCorridasAdmin() {
           ${totalInscritos}
         </p>
 
+        <div class="admin-corrida-status-acoes">
+          <span class="admin-status ${corrida.status}">
+            ${corrida.status === "aberta" ? "ABERTA" : "ENCERRADA"}
+          </span>
+
+          <button
+            class="botao-alterar-status-corrida ${corrida.status === "aberta" ? "acao-encerrar" : "acao-abrir"}"
+            data-corrida-id="${corrida.id}"
+            data-status-atual="${corrida.status}"
+          >
+            ${
+              corrida.status === "aberta"
+                ? "Encerrar inscrições"
+                : "Abrir inscrições"
+            }
+          </button>
+        </div>
+
         <div class="gerenciar-dias">
           <button
             type="button"
@@ -348,9 +366,12 @@ async function carregarCorridasAdmin() {
 
         <div class="admin-card-footer">
 
-          <span class="admin-status ${corrida.status}">
-            ${corrida.status}
-          </span>
+          <button
+            class="botao-ver-inscritos"
+            data-corrida-id="${corrida.id}"
+          >
+            Ver inscritos
+          </button>
 
           <button
             class="botao-editar-corrida botao-admin-secundario"
@@ -360,37 +381,18 @@ async function carregarCorridasAdmin() {
           </button>
 
           <button
-            class="botao-excluir-corrida delete-btn"
-            data-corrida-id="${corrida.id}"
-            data-total-inscritos="${totalInscritos}"
-          >
-            Excluir corrida
-          </button>
-
-          <button
-            class="botao-ver-inscritos"
-            data-corrida-id="${corrida.id}"
-          >
-            Ver inscritos
-          </button>
-
-          <button
-            class="botao-exportar-planilha botao-admin-secundario"
+            class="botao-exportar-planilha botao-admin-secundario botao-exportar-admin"
             data-corrida-id="${corrida.id}"
           >
             Exportar planilha
           </button>
 
           <button
-            class="botao-alterar-status-corrida"
+            class="botao-excluir-corrida delete-btn"
             data-corrida-id="${corrida.id}"
-            data-status-atual="${corrida.status}"
+            data-total-inscritos="${totalInscritos}"
           >
-            ${
-              corrida.status === "aberta"
-                ? "Encerrar inscrições"
-                : "Abrir inscrições"
-            }
+            Excluir corrida
           </button>
 
         </div>
@@ -849,26 +851,8 @@ async function carregarInscritosDaCorrida(
       new Date(b.created_at);
   });
 
-  let vagasPreSelecionadas = 0;
-
   inscricoesComPrioridade.forEach(inscricao => {
-    const status = inscricao.statusNormalizado;
-    const prioridadeAlta =
-      totalDiasCorrida > 0 &&
-      inscricao.quantidadeDiasDisponiveis >= totalDiasCorrida;
-
-    const jaConfirmado = status === "confirmado";
-    const podePreSelecionar =
-      status !== "cancelado" &&
-      status !== "lista_espera" &&
-      (jaConfirmado || prioridadeAlta);
-
-    if (podePreSelecionar && (!totalVagasCorrida || vagasPreSelecionadas < totalVagasCorrida)) {
-      inscricao.preSelecionado = true;
-      vagasPreSelecionadas += 1;
-    } else {
-      inscricao.preSelecionado = false;
-    }
+    inscricao.preSelecionado = false;
   });
 
   const resumo = gerarResumoInscricoes(inscricoesComPrioridade, totalVagasCorrida);
@@ -906,6 +890,9 @@ async function carregarInscritosDaCorrida(
       </div>
 
       <div class="admin-inscritos-acoes-massa">
+        <button type="button" class="botao-admin-batch botao-selecionar-prioridade-alta">
+          Selecionar prioridade alta
+        </button>
         <button type="button" class="botao-admin-batch botao-selecionar-filtrados">
           Selecionar filtrados
         </button>
@@ -1138,6 +1125,28 @@ function ativarControlesInscritosAdmin(areaInscritos, corridaId, totalVagasCorri
       botao.textContent = detalhes.classList.contains("hidden") ? "▸" : "▾";
     });
   });
+
+  const botaoSelecionarPrioridadeAlta = areaInscritos.querySelector(".botao-selecionar-prioridade-alta");
+  if (botaoSelecionarPrioridadeAlta) {
+    botaoSelecionarPrioridadeAlta.addEventListener("click", () => {
+      let selecionados = areaInscritos.querySelectorAll(
+        ".checkbox-inscrito-batch:checked"
+      ).length;
+
+      areaInscritos.querySelectorAll(".linha-inscrito-admin").forEach(linha => {
+        const checkbox = linha.querySelector(".checkbox-inscrito-batch");
+        if (!checkbox || checkbox.disabled || checkbox.checked) return;
+        if (linha.dataset.prioridade !== "prioridade-alta") return;
+        if (linha.dataset.status === "cancelado" || linha.dataset.status === "lista_espera") return;
+        if (totalVagasCorrida > 0 && selecionados >= totalVagasCorrida) return;
+
+        checkbox.checked = true;
+        selecionados += 1;
+      });
+
+      atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
+    });
+  }
 
   const botaoSelecionarFiltrados = areaInscritos.querySelector(".botao-selecionar-filtrados");
   if (botaoSelecionarFiltrados) {

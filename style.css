@@ -2191,3 +2191,182 @@ body {
   line-height: 1.15 !important;
   margin-top: 5px !important;
 }
+
+/* =========================================================
+   AJUSTES VISUAIS V112
+========================================================= */
+
+.botao-editar-cadastro {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botao-editar-cadastro:hover {
+  background: #1d4ed8;
+}
+
+.status-lista_espera,
+.status-reserva {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.admin-topo-painel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.admin-cabecalho-principal {
+  margin: 0;
+}
+
+.admin-acoes {
+  align-items: stretch;
+}
+
+.admin-acoes .submit-btn {
+  height: 100%;
+  min-height: 72px;
+  padding-inline: 26px;
+}
+
+.admin-corrida-status-acoes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0;
+  padding: 14px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-corrida-status-acoes .admin-status {
+  margin: 0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-corrida-status-acoes .botao-alterar-status-corrida {
+  margin: 0;
+  min-height: 42px;
+}
+
+.botao-alterar-status-corrida.acao-abrir {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.botao-alterar-status-corrida.acao-abrir:hover {
+  background: #15803d;
+}
+
+.botao-alterar-status-corrida.acao-encerrar {
+  background: #f59e0b;
+  color: #111827;
+}
+
+.gerenciar-dias {
+  margin-top: 18px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.gerenciar-dias .botao-toggle-dias {
+  width: auto;
+  margin: 0;
+  background: #475569 !important;
+}
+
+.dias-corrida-container:not(.hidden) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.admin-card-footer {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.admin-card-footer .botao-ver-inscritos {
+  background: #2563eb;
+}
+
+.admin-card-footer .botao-ver-inscritos:hover {
+  background: #1d4ed8;
+}
+
+.admin-card-footer .botao-editar-corrida {
+  background: #64748b;
+}
+
+.admin-card-footer .botao-editar-corrida:hover {
+  background: #475569;
+}
+
+.admin-card-footer .botao-exportar-admin {
+  background: #16a34a;
+}
+
+.admin-card-footer .botao-exportar-admin:hover {
+  background: #15803d;
+}
+
+.admin-inscritos-acoes-massa {
+  align-items: stretch;
+}
+
+@media (max-width: 700px) {
+  .acoes-staff {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .botao-admin,
+  .botao-editar-cadastro,
+  .botao-sair {
+    width: 100%;
+  }
+
+  .admin-topo-painel {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-acoes .submit-btn {
+    width: 100%;
+    min-height: 54px;
+  }
+
+  .admin-corrida-status-acoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-corrida-status-acoes .admin-status,
+  .admin-corrida-status-acoes .botao-alterar-status-corrida,
+  .gerenciar-dias .botao-toggle-dias {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dias-corrida-container:not(.hidden),
+  .admin-card-footer {
+    grid-template-columns: 1fr !important;
+  }
+}

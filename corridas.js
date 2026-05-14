@@ -15,6 +15,7 @@ const emailStaff = document.getElementById("email-staff");
 const fotoStaff = document.getElementById("foto-staff");
 const botaoSair = document.getElementById("botao-sair");
 const botaoAdmin = document.getElementById("botao-admin");
+const botaoEditarCadastro = document.getElementById("botao-editar-cadastro");
 
 // STAFF LOGADO
 const staffLogado = JSON.parse(localStorage.getItem("staffLogado"));
@@ -53,6 +54,10 @@ if (staffLogado.is_admin === true) {
 
 botaoAdmin.addEventListener("click", function () {
   window.location.href = "admin.html";
+});
+
+botaoEditarCadastro.addEventListener("click", function () {
+  window.location.href = "cadastro.html?editar=1";
 });
 
 // =========================================================

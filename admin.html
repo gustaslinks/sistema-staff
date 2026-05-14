@@ -6,7 +6,7 @@
 
   <title>Painel Admin | Sistema Staff</title>
 
-  <link rel="stylesheet" href="style.css?v=111">
+  <link rel="stylesheet" href="style.css?v=112">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -36,18 +36,18 @@
 
 </section>
 
-    <section class="cabecalho-corridas">
-      <h1>Painel Administrativo</h1>
-      <p>Gerencie corridas e inscrições do sistema.</p>
+    <section class="admin-topo-painel">
+      <div class="cabecalho-corridas admin-cabecalho-principal">
+        <h1>Painel Administrativo</h1>
+        <p>Gerencie corridas e inscrições do sistema.</p>
+      </div>
+
+      <section class="admin-acoes">
+        <button id="nova-corrida-btn" class="submit-btn btn-admin">
+          Nova corrida
+        </button>
+      </section>
     </section>
-
-<section class="admin-acoes">
-
-  <button id="nova-corrida-btn" class="submit-btn btn-admin">
-    Nova corrida
-  </button>
-
-</section>
 
     <section id="form-nova-corrida" class="form-admin hidden">
 
@@ -177,6 +177,6 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
-  <script src="admin.js?v=111"></script>
+  <script src="admin.js?v=112"></script>
 </body>
 </html>

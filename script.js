@@ -26,6 +26,11 @@ const form = document.getElementById('staffForm');
 const successMessage = document.getElementById('successMessage');
 const submitBtn = document.getElementById('submitBtn');
 const touchedFields = new Set();
+const paramsCadastro = new URLSearchParams(window.location.search);
+const modoEdicao = paramsCadastro.get('editar') === '1';
+const staffLogadoEdicao = JSON.parse(localStorage.getItem('staffLogado') || 'null');
+let fotoAtualUrl = '';
+
 
 function onlyNumbers(value){return value.replace(/\D/g,'');}
 function removeExtraSpaces(value){return value.replace(/\s+/g,' ').trim();}
@@ -88,7 +93,15 @@ function isValidRG(value){const cleaned=value.replace(/[^0-9xX]/g,'').toUpperCas
 
 function isAtLeast16(dateValue){
   if(!dateValue) return false;
-  const birthDate=new Date(dateValue+'T00:00:00');
+  let birthDate;
+  if(dateValue.includes('/')){
+    const parts=dateValue.split('/');
+    if(parts.length!==3) return false;
+    birthDate=new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
+  }else{
+    birthDate=new Date(dateValue+'T00:00:00');
+  }
+  if(Number.isNaN(birthDate.getTime())) return false;
   const today=new Date();
   let age=today.getFullYear()-birthDate.getFullYear();
   const monthDiff=today.getMonth()-birthDate.getMonth();
@@ -130,7 +143,7 @@ function getValidationState(showAll=false){
     fieldCidade:cidade.value.trim().length>=2,
     fieldIndicado:indicado.value.trim().length>=2,
     fieldObservacoes:observacoes.value.trim().length>=2,
-    fieldFoto:foto.files.length>0 && ['image/jpeg','image/png'].includes(foto.files[0].type),
+    fieldFoto: modoEdicao ? (foto.files.length===0 || ['image/jpeg','image/png'].includes(foto.files[0].type)) : (foto.files.length>0 && ['image/jpeg','image/png'].includes(foto.files[0].type)),
     fieldPixOutro:selectedPix!=='outro' || isValidPixOutro(pixOutro.value),
     fieldTermos:termos.checked
   };
@@ -161,6 +174,11 @@ cpf.addEventListener('input',()=>{cpf.value=maskCPF(cpf.value);markTouched('fiel
 cpf.addEventListener('blur', async () => {
 
   markTouched('fieldCpf');
+
+  if (modoEdicao) {
+    refreshSubmitState();
+    return;
+  }
 
   // valida CPF localmente primeiro
 
@@ -309,15 +327,21 @@ form.addEventListener('submit',async function(event){
     }
 
     const cpfLimpo=onlyNumbers(cpf.value);
-    const arquivoFoto=foto.files[0];
-    const extensao=arquivoFoto.name.split('.').pop().toLowerCase();
-    const nomeArquivo=`${cpfLimpo}-${Date.now()}.${extensao}`;
-    const caminhoFoto=`staffs/${nomeArquivo}`;
+    let fotoUrlFinal = fotoAtualUrl;
 
-    const uploadFoto=await supabaseClient.storage.from('fotos-staffs').upload(caminhoFoto,arquivoFoto,{cacheControl:'3600',upsert:false});
-    if(uploadFoto.error) throw uploadFoto.error;
+    if (foto.files.length > 0) {
+      const arquivoFoto=foto.files[0];
+      const extensao=arquivoFoto.name.split('.').pop().toLowerCase();
+      const nomeArquivo=`${cpfLimpo}-${Date.now()}.${extensao}`;
+      const caminhoFoto=`staffs/${nomeArquivo}`;
 
-    const fotoPublica=supabaseClient.storage.from('fotos-staffs').getPublicUrl(caminhoFoto);
+      const uploadFoto=await supabaseClient.storage.from('fotos-staffs').upload(caminhoFoto,arquivoFoto,{cacheControl:'3600',upsert:false});
+      if(uploadFoto.error) throw uploadFoto.error;
+
+      const fotoPublica=supabaseClient.storage.from('fotos-staffs').getPublicUrl(caminhoFoto);
+      fotoUrlFinal = fotoPublica.data.publicUrl;
+    }
+
     const pixTipo=document.querySelector('input[name="pixTipo"]:checked').value;
     let chavePixFinal='';
     if(pixTipo==='cpf') chavePixFinal=cpf.value;
@@ -325,8 +349,10 @@ form.addEventListener('submit',async function(event){
     if(pixTipo==='telefone') chavePixFinal=telefone.value;
     if(pixTipo==='outro') chavePixFinal=pixOutro.value;
 
-    const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value,foto_url:fotoPublica.data.publicUrl};
-    const salvarCadastro=await supabaseClient.from('staffs').insert([dadosCadastro]);
+    const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value,foto_url:fotoUrlFinal};
+    const salvarCadastro = modoEdicao
+      ? await supabaseClient.from('staffs').update(dadosCadastro).eq('id', staffLogadoEdicao.id).select().single()
+      : await supabaseClient.from('staffs').insert([dadosCadastro]);
     if (salvarCadastro.error) {
   const mensagemErro = salvarCadastro.error.message.toLowerCase();
 
@@ -343,21 +369,107 @@ form.addEventListener('submit',async function(event){
   throw salvarCadastro.error;
 }
 
-    successMessage.textContent='Cadastro enviado com sucesso. Os dados foram salvos no Supabase.';
+    successMessage.textContent = modoEdicao ? 'Cadastro atualizado com sucesso.' : 'Cadastro enviado com sucesso. Os dados foram salvos no Supabase.';
+    if (modoEdicao && salvarCadastro.data) {
+      localStorage.setItem('staffLogado', JSON.stringify(salvarCadastro.data));
+    }
     successMessage.style.display='block';
     successMessage.scrollIntoView({behavior:'smooth',block:'center'});
-    form.reset();
-    document.getElementById('fotoPreview').style.display='none';
+    if (!modoEdicao) {
+      form.reset();
+      document.getElementById('fotoPreview').style.display='none';
+    }
     touchedFields.clear();
     updatePixPreviews();
   }catch(error){
     alert('Erro ao enviar cadastro: '+error.message);
     console.error(error);
   }finally{
-    submitBtn.textContent='Finalizar cadastro';
+    submitBtn.textContent = modoEdicao ? 'Salvar alterações' : 'Finalizar cadastro';
     refreshSubmitState();
   }
 });
+
+
+function databaseDateToBr(value){
+  if(!value) return '';
+  const parts = value.split('-');
+  if(parts.length !== 3) return value;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+function selecionarPixPorValor(staff){
+  const chave = staff.chave_pix || '';
+  let tipo = 'outro';
+  if(chave === staff.cpf) tipo = 'cpf';
+  if(chave === staff.email) tipo = 'email';
+  if(chave === staff.telefone) tipo = 'telefone';
+
+  const radio = document.querySelector(`input[name="pixTipo"][value="${tipo}"]`);
+  if(radio) radio.checked = true;
+
+  const fieldPixOutro = document.getElementById('fieldPixOutro');
+  fieldPixOutro.classList.toggle('hidden', tipo !== 'outro');
+  pixOutro.value = tipo === 'outro' ? chave : '';
+}
+
+async function iniciarModoEdicao(){
+  if(!modoEdicao) return;
+  if(!staffLogadoEdicao || !staffLogadoEdicao.id){
+    window.location.href = 'index.html';
+    return;
+  }
+
+  document.title = 'Editar cadastro | Sistema Staff';
+  const titulo = document.querySelector('.header h1');
+  const subtitulo = document.querySelector('.header p');
+  if(titulo) titulo.textContent = 'Editar cadastro';
+  if(subtitulo) subtitulo.textContent = 'Atualize seus dados de staff. O CPF fica bloqueado para manter o vínculo com suas inscrições.';
+  submitBtn.textContent = 'Salvar alterações';
+  cpf.disabled = true;
+  foto.required = false;
+  const helperFoto = document.querySelector('#fieldFoto .error');
+  if(helperFoto) helperFoto.textContent = 'Envie uma nova foto somente se quiser trocar a foto atual.';
+
+  const { data, error } = await supabaseClient
+    .from('staffs')
+    .select('*')
+    .eq('id', staffLogadoEdicao.id)
+    .single();
+
+  if(error){
+    alert('Não foi possível carregar seus dados para edição.');
+    console.error(error);
+    return;
+  }
+
+  nome.value = data.nome_completo || '';
+  cpf.value = data.cpf || '';
+  rg.value = data.rg || '';
+  nascimento.value = databaseDateToBr(data.data_nascimento || '');
+  telefone.value = data.telefone || '';
+  email.value = data.email || '';
+  cidade.value = data.cidade || '';
+  indicado.value = data.indicado_por || '';
+  observacoes.value = data.observacoes || '';
+  fotoAtualUrl = data.foto_url || '';
+  termos.checked = true;
+  selecionarPixPorValor(data);
+
+  if(fotoAtualUrl){
+    const preview=document.getElementById('fotoPreview');
+    const previewImg=document.getElementById('fotoPreviewImg');
+    const previewText=document.getElementById('fotoPreviewText');
+    previewImg.src=fotoAtualUrl;
+    previewText.textContent='Foto atual cadastrada';
+    preview.style.display='flex';
+  }
+
+  updatePixPreviews();
+  refreshSubmitState();
+}
+
+iniciarModoEdicao();
 
 updatePixPreviews();
 refreshSubmitState();
