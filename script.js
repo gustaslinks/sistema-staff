@@ -25,6 +25,7 @@ const termos = document.getElementById('termos');
 const form = document.getElementById('staffForm');
 const successMessage = document.getElementById('successMessage');
 const submitBtn = document.getElementById('submitBtn');
+const btnVoltarCorridas = document.getElementById('btnVoltarCorridas');
 const touchedFields = new Set();
 const paramsCadastro = new URLSearchParams(window.location.search);
 const modoEdicao = paramsCadastro.get('editar') === '1';
@@ -44,6 +45,12 @@ const staffIdEdicao = modoEdicao
   : null;
 let fotoAtualUrl = '';
 let staffAtualEdicao = null;
+
+if (btnVoltarCorridas) {
+  btnVoltarCorridas.addEventListener('click', () => {
+    window.location.href = 'corridas.html';
+  });
+}
 
 
 function onlyNumbers(value){return value.replace(/\D/g,'');}
@@ -489,15 +496,10 @@ form.addEventListener('submit',async function(event){
     successMessage.style.display='block';
     successMessage.scrollIntoView({behavior:'smooth',block:'center'});
 
-    if (!modoEdicao) {
-      setTimeout(() => {
-        window.location.href = 'corridas.html';
-      }, 600);
-      return;
-    }
-
-    touchedFields.clear();
-    updatePixPreviews();
+    setTimeout(() => {
+      window.location.href = 'corridas.html';
+    }, modoEdicao ? 500 : 600);
+    return;
   }catch(error){
     alert('Erro ao enviar cadastro: '+error.message);
     console.error(error);
@@ -543,6 +545,7 @@ async function iniciarModoEdicao(){
   if(titulo) titulo.textContent = 'Editar cadastro';
   if(subtitulo) subtitulo.textContent = 'Atualize seus dados de staff. O CPF fica bloqueado para manter o vínculo com suas inscrições.';
   submitBtn.textContent = 'Salvar alterações';
+  if (btnVoltarCorridas) btnVoltarCorridas.classList.remove('hidden');
   liberarBotaoEdicao();
   cpf.disabled = true;
   foto.required = false;
