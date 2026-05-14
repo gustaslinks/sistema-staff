@@ -67,11 +67,15 @@
         </div>
 
         <div class="floating-calendar-controls">
-          <button type="button" class="floating-calendar-nav" data-cal-nav="prev-year">« Ano</button>
-          <button type="button" class="floating-calendar-nav" data-cal-nav="prev-month">‹ Mês</button>
           <button type="button" class="floating-calendar-today">Hoje</button>
-          <button type="button" class="floating-calendar-nav" data-cal-nav="next-month">Mês ›</button>
-          <button type="button" class="floating-calendar-nav" data-cal-nav="next-year">Ano »</button>
+          <div class="floating-calendar-nav-row">
+            <button type="button" class="floating-calendar-nav" data-cal-nav="prev-month">‹ Mês</button>
+            <button type="button" class="floating-calendar-nav" data-cal-nav="next-month">Mês ›</button>
+          </div>
+          <div class="floating-calendar-nav-row">
+            <button type="button" class="floating-calendar-nav" data-cal-nav="prev-year">‹ Ano</button>
+            <button type="button" class="floating-calendar-nav" data-cal-nav="next-year">Ano ›</button>
+          </div>
         </div>
 
         <div class="floating-calendar-selects">

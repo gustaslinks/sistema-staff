@@ -2575,12 +2575,17 @@ body {
   cursor: pointer;
 }
 
-.floating-calendar-controls,
-.floating-calendar-selects {
+.floating-calendar-controls {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 12px;
+}
+
+.floating-calendar-nav-row,
+.floating-calendar-selects {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .floating-calendar-selects {
@@ -2684,13 +2689,13 @@ button.floating-calendar-day {
     font-size: 21px;
   }
 
-  .floating-calendar-controls {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .floating-calendar-controls,
+  .floating-calendar-nav-row {
+    gap: 8px;
   }
 
   .floating-calendar-today {
-    grid-column: 1 / -1;
-    order: -1;
+    width: 100%;
   }
 
   .floating-calendar-day {
