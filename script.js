@@ -353,13 +353,26 @@ nascimento.addEventListener('change',()=>{markTouched('fieldNascimento');refresh
 pixOutro.addEventListener('input',()=>{pixOutro.value=pixOutro.value.replace(/^\s+/,'');markTouched('fieldPixOutro');refreshSubmitState();});
 pixOutro.addEventListener('blur',()=>{pixOutro.value=removeExtraSpaces(pixOutro.value);markTouched('fieldPixOutro');refreshSubmitState();});
 
-foto.addEventListener('change',()=>{
+foto.addEventListener('change', async ()=>{
   markTouched('fieldFoto');
   const preview=document.getElementById('fotoPreview');
   const previewImg=document.getElementById('fotoPreviewImg');
   const previewText=document.getElementById('fotoPreviewText');
+
+  if(window.StaffPhotoCropper) window.StaffPhotoCropper.clear();
+
   if(foto.files.length>0 && ['image/jpeg','image/png'].includes(foto.files[0].type)){
     const file=foto.files[0];
+
+    if(window.StaffPhotoCropper && typeof window.StaffPhotoCropper.open === 'function'){
+      const recortada = await window.StaffPhotoCropper.open(file, foto);
+      if(!recortada){
+        preview.style.display='none';
+      }
+      refreshSubmitState();
+      return;
+    }
+
     previewImg.src=URL.createObjectURL(file);
     previewText.textContent=`${file.name} • ${(file.size/1024/1024).toFixed(2)} MB`;
     preview.style.display='flex';
@@ -441,12 +454,12 @@ form.addEventListener('submit',async function(event){
     let fotoUrlFinal = fotoAtualUrl;
 
     if (foto.files.length > 0) {
-      const arquivoFoto=foto.files[0];
-      const extensao=arquivoFoto.name.split('.').pop().toLowerCase();
+      const arquivoFoto=(window.StaffPhotoCropper && window.StaffPhotoCropper.getFile && window.StaffPhotoCropper.getFile()) || foto.files[0];
+      const extensao=arquivoFoto.type === 'image/jpeg' ? 'jpg' : (arquivoFoto.name.split('.').pop().toLowerCase() || 'jpg');
       const nomeArquivo=`${cpfLimpo}-${Date.now()}.${extensao}`;
       const caminhoFoto=`staffs/${nomeArquivo}`;
 
-      const uploadFoto=await supabaseClient.storage.from('fotos-staffs').upload(caminhoFoto,arquivoFoto,{cacheControl:'3600',upsert:false});
+      const uploadFoto=await supabaseClient.storage.from('fotos-staffs').upload(caminhoFoto,arquivoFoto,{cacheControl:'3600',upsert:false,contentType:arquivoFoto.type || 'image/jpeg'});
       if(uploadFoto.error) throw uploadFoto.error;
 
       const fotoPublica=supabaseClient.storage.from('fotos-staffs').getPublicUrl(caminhoFoto);
