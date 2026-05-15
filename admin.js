@@ -317,6 +317,7 @@ async function atualizarCorridaComFallback(corridaId, dadosCorrida) {
   // Compatibilidade para bancos que ainda não receberam alguma coluna nova.
   if (mensagem.includes("possui_patrocinador_tenis") || mensagem.includes("schema cache") || mensagem.includes("column")) {
     delete payloadCompat.possui_patrocinador_tenis;
+    delete payloadCompat.possui_patrocinio_tenis;
     resultado = await tentar(payloadCompat);
     if (!resultado.error) return resultado;
   }
@@ -375,7 +376,7 @@ salvarCorridaBtn.addEventListener("click", async function () {
     vagas_total: Number(corridaVagas.value),
     prazo_inscricao: normalizarDataInput(corridaPrazo.value),
     observacoes: corridaObservacoes.value.trim() || OBSERVACOES_PADRAO,
-    possui_patrocinador_tenis: corridaPatrocinadorTenis ? corridaPatrocinadorTenis.checked : false
+    possui_patrocinio_tenis: corridaPatrocinadorTenis ? corridaPatrocinadorTenis.checked : false
   };
 
   let corridaId = corridaEmEdicaoId;
@@ -575,6 +576,12 @@ function obterClasseProgressoVagas(percentual) {
   return "baixo";
 }
 
+function corridaPossuiPatrocinioTenis(corrida) {
+  if (!corrida) return false;
+  return corrida.possui_patrocinio_tenis === true || corridaPossuiPatrocinioTenis(corrida);
+}
+
+
 async function encerrarCorridasLotadas(corridas, inscricoes) {
   const corridasLotadas = (corridas || []).filter(corrida => {
     const vagasTotal = Number(corrida.vagas_total || 0);
@@ -660,7 +667,7 @@ async function carregarCorridasAdmin() {
         ${obterBannerCorridaUrl(corrida) ? `<img class="corrida-card-banner-admin" src="${escapeHtml(obterBannerCorridaUrl(corrida))}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">` : ""}
 
         <h3>${corrida.nome}</h3>
-        ${corrida.possui_patrocinador_tenis ? `<div class="badge-tenis">👟 Patrocinador de tênis</div>` : ""}
+        ${corridaPossuiPatrocinioTenis(corrida) ? `<div class="badge-tenis">👟 Patrocinador de tênis</div>` : ""}
 
         <div class="corrida-status-card ${corrida.status}">
           <div class="corrida-status-topo-linha">
@@ -744,6 +751,7 @@ async function carregarCorridasAdmin() {
         <div class="admin-card-footer admin-card-footer-v128">
 
           <button
+            type="button"
             class="botao-editar-corrida botao-admin-secundario"
             data-corrida-id="${corrida.id}"
           >
@@ -751,6 +759,7 @@ async function carregarCorridasAdmin() {
           </button>
 
           <button
+            type="button"
             class="botao-excluir-corrida delete-btn"
             data-corrida-id="${corrida.id}"
             data-total-inscritos="${totalInscritos}"
@@ -793,7 +802,7 @@ async function carregarCorridasAdmin() {
                 </div>
               </div>
 
-              ${corrida.possui_patrocinador_tenis ? `
+              ${corridaPossuiPatrocinioTenis(corrida) ? `
                 <div class="relatorios-secao relatorios-tenis">
                   <span class="relatorios-label">Tênis</span>
                   <div class="relatorios-grid">
@@ -808,6 +817,7 @@ async function carregarCorridasAdmin() {
           </div>
 
           <button
+            type="button"
             class="botao-ver-inscritos"
             data-corrida-id="${corrida.id}"
           >
@@ -865,9 +875,32 @@ function ativarBotoesEditarCorrida() {
   const botoes = document.querySelectorAll(".botao-editar-corrida");
 
   botoes.forEach(botao => {
-    botao.addEventListener("click", async function () {
+    if (botao.dataset.listenerEditarCorrida === "1") return;
+    botao.dataset.listenerEditarCorrida = "1";
+
+    botao.addEventListener("click", async function (evento) {
+      evento.preventDefault();
+      evento.stopPropagation();
+
       const corridaId = Number(botao.dataset.corridaId);
-      await carregarCorridaParaEdicao(corridaId);
+      if (!corridaId) {
+        alert("Não foi possível identificar a corrida para edição.");
+        return;
+      }
+
+      botao.disabled = true;
+      const htmlOriginal = botao.innerHTML;
+      botao.innerHTML = `<span class="btn-ico">⏳</span><span>Carregando...</span>`;
+
+      try {
+        await carregarCorridaParaEdicao(corridaId);
+      } catch (erro) {
+        console.error("Erro inesperado ao abrir edição da corrida:", erro);
+        alert("Não foi possível abrir a edição da corrida. Confira o console ou tente recarregar a página.");
+      } finally {
+        botao.disabled = false;
+        botao.innerHTML = htmlOriginal;
+      }
     });
   });
 }
@@ -906,7 +939,7 @@ async function carregarCorridaParaEdicao(corridaId) {
   corridaPrazo.value = normalizarDataInput(corrida.prazo_inscricao || "") || "";
   corridaVagas.value = corrida.vagas_total || "";
   corridaObservacoes.value = corrida.observacoes || OBSERVACOES_PADRAO;
-  if (corridaPatrocinadorTenis) corridaPatrocinadorTenis.checked = corrida.possui_patrocinador_tenis === true;
+  if (corridaPatrocinadorTenis) corridaPatrocinadorTenis.checked = corridaPossuiPatrocinioTenis(corrida);
   corridaBannerArquivo = null;
   corridaBannerRemovido = false;
   corridaBannerUrlAtual = corrida.banner_url || null;
@@ -1133,7 +1166,7 @@ async function carregarInscritosDaCorrida(
 
   const { data: corridaAtual } = await supabaseClient
     .from("corridas")
-    .select("id, nome, data_corrida, data_inicio, data_fim, local, prazo_inscricao, observacoes, vagas_total, possui_patrocinador_tenis")
+    .select("*")
     .eq("id", corridaIdNumerico)
     .single();
 
@@ -2863,11 +2896,11 @@ function ativarBotoesExportarPlanilha() {
 async function abrirFluxoExportacao(corridaId, formato = "pdf") {
   const { data: corrida } = await supabaseClient
     .from("corridas")
-    .select("possui_patrocinador_tenis")
+    .select("*")
     .eq("id", corridaId)
     .single();
 
-  const corridaTemTenis = corrida && corrida.possui_patrocinador_tenis === true;
+  const corridaTemTenis = corrida && corridaPossuiPatrocinioTenis(corrida);
   const textoOpcaoTenis = corridaTemTenis
     ? "\n4 - Resumo de tênis por numeração"
     : "";
@@ -3015,7 +3048,7 @@ async function exportarInscritosCorrida(corridaId, opcoes) {
   try {
     const dadosExportacao = await buscarDadosExportacao(corridaId);
     if (opcoes.filtro === "4") {
-      if (!dadosExportacao.corrida.possui_patrocinador_tenis) {
+      if (!corridaPossuiPatrocinioTenis(dadosExportacao.corrida)) {
         alert("Esta corrida não está marcada como patrocinada por tênis.");
         return;
       }
@@ -4004,7 +4037,7 @@ function exportarExcelTabelaNumeracao(corrida, inscritos) {
 
 async function exportarTabelaNumeracaoTenis(corridaId, formato = "pdf") {
   const dadosExportacao = await buscarDadosExportacao(corridaId);
-  if (!dadosExportacao.corrida.possui_patrocinador_tenis) {
+  if (!corridaPossuiPatrocinioTenis(dadosExportacao.corrida)) {
     throw new Error("Esta corrida não está marcada como patrocinada por tênis.");
   }
   const secoes = montarSecoesTabelaNumeracao(dadosExportacao.inscritos);
@@ -4021,7 +4054,7 @@ async function exportarInscritosCorrida(corridaId, opcoes) {
   const dadosExportacao = await buscarDadosExportacao(corridaId);
 
   if (opcoes.filtro === "4") {
-    if (!dadosExportacao.corrida.possui_patrocinador_tenis) {
+    if (!corridaPossuiPatrocinioTenis(dadosExportacao.corrida)) {
       throw new Error("Esta corrida não está marcada como patrocinada por tênis.");
     }
     if (opcoes.formato === "pdf") {
