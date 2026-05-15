@@ -48,7 +48,7 @@ botaoSair.addEventListener("click", function () {
   window.location.href = "index.html";
 });
 
-if (staffLogado.is_admin === true) {
+if (staffLogado.is_admin === true || staffLogado.is_admin === "true") {
   botaoAdmin.classList.remove("hidden");
 }
 

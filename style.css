@@ -3251,3 +3251,106 @@ button.floating-calendar-day {
     width: 100% !important;
   }
 }
+
+/* =========================================================
+   AJUSTES V132 - CARD LOGADO PADRÃO EM ADMIN/CORRIDAS/CADASTRO
+========================================================= */
+.pagina-corridas .card-staff,
+.card-staff-cadastro,
+.pagina-admin .card-staff {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) minmax(230px, auto) !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 16px 18px !important;
+}
+
+.pagina-corridas .foto-staff,
+.card-staff-cadastro .foto-staff,
+.pagina-admin .foto-staff {
+  width: 72px !important;
+  height: 72px !important;
+}
+
+.pagina-corridas .dados-staff h2,
+.card-staff-cadastro .dados-staff h2,
+.pagina-admin .dados-staff h2 {
+  margin: 2px 0 4px !important;
+  font-size: 20px !important;
+  line-height: 1.15 !important;
+}
+
+.pagina-corridas .dados-staff p,
+.card-staff-cadastro .dados-staff p,
+.pagina-admin .dados-staff p {
+  margin: 2px 0 !important;
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+}
+
+.pagina-corridas .acoes-staff.admin-card-acoes-logado,
+.card-staff-cadastro .admin-card-acoes-logado,
+.pagina-admin .admin-card-acoes-logado {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-items: center;
+  min-width: 250px;
+  width: auto;
+}
+
+.card-staff-cadastro {
+  margin-bottom: 20px;
+}
+
+.pagina-corridas .admin-card-acoes-logado .logout-btn,
+.card-staff-cadastro .admin-card-acoes-logado .logout-btn,
+.pagina-admin .admin-card-acoes-logado .logout-btn {
+  grid-column: auto !important;
+  width: 100% !important;
+}
+
+@media (max-width: 760px) {
+  .pagina-corridas .card-staff,
+  .card-staff-cadastro,
+  .pagina-admin .card-staff {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 14px !important;
+  }
+
+  .pagina-corridas .foto-staff,
+  .card-staff-cadastro .foto-staff,
+  .pagina-admin .foto-staff {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .pagina-corridas .admin-card-acoes-logado,
+  .card-staff-cadastro .admin-card-acoes-logado,
+  .pagina-admin .admin-card-acoes-logado {
+    grid-column: 1 / -1;
+    width: 100% !important;
+    min-width: 0 !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .pagina-corridas .admin-card-acao,
+  .card-staff-cadastro .admin-card-acao,
+  .pagina-admin .admin-card-acao,
+  .pagina-corridas .admin-card-acao.logout-btn,
+  .card-staff-cadastro .admin-card-acao.logout-btn,
+  .pagina-admin .admin-card-acao.logout-btn {
+    min-height: 36px !important;
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .pagina-corridas .admin-card-acoes-logado,
+  .card-staff-cadastro .admin-card-acoes-logado,
+  .pagina-admin .admin-card-acoes-logado {
+    grid-template-columns: 1fr;
+  }
+}

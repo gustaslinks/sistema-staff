@@ -4,10 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Staffs</title>
-  <link rel="stylesheet" href="style.css?v=129" />
+  <link rel="stylesheet" href="style.css?v=132" />
 </head>
 <body>
   <div class="container">
+    <section id="card-staff-cadastro" class="card-staff card-staff-cadastro hidden">
+      <div class="foto-staff-wrapper">
+        <img id="foto-staff-cadastro" class="foto-staff" src="" alt="Foto do staff">
+      </div>
+
+      <div class="dados-staff">
+        <p class="label-card">Você está logado como</p>
+        <h2 id="nome-staff-cadastro"></h2>
+        <p id="cidade-staff-cadastro"></p>
+        <p id="email-staff-cadastro"></p>
+      </div>
+
+      <div class="admin-card-acoes-logado">
+        <button id="botao-admin-cadastro" class="admin-card-acao admin-card-acao-corridas hidden" type="button">
+          Painel Admin
+        </button>
+
+        <button id="botao-corridas-cadastro" class="admin-card-acao admin-card-acao-perfil" type="button">
+          Corridas
+        </button>
+
+        <button id="botao-sair-cadastro" class="admin-card-acao admin-card-acao-sair logout-btn" type="button">
+          Sair
+        </button>
+      </div>
+    </section>
+
     <div class="header">
       <h1>Cadastro Geral de Staffs</h1>
       <p>Realize seu cadastro apenas uma vez para participar das próximas corridas e eventos. Seus dados ficarão salvos para futuras convocações.</p>
@@ -173,7 +200,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=125"></script>
+  <script src="script.js?v=132"></script>
   <script src="floating-tools.js?v=129"></script>
 </body>
 </html>

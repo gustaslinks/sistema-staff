@@ -46,6 +46,62 @@ const staffIdEdicao = modoEdicao
 let fotoAtualUrl = '';
 let staffAtualEdicao = null;
 
+const cardStaffCadastro = document.getElementById('card-staff-cadastro');
+const fotoStaffCadastro = document.getElementById('foto-staff-cadastro');
+const nomeStaffCadastro = document.getElementById('nome-staff-cadastro');
+const cidadeStaffCadastro = document.getElementById('cidade-staff-cadastro');
+const emailStaffCadastro = document.getElementById('email-staff-cadastro');
+const botaoAdminCadastro = document.getElementById('botao-admin-cadastro');
+const botaoCorridasCadastro = document.getElementById('botao-corridas-cadastro');
+const botaoSairCadastro = document.getElementById('botao-sair-cadastro');
+
+function renderizarCardLogadoCadastro(){
+  if(!cardStaffCadastro || !staffLogadoEdicao) return;
+
+  cardStaffCadastro.classList.remove('hidden');
+
+  if(fotoStaffCadastro){
+    fotoStaffCadastro.src = staffLogadoEdicao.foto_url || 'https://placehold.co/120x120?text=Foto';
+  }
+
+  if(nomeStaffCadastro){
+    nomeStaffCadastro.textContent = staffLogadoEdicao.nome_completo || 'Staff';
+  }
+
+  if(cidadeStaffCadastro){
+    cidadeStaffCadastro.textContent = staffLogadoEdicao.cidade ? `Cidade: ${staffLogadoEdicao.cidade}` : 'Cidade não informada';
+  }
+
+  if(emailStaffCadastro){
+    emailStaffCadastro.textContent = staffLogadoEdicao.email ? `E-mail: ${staffLogadoEdicao.email}` : 'E-mail não informado';
+  }
+
+  if(botaoAdminCadastro && isAdminEdicao){
+    botaoAdminCadastro.classList.remove('hidden');
+  }
+}
+
+renderizarCardLogadoCadastro();
+
+if(botaoAdminCadastro){
+  botaoAdminCadastro.addEventListener('click', () => {
+    window.location.href = 'admin.html';
+  });
+}
+
+if(botaoCorridasCadastro){
+  botaoCorridasCadastro.addEventListener('click', () => {
+    window.location.href = 'corridas.html';
+  });
+}
+
+if(botaoSairCadastro){
+  botaoSairCadastro.addEventListener('click', () => {
+    localStorage.removeItem('staffLogado');
+    window.location.href = 'index.html';
+  });
+}
+
 if (btnVoltarCorridas) {
   btnVoltarCorridas.addEventListener('click', () => {
     window.location.href = 'corridas.html';
