@@ -3601,3 +3601,368 @@ button.floating-calendar-day {
     min-height: 52px;
   }
 }
+
+/* =========================================================
+   AJUSTES V137 - POLIMENTO VISUAL COMPLETO DO ADMIN
+========================================================= */
+
+.pagina-admin {
+  gap: 20px;
+}
+
+.pagina-admin .card-staff {
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+  box-shadow: 0 18px 48px rgba(30, 27, 75, 0.10) !important;
+}
+
+.pagina-admin .label-card {
+  color: #6d28d9 !important;
+}
+
+.pagina-admin .foto-staff {
+  border: 3px solid #ede9fe !important;
+  box-shadow: 0 10px 24px rgba(76, 29, 149, 0.15) !important;
+}
+
+.admin-hero-gerenciamento {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 22px 50px rgba(30, 27, 75, 0.26) !important;
+}
+
+.admin-hero-gerenciamento::after {
+  content: "";
+  position: absolute;
+  right: -70px;
+  bottom: -90px;
+  width: 220px;
+  height: 220px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.admin-hero-texto,
+.admin-hero-btn {
+  position: relative;
+  z-index: 1;
+}
+
+.admin-hero-btn {
+  box-shadow: 0 16px 34px rgba(124, 58, 237, 0.34) !important;
+}
+
+.form-admin {
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  border-radius: 26px;
+  background: linear-gradient(180deg, #ffffff 0%, #fafaff 100%);
+  box-shadow: 0 18px 44px rgba(30, 27, 75, 0.10);
+  overflow: hidden;
+}
+
+.form-admin .form-area {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.form-admin .section-title {
+  color: #1e1b4b !important;
+}
+
+.form-admin .section-title::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 4px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+}
+
+.form-admin label,
+.form-admin .field label {
+  color: #334155 !important;
+}
+
+.form-admin input,
+.form-admin select,
+.form-admin textarea,
+.form-admin .field input,
+.form-admin .field select,
+.form-admin .field textarea {
+  border-color: #dbe3f0 !important;
+  background: #ffffff !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
+}
+
+.form-admin input:focus,
+.form-admin select:focus,
+.form-admin textarea:focus,
+.form-admin .field input:focus,
+.form-admin .field select:focus,
+.form-admin .field textarea:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12) !important;
+  outline: none !important;
+}
+
+.preview-dias-corrida {
+  border-radius: 18px !important;
+  background: #f8fafc !important;
+  border: 1px dashed #c4b5fd !important;
+}
+
+.card-corrida-admin {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(124, 58, 237, 0.10);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%) !important;
+  box-shadow: 0 18px 46px rgba(30, 27, 75, 0.10) !important;
+}
+
+.card-corrida-admin::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: linear-gradient(90deg, #7c3aed, #2563eb, #14b8a6);
+}
+
+.card-corrida-admin h3 {
+  color: #0f172a;
+  letter-spacing: -0.03em;
+}
+
+.card-corrida-admin p {
+  color: #475569;
+}
+
+.card-corrida-admin p strong {
+  color: #111827;
+}
+
+.card-corrida-admin .corrida-status-card.aberta {
+  background: linear-gradient(180deg, #ecfdf5 0%, #f0fdf4 100%) !important;
+  border-color: #86efac !important;
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.12) !important;
+}
+
+.card-corrida-admin .corrida-status-card.encerrada {
+  background: linear-gradient(180deg, #fef2f2 0%, #fff7f7 100%) !important;
+  border-color: #fca5a5 !important;
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.10) !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto {
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12) !important;
+}
+
+.dias-corrida-container:not(.hidden) {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%) !important;
+  border-color: #e2e8f0 !important;
+}
+
+.dia-corrida-card {
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+.gerenciar-dias .botao-toggle-dias {
+  background: linear-gradient(135deg, #334155, #475569) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 22px rgba(51, 65, 85, 0.16) !important;
+}
+
+.admin-card-footer-v128 .botao-editar-corrida {
+  background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-excluir-corrida,
+.admin-card-footer-v128 .delete-btn {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-exportar-pdf {
+  background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-exportar-excel {
+  background: linear-gradient(135deg, #15803d, #22c55e) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-gerar-pagamento-pix {
+  background: linear-gradient(135deg, #7c2d12, #f97316) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-ver-inscritos {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 button,
+.admin-card-footer-v128 .botao-admin-secundario,
+.admin-card-footer-v128 .delete-btn,
+.admin-card-footer-v128 .botao-ver-inscritos,
+.botao-admin-secundario,
+.botao-admin-batch,
+.admin-filtro-inscrito,
+.admin-toggle-tipo,
+.botao-confirmar-inscrito,
+.botao-cancelar-inscrito,
+.linha-inscrito-acoes button,
+.botao-whatsapp-inscrito {
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease !important;
+}
+
+.admin-card-footer-v128 button:hover,
+.admin-card-footer-v128 .botao-admin-secundario:hover,
+.admin-card-footer-v128 .delete-btn:hover,
+.admin-card-footer-v128 .botao-ver-inscritos:hover,
+.botao-admin-secundario:hover,
+.botao-admin-batch:hover,
+.admin-filtro-inscrito:hover,
+.admin-toggle-tipo:hover,
+.botao-confirmar-inscrito:hover,
+.botao-cancelar-inscrito:hover,
+.linha-inscrito-acoes button:hover,
+.botao-whatsapp-inscrito:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 24px rgba(15, 23, 42, 0.14) !important;
+  filter: brightness(1.02);
+}
+
+.lista-inscritos-admin {
+  border-top-color: #e0e7ff !important;
+}
+
+.admin-inscritos-painel {
+  padding: 14px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e0e7ff;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card {
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.055) !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-total,
+.admin-inscritos-resumo-v127 .resumo-card-vagas {
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%) !important;
+  border-color: #bfdbfe !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-confirmados {
+  background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%) !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-pendentes {
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%) !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-espera {
+  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 100%) !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-cancelados {
+  background: linear-gradient(180deg, #fef2f2 0%, #ffffff 100%) !important;
+}
+
+.admin-inscritos-filtros-v127,
+.admin-inscritos-acoes-v127 {
+  border-color: #e0e7ff !important;
+  box-shadow: 0 10px 24px rgba(30, 27, 75, 0.06) !important;
+}
+
+.admin-toggle-tipo.ativo,
+.admin-filtro-inscrito.ativo {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+.admin-status-select,
+.admin-busca-inscrito {
+  border-color: #dbe3f0 !important;
+}
+
+.admin-status-select:focus,
+.admin-busca-inscrito:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.11) !important;
+  outline: none !important;
+}
+
+.linha-inscrito-admin {
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.045) !important;
+}
+
+.linha-inscrito-admin:hover {
+  border-color: #c4b5fd !important;
+}
+
+.botao-expandir-inscrito {
+  background: #eef2ff !important;
+  color: #3730a3 !important;
+}
+
+.linha-inscrito-detalhes {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%) !important;
+}
+
+.foto-inscrito-admin {
+  border-color: #c4b5fd !important;
+  box-shadow: 0 8px 20px rgba(76, 29, 149, 0.10) !important;
+}
+
+.botao-confirmar-inscrito {
+  background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+  color: #ffffff !important;
+}
+
+.botao-cancelar-inscrito {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  color: #ffffff !important;
+}
+
+.botao-lista-espera-inscrito {
+  background: linear-gradient(135deg, #2563eb, #60a5fa) !important;
+  color: #ffffff !important;
+}
+
+.botao-whatsapp-inscrito {
+  background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+  color: #ffffff !important;
+}
+
+.floating-calendar-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  box-shadow: 0 16px 32px rgba(79, 70, 229, 0.28) !important;
+}
+
+@media (max-width: 700px) {
+  .card-corrida-admin {
+    padding: 22px 18px !important;
+    border-radius: 24px !important;
+  }
+
+  .admin-inscritos-painel {
+    padding: 10px;
+    border-radius: 18px;
+  }
+
+  .admin-card-footer-v128 button,
+  .admin-card-footer-v128 .botao-admin-secundario,
+  .admin-card-footer-v128 .delete-btn,
+  .admin-card-footer-v128 .botao-ver-inscritos {
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.10) !important;
+  }
+}
