@@ -119,56 +119,62 @@
           Cadastro de dias da corrida
         </h2>
 
-        <div class="grid">
-
-          <div class="field">
-            <label>Tipo do período</label>
-            <select id="novo-dia-tipo">
-              <option value="Entrega de kit">Entrega de kit</option>
-              <option value="Corrida">Dia da corrida</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Ajuda de custo do período</label>
-            <input type="number" id="novo-dia-ajuda" min="0" step="0.01" placeholder="Ex.: 120">
-          </div>
-
-          <div class="field">
-            <label>Data inicial</label>
-            <input type="date" id="novo-dia-inicio">
-          </div>
-
-          <div class="field">
-            <label>Data final <span class="label-opcional">(opcional)</span></label>
-            <input type="date" id="novo-dia-fim">
-          </div>
-
-          <div class="field">
-            <label>Horário início</label>
-            <input type="time" id="novo-dia-horario-inicio">
-          </div>
-
-          <div class="field">
-            <label>Horário fim <span class="label-opcional">(opcional)</span></label>
-            <input type="time" id="novo-dia-horario-fim">
-          </div>
-
-          <div class="field field-checkbox-admin field-ate-ultimo">
-            <label class="checkbox-admin-card checkbox-admin-card-compacto">
-              <input type="checkbox" id="novo-dia-ate-ultimo">
-              <span>
-                <strong>Até o último atleta chegar</strong>
-                <small>Desativa o horário final fixo deste período.</small>
-              </span>
-            </label>
-          </div>
-
-        </div>
-
-        <button id="adicionar-periodo-btn" class="botao-admin-secundario" type="button">
-          Adicionar período
+        <button id="toggle-novo-dia-btn" class="botao-admin-secundario botao-toggle-novo-dia hidden" type="button">
+          + Cadastrar novo dia
         </button>
+
+        <div id="novo-dia-form-bloco" class="novo-dia-form-bloco">
+          <div class="grid">
+
+            <div class="field">
+              <label>Tipo do período</label>
+              <select id="novo-dia-tipo">
+                <option value="Entrega de kit">Entrega de kit</option>
+                <option value="Corrida">Dia da corrida</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Ajuda de custo do período</label>
+              <input type="number" id="novo-dia-ajuda" min="0" step="0.01" placeholder="Ex.: 120">
+            </div>
+
+            <div class="field">
+              <label>Data inicial</label>
+              <input type="date" id="novo-dia-inicio">
+            </div>
+
+            <div class="field">
+              <label>Data final <span class="label-opcional">(opcional)</span></label>
+              <input type="date" id="novo-dia-fim">
+            </div>
+
+            <div class="field">
+              <label>Horário início</label>
+              <input type="time" id="novo-dia-horario-inicio">
+            </div>
+
+            <div class="field">
+              <label>Horário fim <span class="label-opcional">(opcional)</span></label>
+              <input type="time" id="novo-dia-horario-fim">
+            </div>
+
+            <div class="field field-checkbox-admin field-ate-ultimo">
+              <label class="checkbox-admin-card checkbox-admin-card-compacto">
+                <input type="checkbox" id="novo-dia-ate-ultimo">
+                <span>
+                  <strong>Até o último atleta chegar</strong>
+                  <small>Desativa o horário final fixo deste período.</small>
+                </span>
+              </label>
+            </div>
+
+          </div>
+
+          <button id="adicionar-periodo-btn" class="botao-admin-secundario" type="button">
+            Adicionar período
+          </button>
+        </div>
 
         <div id="preview-dias-corrida" class="preview-dias-corrida">
           <p>Nenhum dia adicionado ainda.</p>

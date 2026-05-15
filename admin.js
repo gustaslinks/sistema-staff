@@ -31,6 +31,8 @@ const novoDiaHorarioInicio = document.getElementById("novo-dia-horario-inicio");
 const novoDiaHorarioFim = document.getElementById("novo-dia-horario-fim");
 const novoDiaAteUltimo = document.getElementById("novo-dia-ate-ultimo");
 const adicionarPeriodoBtn = document.getElementById("adicionar-periodo-btn");
+const toggleNovoDiaBtn = document.getElementById("toggle-novo-dia-btn");
+const novoDiaFormBloco = document.getElementById("novo-dia-form-bloco");
 const previewDiasCorrida = document.getElementById("preview-dias-corrida");
 
 const OBSERVACOES_PADRAO = "Traje obrigatório: calça jeans ou preta. Não levar mochila grande. Levar documento com foto e chegar com antecedência ao local informado.";
@@ -80,9 +82,19 @@ novaCorridaBtn.addEventListener("click", function () {
   }
 });
 
-adicionarPeriodoBtn.addEventListener("click", function () {
-  adicionarPeriodoCadastro();
-});
+if (adicionarPeriodoBtn) {
+  adicionarPeriodoBtn.addEventListener("click", function () {
+    adicionarPeriodoCadastro();
+  });
+}
+
+if (toggleNovoDiaBtn && novoDiaFormBloco) {
+  toggleNovoDiaBtn.addEventListener("click", function () {
+    const fechado = novoDiaFormBloco.classList.contains("hidden");
+    novoDiaFormBloco.classList.toggle("hidden", !fechado);
+    toggleNovoDiaBtn.textContent = fechado ? "Ocultar cadastro de novo dia" : "+ Cadastrar novo dia";
+  });
+}
 
 if (novoDiaAteUltimo) {
   novoDiaAteUltimo.addEventListener("change", function () {
@@ -93,6 +105,51 @@ if (novoDiaAteUltimo) {
       novoDiaHorarioFim.disabled = false;
     }
   });
+}
+
+function normalizarDataInput(valor) {
+  if (!valor) return null;
+  const texto = String(valor).trim();
+  const iso = texto.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (iso) return iso[1];
+  const partesBR = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (partesBR) return `${partesBR[3]}-${partesBR[2]}-${partesBR[1]}`;
+  return texto;
+}
+
+async function atualizarCorridaComFallback(corridaId, dadosCorrida) {
+  const tentar = async (payload) => supabaseClient
+    .from("corridas")
+    .update(payload)
+    .eq("id", corridaId);
+
+  let resultado = await tentar(dadosCorrida);
+  if (!resultado.error) return resultado;
+
+  const mensagem = String(resultado.error.message || "").toLowerCase();
+  const payloadCompat = { ...dadosCorrida };
+
+  // Compatibilidade para bancos que ainda não receberam alguma coluna nova.
+  if (mensagem.includes("possui_patrocinador_tenis") || mensagem.includes("schema cache") || mensagem.includes("column")) {
+    delete payloadCompat.possui_patrocinador_tenis;
+    resultado = await tentar(payloadCompat);
+    if (!resultado.error) return resultado;
+  }
+
+  return resultado;
+}
+
+function configurarModoFormularioCorrida(modo) {
+  const editando = modo === "edicao";
+
+  if (toggleNovoDiaBtn) {
+    toggleNovoDiaBtn.classList.toggle("hidden", !editando);
+    toggleNovoDiaBtn.textContent = "+ Cadastrar novo dia";
+  }
+
+  if (novoDiaFormBloco) {
+    novoDiaFormBloco.classList.toggle("hidden", editando);
+  }
 }
 
 // SALVAR / ATUALIZAR CORRIDA
@@ -125,13 +182,13 @@ salvarCorridaBtn.addEventListener("click", async function () {
 
   const dadosCorrida = {
     nome: corridaNome.value.trim(),
-    data_corrida: corridaDataFim.value,
-    data_inicio: corridaDataInicio.value,
-    data_fim: corridaDataFim.value,
+    data_corrida: normalizarDataInput(corridaDataFim.value),
+    data_inicio: normalizarDataInput(corridaDataInicio.value),
+    data_fim: normalizarDataInput(corridaDataFim.value),
     cidade: null,
     local: corridaLocal.value.trim() || null,
     vagas_total: Number(corridaVagas.value),
-    prazo_inscricao: corridaPrazo.value || null,
+    prazo_inscricao: normalizarDataInput(corridaPrazo.value),
     observacoes: corridaObservacoes.value.trim() || OBSERVACOES_PADRAO,
     possui_patrocinador_tenis: corridaPatrocinadorTenis ? corridaPatrocinadorTenis.checked : false
   };
@@ -140,14 +197,11 @@ salvarCorridaBtn.addEventListener("click", async function () {
   let diasJaSalvos = false;
 
   if (corridaEmEdicaoId) {
-    const { error } = await supabaseClient
-      .from("corridas")
-      .update(dadosCorrida)
-      .eq("id", corridaEmEdicaoId);
+    const { error } = await atualizarCorridaComFallback(corridaEmEdicaoId, dadosCorrida);
 
     if (error) {
       console.error("Erro ao atualizar corrida:", error);
-      alert("Não foi possível atualizar a corrida.");
+      alert(`Não foi possível atualizar a corrida. ${error && error.message ? error.message : ""}`);
       salvarCorridaBtn.disabled = false;
       salvarCorridaBtn.textContent = "Atualizar corrida";
       return;
@@ -615,12 +669,13 @@ async function carregarCorridaParaEdicao(corridaId) {
   }
 
   corridaEmEdicaoId = corridaId;
+  configurarModoFormularioCorrida("edicao");
 
   corridaNome.value = corrida.nome || "";
-  corridaDataInicio.value = corrida.data_inicio || corrida.data_corrida || "";
-  corridaDataFim.value = corrida.data_fim || corrida.data_corrida || "";
+  corridaDataInicio.value = normalizarDataInput(corrida.data_inicio || corrida.data_corrida || "") || "";
+  corridaDataFim.value = normalizarDataInput(corrida.data_fim || corrida.data_corrida || "") || "";
   corridaLocal.value = corrida.local || "";
-  corridaPrazo.value = corrida.prazo_inscricao || "";
+  corridaPrazo.value = normalizarDataInput(corrida.prazo_inscricao || "") || "";
   corridaVagas.value = corrida.vagas_total || "";
   corridaObservacoes.value = corrida.observacoes || OBSERVACOES_PADRAO;
   if (corridaPatrocinadorTenis) corridaPatrocinadorTenis.checked = corrida.possui_patrocinador_tenis === true;
@@ -3073,6 +3128,48 @@ function exportarExcelResumoTenis(corrida, inscritos) {
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Resumo tênis");
   XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)}-resumo-tenis.xlsx`);
+}
+
+
+function limparCamposNovoDia() {
+  if (novoDiaTipo) novoDiaTipo.value = "Entrega de kit";
+  if (novoDiaAjuda) novoDiaAjuda.value = "";
+  if (novoDiaInicio) novoDiaInicio.value = "";
+  if (novoDiaFim) novoDiaFim.value = "";
+  if (novoDiaHorarioInicio) novoDiaHorarioInicio.value = "";
+  if (novoDiaHorarioFim) {
+    novoDiaHorarioFim.value = "";
+    novoDiaHorarioFim.disabled = false;
+  }
+  if (novoDiaAteUltimo) novoDiaAteUltimo.checked = false;
+}
+
+function limparFormularioCorrida() {
+  corridaEmEdicaoId = null;
+  configurarModoFormularioCorrida("nova");
+
+  if (corridaNome) corridaNome.value = "";
+  if (corridaDataInicio) corridaDataInicio.value = "";
+  if (corridaDataFim) corridaDataFim.value = "";
+  if (corridaLocal) corridaLocal.value = "";
+  if (corridaPrazo) corridaPrazo.value = "";
+  if (corridaVagas) corridaVagas.value = "";
+  if (corridaObservacoes) corridaObservacoes.value = OBSERVACOES_PADRAO;
+  if (corridaPatrocinadorTenis) corridaPatrocinadorTenis.checked = false;
+
+  diasCadastroCorrida = [];
+  limparCamposNovoDia();
+  renderizarPreviewDiasCadastro();
+
+  if (salvarCorridaBtn) {
+    salvarCorridaBtn.disabled = false;
+    salvarCorridaBtn.textContent = "Salvar corrida";
+  }
+}
+
+function prepararNovaCorrida() {
+  limparFormularioCorrida();
+  configurarModoFormularioCorrida("nova");
 }
 
 // INICIALIZAÇÃO
