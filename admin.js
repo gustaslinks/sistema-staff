@@ -925,7 +925,8 @@ async function carregarCorridaParaEdicao(corridaId) {
     return;
   }
 
-  const { data: dias, error: erroDias } = await supabaseClient
+  let dias = [];
+  const { data: diasCarregados, error: erroDias } = await supabaseClient
     .from("corrida_dias")
     .select("*")
     .eq("corrida_id", corridaId)
@@ -934,6 +935,8 @@ async function carregarCorridaParaEdicao(corridaId) {
   if (erroDias) {
     console.error("Erro ao carregar dias para edição:", erroDias);
     alert("A corrida foi carregada, mas os dias não puderam ser carregados.");
+  } else {
+    dias = diasCarregados || [];
   }
 
   corridaEmEdicaoId = corridaId;
@@ -2113,6 +2116,16 @@ function atualizarAteUltimoDiaCadastro(index, marcado) {
   }
 
   renderizarPreviewDiasCadastro();
+}
+
+function formatarDataBR(valor) {
+  if (!valor) return "";
+  const texto = String(valor).trim();
+  const iso = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return `${iso[3]}/${iso[2]}/${iso[1]}`;
+  const br = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (br) return texto;
+  return formatarData ? formatarData(texto) : texto;
 }
 
 function renderizarPreviewDiasCadastro() {
