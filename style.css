@@ -4888,3 +4888,110 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 .card-staff-cadastro.hidden {
   display: none !important;
 }
+
+/* =====================================================
+   V147 - Banner da corrida, ícones persistentes e WhatsApp circular
+   ===================================================== */
+.field-banner-corrida {
+  grid-column: 1 / -1;
+}
+
+.field-banner-corrida input[type="file"] {
+  padding: 13px;
+  background: #f8fafc;
+  border: 1px dashed rgba(37, 99, 235, 0.35);
+  cursor: pointer;
+}
+
+.corrida-banner-preview {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+.corrida-banner-preview img {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+}
+
+.corrida-banner-preview span {
+  display: block;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.botao-remover-banner {
+  margin-top: 10px !important;
+  width: auto !important;
+  min-height: 38px !important;
+  padding: 9px 14px !important;
+  background: #fff1f2 !important;
+  color: #be123c !important;
+  border: 1px solid #fecdd3 !important;
+  box-shadow: none !important;
+}
+
+.corrida-card-banner,
+.corrida-card-banner-admin {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 20px;
+  margin: 0 0 18px;
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.16);
+  background: #e5e7eb;
+}
+
+.card-corrida .corrida-card-banner {
+  margin: -4px 0 20px;
+}
+
+.card-corrida-admin .corrida-card-banner-admin {
+  margin-bottom: 18px;
+}
+
+/* Botão de WhatsApp como círculo simples, no padrão dos flutuantes */
+.floating-whatsapp {
+  width: 74px !important;
+  min-width: 74px !important;
+  height: 74px !important;
+  min-height: 74px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  gap: 0 !important;
+}
+
+.floating-whatsapp-icon {
+  width: 44px !important;
+  height: 44px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  font-size: 25px !important;
+}
+
+.floating-whatsapp-text {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .corrida-card-banner,
+  .corrida-card-banner-admin {
+    border-radius: 18px;
+    margin-bottom: 16px;
+  }
+
+  .floating-whatsapp {
+    width: 70px !important;
+    min-width: 70px !important;
+    height: 70px !important;
+    min-height: 70px !important;
+  }
+}

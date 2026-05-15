@@ -33,8 +33,7 @@
     link.rel = "noopener noreferrer";
     link.setAttribute("aria-label", "Falar pelo WhatsApp");
     link.innerHTML = `
-      <span class="floating-whatsapp-icon" aria-hidden="true">✆</span>
-      <span class="floating-whatsapp-text">Dúvidas?</span>
+      <span class="floating-whatsapp-icon" aria-hidden="true">💬</span>
     `;
 
     document.body.appendChild(link);

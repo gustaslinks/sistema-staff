@@ -21,6 +21,14 @@ const corridaPrazo = document.getElementById("corrida-prazo");
 const corridaVagas = document.getElementById("corrida-vagas");
 const corridaObservacoes = document.getElementById("corrida-observacoes");
 const corridaPatrocinadorTenis = document.getElementById("corrida-patrocinador-tenis");
+const corridaBannerInput = document.getElementById("corrida-banner");
+const corridaBannerPreview = document.getElementById("corrida-banner-preview");
+const removerBannerCorridaBtn = document.getElementById("remover-banner-corrida");
+const BANNER_BUCKET = "corrida-banners";
+let corridaBannerArquivo = null;
+let corridaBannerUrlAtual = null;
+let corridaBannerPathAtual = null;
+let corridaBannerRemovido = false;
 
 // CAMPOS DOS DIAS NO CADASTRO
 const novoDiaTipo = document.getElementById("novo-dia-tipo");
@@ -105,6 +113,114 @@ if (novoDiaAteUltimo) {
       novoDiaHorarioFim.disabled = false;
     }
   });
+}
+
+if (corridaBannerInput) {
+  corridaBannerInput.addEventListener("change", function () {
+    const arquivo = corridaBannerInput.files && corridaBannerInput.files[0] ? corridaBannerInput.files[0] : null;
+
+    if (!arquivo) return;
+
+    if (!arquivo.type.startsWith("image/")) {
+      alert("Selecione uma imagem válida para o banner.");
+      corridaBannerInput.value = "";
+      return;
+    }
+
+    if (arquivo.size > 1024 * 1024) {
+      alert("O banner deve ter até 1 MB. Exporte a imagem mais leve antes de enviar.");
+      corridaBannerInput.value = "";
+      return;
+    }
+
+    corridaBannerArquivo = arquivo;
+    corridaBannerRemovido = false;
+    const urlPreview = URL.createObjectURL(arquivo);
+    atualizarPreviewBannerCorrida(urlPreview, "Novo banner selecionado");
+  });
+}
+
+if (removerBannerCorridaBtn) {
+  removerBannerCorridaBtn.addEventListener("click", function () {
+    corridaBannerArquivo = null;
+    corridaBannerRemovido = true;
+    if (corridaBannerInput) corridaBannerInput.value = "";
+    atualizarPreviewBannerCorrida(null);
+  });
+}
+
+
+function atualizarPreviewBannerCorrida(url, legenda = "Banner atual") {
+  if (!corridaBannerPreview) return;
+
+  if (!url) {
+    corridaBannerPreview.classList.add("hidden");
+    corridaBannerPreview.innerHTML = "";
+    if (removerBannerCorridaBtn) removerBannerCorridaBtn.classList.add("hidden");
+    return;
+  }
+
+  corridaBannerPreview.classList.remove("hidden");
+  corridaBannerPreview.innerHTML = `
+    <img src="${escapeHtml(url)}" alt="Preview do banner da corrida">
+    <span>${escapeHtml(legenda)}</span>
+  `;
+
+  if (removerBannerCorridaBtn) removerBannerCorridaBtn.classList.remove("hidden");
+}
+
+function obterExtensaoArquivoBanner(arquivo) {
+  const tipo = String(arquivo && arquivo.type ? arquivo.type : "").toLowerCase();
+  if (tipo.includes("png")) return "png";
+  if (tipo.includes("webp")) return "webp";
+  return "jpg";
+}
+
+async function uploadBannerCorrida(corridaId) {
+  if (!corridaBannerArquivo) {
+    return {
+      banner_url: corridaBannerRemovido ? null : corridaBannerUrlAtual,
+      banner_path: corridaBannerRemovido ? null : corridaBannerPathAtual
+    };
+  }
+
+  const extensao = obterExtensaoArquivoBanner(corridaBannerArquivo);
+  const caminho = `${corridaId}/banner-${Date.now()}.${extensao}`;
+
+  const { error: erroUpload } = await supabaseClient.storage
+    .from(BANNER_BUCKET)
+    .upload(caminho, corridaBannerArquivo, {
+      cacheControl: "3600",
+      upsert: true,
+      contentType: corridaBannerArquivo.type || "image/jpeg"
+    });
+
+  if (erroUpload) throw erroUpload;
+
+  const { data: publicData } = supabaseClient.storage
+    .from(BANNER_BUCKET)
+    .getPublicUrl(caminho);
+
+  return {
+    banner_url: publicData && publicData.publicUrl ? publicData.publicUrl : null,
+    banner_path: caminho
+  };
+}
+
+async function atualizarBannerCorridaNoBanco(corridaId) {
+  const dadosBanner = await uploadBannerCorrida(corridaId);
+
+  const { error } = await supabaseClient
+    .from("corridas")
+    .update(dadosBanner)
+    .eq("id", corridaId);
+
+  if (error) throw error;
+
+  corridaBannerUrlAtual = dadosBanner.banner_url;
+  corridaBannerPathAtual = dadosBanner.banner_path;
+  corridaBannerArquivo = null;
+  corridaBannerRemovido = false;
 }
 
 function normalizarDataInput(valor) {
@@ -207,6 +323,16 @@ salvarCorridaBtn.addEventListener("click", async function () {
       return;
     }
 
+    try {
+      await atualizarBannerCorridaNoBanco(corridaEmEdicaoId);
+    } catch (erroBanner) {
+      console.error("Erro ao atualizar banner da corrida:", erroBanner);
+      alert("A corrida foi atualizada, mas não foi possível salvar o banner. Confira o bucket corrida-banners no Supabase.");
+      salvarCorridaBtn.disabled = false;
+      salvarCorridaBtn.textContent = "Atualizar corrida";
+      return;
+    }
+
     // Preserva os IDs dos dias já existentes para não quebrar as disponibilidades dos inscritos.
     const { data: diasExistentes, error: erroBuscarDiasExistentes } = await supabaseClient
       .from("corrida_dias")
@@ -304,6 +430,13 @@ salvarCorridaBtn.addEventListener("click", async function () {
     }
 
     corridaId = corridaCriada.id;
+
+    try {
+      await atualizarBannerCorridaNoBanco(corridaId);
+    } catch (erroBanner) {
+      console.error("Erro ao salvar banner da corrida:", erroBanner);
+      alert("A corrida foi cadastrada, mas não foi possível salvar o banner. Confira o bucket corrida-banners no Supabase.");
+    }
   }
 
   if (!diasJaSalvos && diasCadastroCorrida.length > 0) {
@@ -454,6 +587,8 @@ async function carregarCorridasAdmin() {
 
     return `
       <article class="card-corrida-admin" data-corrida-id="${corrida.id}">
+
+        ${corrida.banner_url ? `<img class="corrida-card-banner-admin" src="${escapeHtml(corrida.banner_url)}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">` : ""}
 
         <h3>${corrida.nome}</h3>
         ${corrida.possui_patrocinador_tenis ? `<div class="badge-tenis">👟 Patrocinador de tênis</div>` : ""}
@@ -647,10 +782,10 @@ function ativarBotoesToggleDias() {
 
       if (fechado) {
         container.classList.remove("hidden");
-        botao.textContent = "Ocultar dias cadastrados";
+        botao.innerHTML = `<span class="btn-ico">📅</span><span>Ocultar dias cadastrados</span>`;
       } else {
         container.classList.add("hidden");
-        botao.textContent = "Mostrar dias cadastrados";
+        botao.innerHTML = `<span class="btn-ico">📅</span><span>Mostrar dias cadastrados</span>`;
       }
     });
   });
@@ -703,6 +838,12 @@ async function carregarCorridaParaEdicao(corridaId) {
   corridaVagas.value = corrida.vagas_total || "";
   corridaObservacoes.value = corrida.observacoes || OBSERVACOES_PADRAO;
   if (corridaPatrocinadorTenis) corridaPatrocinadorTenis.checked = corrida.possui_patrocinador_tenis === true;
+  corridaBannerArquivo = null;
+  corridaBannerRemovido = false;
+  corridaBannerUrlAtual = corrida.banner_url || null;
+  corridaBannerPathAtual = corrida.banner_path || null;
+  if (corridaBannerInput) corridaBannerInput.value = "";
+  atualizarPreviewBannerCorrida(corridaBannerUrlAtual, "Banner atual");
 
   diasCadastroCorrida = (dias || []).map(dia => ({
     id: dia.id,
@@ -836,12 +977,12 @@ function ativarBotoesVerInscritos() {
       if (estaAberto) {
         container.classList.add("hidden");
         container.innerHTML = "";
-        botao.textContent = "Ver inscritos";
+        botao.innerHTML = `<span class="btn-ico">👥</span><span>Ver inscritos</span>`;
         return;
       }
 
       container.classList.remove("hidden");
-      botao.textContent = "Ocultar inscritos";
+      botao.innerHTML = `<span class="btn-ico">👥</span><span>Ocultar inscritos</span>`;
 
       await carregarInscritosDaCorrida(
         corridaId,
@@ -3813,6 +3954,12 @@ function limparFormularioCorrida() {
   if (corridaVagas) corridaVagas.value = "";
   if (corridaObservacoes) corridaObservacoes.value = OBSERVACOES_PADRAO;
   if (corridaPatrocinadorTenis) corridaPatrocinadorTenis.checked = false;
+  corridaBannerArquivo = null;
+  corridaBannerUrlAtual = null;
+  corridaBannerPathAtual = null;
+  corridaBannerRemovido = false;
+  if (corridaBannerInput) corridaBannerInput.value = "";
+  atualizarPreviewBannerCorrida(null);
 
   diasCadastroCorrida = [];
   limparCamposNovoDia();

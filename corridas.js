@@ -316,6 +316,8 @@ async function carregarCorridas() {
     return `
       <article class="card-corrida">
 
+        ${corrida.banner_url ? `<img class="corrida-card-banner" src="${escapeHtml(corrida.banner_url)}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">` : ""}
+
         <h2>${corrida.nome}</h2>
 
         <div class="corrida-status-card aberta">
@@ -632,6 +634,15 @@ async function carregarMinhasInscricoes() {
 // =========================================================
 // FORMATAÇÕES
 // =========================================================
+
+function escapeHtml(texto) {
+  return String(texto || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 function formatarData(dataISO) {
   if (!dataISO) return "Não informado";
