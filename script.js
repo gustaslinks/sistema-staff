@@ -24,6 +24,9 @@ const foto = document.getElementById('foto');
 const observacoes = document.getElementById('observacoes');
 const termos = document.getElementById('termos');
 const form = document.getElementById('staffForm');
+const staffIdInput = document.getElementById('staffId');
+const staffCpfOriginalInput = document.getElementById('staffCpfOriginal');
+const staffNascimentoOriginalInput = document.getElementById('staffNascimentoOriginal');
 const successMessage = document.getElementById('successMessage');
 const submitBtn = document.getElementById('submitBtn');
 const btnVoltarCorridas = document.getElementById('btnVoltarCorridas');
@@ -482,82 +485,16 @@ form.addEventListener('submit',async function(event){
     let cadastroSalvo = null;
 
     if (modoEdicao) {
-      const idParaAtualizar = (staffAtualEdicao && staffAtualEdicao.id) || staffIdEdicao;
-      const cpfOriginalEdicao = (staffAtualEdicao && staffAtualEdicao.cpf) || cpf.value;
-      const nascimentoOriginalEdicao = (staffAtualEdicao && staffAtualEdicao.data_nascimento) || dateToDatabase(nascimento.value);
+      cadastroSalvo = await atualizarCadastroExistente(dadosCadastro);
 
-      if (!idParaAtualizar && !cpfOriginalEdicao) {
-        throw new Error('Sessão expirada. Faça login novamente.');
-      }
-
-      // Atualiza pelo ID carregado e CONFIRMA no banco antes de mostrar sucesso.
-      // Importante: não criamos mais um objeto local falso, porque isso fazia parecer que salvou
-      // mesmo quando o Supabase não tinha atualizado a linha.
-      let respostaUpdate = null;
-
-      if (idParaAtualizar) {
-        respostaUpdate = await supabaseClient
-          .from('staffs')
-          .update(dadosCadastro)
-          .eq('id', idParaAtualizar)
-          .select('*')
-          .maybeSingle();
-
-        if (respostaUpdate.error) throw respostaUpdate.error;
-        cadastroSalvo = respostaUpdate.data;
-
-        // Alguns ambientes podem não devolver a linha atualizada no update.
-        // Então fazemos uma leitura explícita pelo ID para validar o dado salvo.
-        const confirmarUpdate = await supabaseClient
-          .from('staffs')
-          .select('*')
-          .eq('id', idParaAtualizar)
-          .maybeSingle();
-
-        if (confirmarUpdate.error) throw confirmarUpdate.error;
-        if (confirmarUpdate.data) cadastroSalvo = confirmarUpdate.data;
-      }
-
-      // Fallback: se o ID do localStorage estiver antigo/inconsistente, tenta localizar pela chave antiga
-      // do cadastro carregado na própria tela.
-      if (!cadastroSalvo && cpfOriginalEdicao) {
-        respostaUpdate = await supabaseClient
-          .from('staffs')
-          .update(dadosCadastro)
-          .eq('cpf', cpfOriginalEdicao)
-          .eq('data_nascimento', nascimentoOriginalEdicao)
-          .select('*')
-          .maybeSingle();
-
-        if (respostaUpdate.error) throw respostaUpdate.error;
-        cadastroSalvo = respostaUpdate.data;
-
-        if (cadastroSalvo && cadastroSalvo.id) {
-          const confirmarFallback = await supabaseClient
-            .from('staffs')
-            .select('*')
-            .eq('id', cadastroSalvo.id)
-            .maybeSingle();
-
-          if (confirmarFallback.error) throw confirmarFallback.error;
-          if (confirmarFallback.data) cadastroSalvo = confirmarFallback.data;
-        }
-      }
-
-      if (!cadastroSalvo) {
-        throw new Error('Não foi possível atualizar seu cadastro no banco. Faça login novamente e tente outra vez.');
-      }
-
-      const calcadoEsperado = dadosCadastro.numero_calcado === null ? null : Number(dadosCadastro.numero_calcado);
-      const calcadoSalvo = cadastroSalvo.numero_calcado === null || cadastroSalvo.numero_calcado === undefined || cadastroSalvo.numero_calcado === ''
-        ? null
-        : Number(cadastroSalvo.numero_calcado);
-
-      if (calcadoEsperado !== calcadoSalvo) {
+      if (!confirmarNumeroCalcado(cadastroSalvo, dadosCadastro.numero_calcado)) {
         throw new Error('O cadastro foi enviado, mas o número do calçado não foi confirmado no banco. Recarregue a página e tente novamente.');
       }
 
       staffAtualEdicao = cadastroSalvo;
+      if (staffIdInput) staffIdInput.value = cadastroSalvo.id || '';
+      if (staffCpfOriginalInput) staffCpfOriginalInput.value = cadastroSalvo.cpf || '';
+      if (staffNascimentoOriginalInput) staffNascimentoOriginalInput.value = cadastroSalvo.data_nascimento || '';
     } else {
       const inserirCadastro = await supabaseClient
         .from('staffs')
@@ -684,6 +621,9 @@ async function iniciarModoEdicao(){
   }
 
   staffAtualEdicao = data;
+  if (staffIdInput) staffIdInput.value = data.id || '';
+  if (staffCpfOriginalInput) staffCpfOriginalInput.value = data.cpf || '';
+  if (staffNascimentoOriginalInput) staffNascimentoOriginalInput.value = data.data_nascimento || '';
 
   nome.value = data.nome_completo || '';
   cpf.value = data.cpf || '';

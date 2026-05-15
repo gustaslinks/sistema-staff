@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Staffs</title>
-  <link rel="stylesheet" href="style.css?v=157" />
-  <link rel="stylesheet" href="photo-cropper.css?v=157" />
+  <link rel="stylesheet" href="style.css?v=158" />
+  <link rel="stylesheet" href="photo-cropper.css?v=158" />
 </head>
 <body>
   <div class="container">
@@ -41,6 +41,9 @@
       <p>Realize seu cadastro apenas uma vez para participar das próximas corridas e eventos. Seus dados ficarão salvos para futuras convocações.</p>
     </div>
 <form class="form-area" id="staffForm" novalidate>
+    <input type="hidden" id="staffId" value="" />
+    <input type="hidden" id="staffCpfOriginal" value="" />
+    <input type="hidden" id="staffNascimentoOriginal" value="" />
 
   <div class="section-title">Dados pessoais</div>
 
@@ -222,8 +225,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="photo-cropper.js?v=157"></script>
-  <script src="script.js?v=157"></script>
-  <script src="floating-tools.js?v=157"></script>
+  <script src="photo-cropper.js?v=158"></script>
+  <script src="script.js?v=158"></script>
+  <script src="floating-tools.js?v=158"></script>
 </body>
 </html>
