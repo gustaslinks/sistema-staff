@@ -6,7 +6,7 @@
 
   <title>Painel Admin | Sistema Staff</title>
 
-  <link rel="stylesheet" href="style.css?v=146">
+  <link rel="stylesheet" href="style.css?v=147">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -101,6 +101,14 @@
                 <small>Habilita relatórios de numeração para entrega de tênis aos staffs.</small>
               </span>
             </label>
+          </div>
+
+          <div class="field field-banner-corrida">
+            <label for="corrida-banner">Banner da corrida <span class="label-opcional">(opcional)</span></label>
+            <input type="file" id="corrida-banner" accept="image/jpeg,image/png,image/webp">
+            <small>Formato recomendado: 16:9, 1200×675 px, JPG/PNG/WebP até 1 MB.</small>
+            <div id="corrida-banner-preview" class="corrida-banner-preview hidden"></div>
+            <button id="remover-banner-corrida" class="botao-admin-secundario botao-remover-banner hidden" type="button">Remover banner</button>
           </div>
 
         </div>
@@ -201,8 +209,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
-  <script src="qrcode.min.js?v=146"></script>
-  <script src="admin.js?v=146"></script>
-  <script src="floating-tools.js?v=146"></script>
+  <script src="qrcode.min.js?v=147"></script>
+  <script src="admin.js?v=147"></script>
+  <script src="floating-tools.js?v=147"></script>
 </body>
 </html>
