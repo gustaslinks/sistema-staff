@@ -6198,7 +6198,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 }
 
 
-/* v170 - seta outline consistente no card de inscritos */
+/* v171 - seta outline consistente no card de inscritos */
 .botao-expandir-inscrito {
   font-size: 0 !important;
   line-height: 0 !important;
@@ -6227,4 +6227,98 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 }
 .linha-inscrito-admin.is-expanded .botao-expandir-inscrito .icone-expandir-inscrito {
   transform: rotate(90deg) !important;
+}
+
+/* v171 - busca admin na edição de cadastro */
+.admin-editar-staff-panel {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  border-radius: 18px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.07);
+  padding: 16px;
+  margin: 0 0 18px;
+}
+
+.admin-editar-staff-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.admin-editar-staff-header strong {
+  display: block;
+  color: #1f2937;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.admin-editar-staff-header span {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.admin-editar-staff-busca {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-editar-staff-busca input {
+  height: 42px;
+  border: 1px solid #d8dce8;
+  border-radius: 12px;
+  padding: 0 12px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+}
+
+.admin-editar-staff-busca input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.admin-editar-staff-busca button {
+  height: 42px;
+  border: 0;
+  border-radius: 12px;
+  padding: 0 18px;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  box-shadow: 0 8px 18px rgba(124, 58, 237, 0.22);
+}
+
+.admin-editar-staff-busca button:disabled {
+  opacity: .7;
+  cursor: wait;
+}
+
+.admin-editar-staff-status {
+  min-height: 18px;
+  color: #475569;
+  font-size: 12px;
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.campo-bloqueado-edicao {
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .admin-editar-staff-busca {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-editar-staff-busca button {
+    width: 100%;
+  }
 }

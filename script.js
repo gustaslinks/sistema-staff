@@ -58,6 +58,10 @@ const emailStaffCadastro = document.getElementById('email-staff-cadastro');
 const botaoAdminCadastro = document.getElementById('botao-admin-cadastro');
 const botaoCorridasCadastro = document.getElementById('botao-corridas-cadastro');
 const botaoSairCadastro = document.getElementById('botao-sair-cadastro');
+const adminEditarStaffPanel = document.getElementById('adminEditarStaffPanel');
+const adminBuscaCpfStaff = document.getElementById('adminBuscaCpfStaff');
+const adminBtnBuscarStaff = document.getElementById('adminBtnBuscarStaff');
+const adminBuscaStaffStatus = document.getElementById('adminBuscaStaffStatus');
 
 function renderizarCardLogadoCadastro(){
   if(!cardStaffCadastro) return;
@@ -486,6 +490,128 @@ function getCandidatosCpfNascimento(dadosCadastro){
     });
 }
 
+
+async function buscarCadastroPorCpf(cpfValor){
+  const cpfFormatado = normalizarTextoBusca(cpfValor);
+  const cpfNumeros = normalizarCpfSomenteNumeros(cpfValor);
+  if (!cpfFormatado && !cpfNumeros) return null;
+
+  const tentativas = [...new Set([cpfFormatado, cpfNumeros].filter(Boolean))];
+
+  for (const cpfBusca of tentativas) {
+    const { data, error } = await supabaseClient
+      .from('staffs')
+      .select('*')
+      .eq('cpf', cpfBusca)
+      .limit(1);
+
+    if (error) throw error;
+    if (Array.isArray(data) && data.length) return data[0];
+  }
+
+  return null;
+}
+
+function travarCamposLoginStaffComum(){
+  if (!modoEdicao) return;
+
+  const deveTravar = !isAdminEdicao;
+  [cpf, nascimento].forEach((campo) => {
+    if (!campo) return;
+    campo.disabled = deveTravar;
+    campo.classList.toggle('campo-bloqueado-edicao', deveTravar);
+  });
+}
+
+function preencherFormularioComStaff(data){
+  if (!data) return;
+
+  staffAtualEdicao = data;
+  if (staffIdInput) staffIdInput.value = data.id || '';
+  if (staffCpfOriginalInput) staffCpfOriginalInput.value = data.cpf || '';
+  if (staffNascimentoOriginalInput) staffNascimentoOriginalInput.value = data.data_nascimento || '';
+
+  nome.value = data.nome_completo || '';
+  cpf.value = data.cpf || '';
+  rg.value = data.rg || '';
+  nascimento.value = databaseDateToBr(data.data_nascimento || '');
+  telefone.value = data.telefone || '';
+  email.value = data.email || '';
+  cidade.value = data.cidade || '';
+  if (calcado) calcado.value = data.numero_calcado || '';
+  indicado.value = data.indicado_por || '';
+  observacoes.value = data.observacoes || '';
+  fotoAtualUrl = data.foto_url || '';
+  termos.checked = true;
+  selecionarPixPorValor(data);
+
+  const preview=document.getElementById('fotoPreview');
+  const previewImg=document.getElementById('fotoPreviewImg');
+  const previewText=document.getElementById('fotoPreviewText');
+  if(preview && previewImg && previewText){
+    if(fotoAtualUrl){
+      previewImg.src=fotoAtualUrl;
+      previewText.textContent='Foto atual cadastrada';
+      preview.style.display='flex';
+    }else{
+      preview.style.display='none';
+    }
+  }
+
+  updatePixPreviews();
+  refreshSubmitState();
+  liberarBotaoEdicao();
+  travarCamposLoginStaffComum();
+}
+
+function configurarBuscaAdminCadastro(){
+  if (!modoEdicao || !isAdminEdicao || !adminEditarStaffPanel) return;
+
+  adminEditarStaffPanel.classList.remove('hidden');
+
+  if (adminBuscaCpfStaff) {
+    adminBuscaCpfStaff.addEventListener('input', () => {
+      adminBuscaCpfStaff.value = maskCPF(adminBuscaCpfStaff.value);
+      if (adminBuscaStaffStatus) adminBuscaStaffStatus.textContent = '';
+    });
+  }
+
+  if (adminBtnBuscarStaff) {
+    adminBtnBuscarStaff.addEventListener('click', async () => {
+      const cpfBusca = adminBuscaCpfStaff ? adminBuscaCpfStaff.value : '';
+
+      if (!isValidCPF(cpfBusca)) {
+        if (adminBuscaStaffStatus) adminBuscaStaffStatus.textContent = 'Informe um CPF válido para buscar.';
+        return;
+      }
+
+      adminBtnBuscarStaff.disabled = true;
+      adminBtnBuscarStaff.textContent = 'Buscando...';
+      if (adminBuscaStaffStatus) adminBuscaStaffStatus.textContent = '';
+
+      try {
+        const staffEncontrado = await buscarCadastroPorCpf(cpfBusca);
+
+        if (!staffEncontrado) {
+          if (adminBuscaStaffStatus) adminBuscaStaffStatus.textContent = 'Nenhum cadastro encontrado para este CPF.';
+          return;
+        }
+
+        preencherFormularioComStaff(staffEncontrado);
+        if (adminBuscaStaffStatus) {
+          adminBuscaStaffStatus.textContent = `Cadastro carregado: ${staffEncontrado.nome_completo || 'staff sem nome'}.`;
+        }
+      } catch (error) {
+        console.error(error);
+        if (adminBuscaStaffStatus) adminBuscaStaffStatus.textContent = 'Erro ao buscar cadastro: ' + error.message;
+      } finally {
+        adminBtnBuscarStaff.disabled = false;
+        adminBtnBuscarStaff.textContent = 'Buscar';
+      }
+    });
+  }
+}
+
 async function buscarCadastroPorId(id){
   const idBusca = normalizarTextoBusca(id);
   if (!idBusca) return null;
@@ -580,9 +706,12 @@ async function atualizarCadastroExistente(dadosCadastro){
   const idBusca = normalizarTextoBusca(cadastroEncontrado.id);
   const dadosUpdate = { ...dadosCadastro };
 
-  // O CPF é a chave de login provisória. Na edição, manter o CPF original evita
-  // perder o vínculo do usuário enquanto ainda não usamos Supabase Auth/RLS.
-  dadosUpdate.cpf = cadastroEncontrado.cpf || dadosCadastro.cpf;
+  // Staff comum não pode alterar a chave de login provisória.
+  // Admin pode corrigir CPF e nascimento do cadastro carregado.
+  if (!isAdminEdicao) {
+    dadosUpdate.cpf = cadastroEncontrado.cpf || dadosCadastro.cpf;
+    dadosUpdate.data_nascimento = cadastroEncontrado.data_nascimento || dadosCadastro.data_nascimento;
+  }
 
   const { data, error } = await supabaseClient
     .from('staffs')
@@ -777,11 +906,11 @@ async function iniciarModoEdicao(){
   const titulo = document.querySelector('.header h1');
   const subtitulo = document.querySelector('.header p');
   if(titulo) titulo.textContent = 'Editar cadastro';
-  if(subtitulo) subtitulo.textContent = 'Atualize seus dados de staff. O CPF fica bloqueado para manter o vínculo com suas inscrições.';
+  if(subtitulo) subtitulo.textContent = isAdminEdicao ? 'Atualize seu cadastro ou busque outro staff por CPF para editar nesta mesma tela.' : 'Atualize seus dados de staff. CPF e data de nascimento ficam bloqueados para manter seu acesso seguro.';
   submitBtn.textContent = 'Salvar alterações';
   if (btnVoltarCorridas) btnVoltarCorridas.classList.remove('hidden');
   liberarBotaoEdicao();
-  cpf.disabled = true;
+  travarCamposLoginStaffComum();
   foto.required = false;
   const helperFoto = document.querySelector('#fieldFoto .error');
   if(helperFoto) helperFoto.textContent = 'Envie uma nova foto somente se quiser trocar a foto atual.';
@@ -798,37 +927,8 @@ async function iniciarModoEdicao(){
     return;
   }
 
-  staffAtualEdicao = data;
-  if (staffIdInput) staffIdInput.value = data.id || '';
-  if (staffCpfOriginalInput) staffCpfOriginalInput.value = data.cpf || '';
-  if (staffNascimentoOriginalInput) staffNascimentoOriginalInput.value = data.data_nascimento || '';
-
-  nome.value = data.nome_completo || '';
-  cpf.value = data.cpf || '';
-  rg.value = data.rg || '';
-  nascimento.value = databaseDateToBr(data.data_nascimento || '');
-  telefone.value = data.telefone || '';
-  email.value = data.email || '';
-  cidade.value = data.cidade || '';
-  if (calcado) calcado.value = data.numero_calcado || '';
-  indicado.value = data.indicado_por || '';
-  observacoes.value = data.observacoes || '';
-  fotoAtualUrl = data.foto_url || '';
-  termos.checked = true;
-  selecionarPixPorValor(data);
-
-  if(fotoAtualUrl){
-    const preview=document.getElementById('fotoPreview');
-    const previewImg=document.getElementById('fotoPreviewImg');
-    const previewText=document.getElementById('fotoPreviewText');
-    previewImg.src=fotoAtualUrl;
-    previewText.textContent='Foto atual cadastrada';
-    preview.style.display='flex';
-  }
-
-  updatePixPreviews();
-  refreshSubmitState();
-  liberarBotaoEdicao();
+  preencherFormularioComStaff(data);
+  configurarBuscaAdminCadastro();
 }
 
 
@@ -843,3 +943,6 @@ iniciarModoEdicao().finally(() => {
 
 updatePixPreviews();
 refreshSubmitState();
+
+
+// v171 - edição admin por CPF na própria página de cadastro; CPF/nascimento travados para staff comum.

@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Staffs</title>
-  <link rel="stylesheet" href="style.css?v=170" />
-  <link rel="stylesheet" href="photo-cropper.css?v=170" />
+  <link rel="stylesheet" href="style.css?v=171" />
+  <link rel="stylesheet" href="photo-cropper.css?v=171" />
 </head>
 <body>
-  <div class="version-badge">v170</div>
+  <div class="version-badge">v171</div>
   <div class="container">
     <section id="card-staff-cadastro" class="card-staff card-staff-cadastro hidden">
       <div class="foto-staff-wrapper">
@@ -41,6 +41,21 @@
       <h1>Cadastro Geral de Staffs</h1>
       <p>Realize seu cadastro apenas uma vez para participar das próximas corridas e eventos. Seus dados ficarão salvos para futuras convocações.</p>
     </div>
+
+    <section id="adminEditarStaffPanel" class="admin-editar-staff-panel hidden">
+      <div class="admin-editar-staff-header">
+        <div>
+          <strong>Editar cadastro de outro staff</strong>
+          <span>Busque pelo CPF para carregar o cadastro nesta mesma tela.</span>
+        </div>
+      </div>
+      <div class="admin-editar-staff-busca">
+        <input id="adminBuscaCpfStaff" type="text" placeholder="CPF do staff" maxlength="14" inputmode="numeric" autocomplete="off" />
+        <button id="adminBtnBuscarStaff" type="button">Buscar</button>
+      </div>
+      <div id="adminBuscaStaffStatus" class="admin-editar-staff-status"></div>
+    </section>
+
 <form class="form-area" id="staffForm" novalidate>
     <input type="hidden" id="staffId" value="" />
     <input type="hidden" id="staffCpfOriginal" value="" />
@@ -226,8 +241,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="photo-cropper.js?v=170"></script>
-  <script src="script.js?v=170"></script>
-  <script src="floating-tools.js?v=170"></script>
+  <script src="photo-cropper.js?v=171"></script>
+  <script src="script.js?v=171"></script>
+  <script src="floating-tools.js?v=171"></script>
 </body>
 </html>
