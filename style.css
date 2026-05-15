@@ -2996,3 +2996,91 @@ button.floating-calendar-day {
     justify-content: flex-start;
   }
 }
+
+/* =========================================================
+   AJUSTES V128 - PAGAMENTO PIX E CARD DE CORRIDA MAIS LIMPO
+========================================================= */
+
+.corrida-status-card {
+  position: relative;
+}
+
+.corrida-status-topo-linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+}
+
+.corrida-status-topo-linha strong,
+.corrida-status-topo-linha span {
+  display: block;
+}
+
+.botao-status-compacto,
+.botao-alterar-status-corrida.botao-status-compacto {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 999px !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+
+.admin-card-footer-v128 {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+  margin-top: 14px !important;
+}
+
+.admin-card-footer-v128 .botao-gerar-pagamento-pix,
+.admin-card-footer-v128 .botao-ver-inscritos {
+  grid-column: 1 / -1 !important;
+}
+
+.admin-card-footer-v128 .botao-gerar-pagamento-pix {
+  background: #0f766e !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-gerar-pagamento-pix:hover {
+  background: #115e59 !important;
+}
+
+.admin-card-footer-v128 button,
+.admin-card-footer-v128 .botao-admin-secundario,
+.admin-card-footer-v128 .delete-btn,
+.admin-card-footer-v128 .botao-ver-inscritos {
+  min-height: 41px !important;
+  padding: 9px 11px !important;
+  font-size: 13px !important;
+}
+
+@media (max-width: 700px) {
+  .admin-card-footer-v128 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .admin-card-footer-v128 .botao-gerar-pagamento-pix,
+  .admin-card-footer-v128 .botao-ver-inscritos {
+    grid-column: 1 / -1 !important;
+  }
+
+  .admin-card-footer-v128 button,
+  .admin-card-footer-v128 .botao-admin-secundario,
+  .admin-card-footer-v128 .delete-btn,
+  .admin-card-footer-v128 .botao-ver-inscritos {
+    min-height: 39px !important;
+    padding: 8px 9px !important;
+    font-size: 12.5px !important;
+  }
+}

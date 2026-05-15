@@ -329,8 +329,24 @@ async function carregarCorridasAdmin() {
         <h3>${corrida.nome}</h3>
 
         <div class="corrida-status-card ${corrida.status}">
-          <strong>${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
-          <span>${textoVagas}</span>
+          <div class="corrida-status-topo-linha">
+            <div>
+              <strong>${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
+              <span>${textoVagas}</span>
+            </div>
+
+            <button
+              type="button"
+              class="botao-alterar-status-corrida botao-status-compacto ${corrida.status === "aberta" ? "acao-encerrar" : "acao-abrir"}"
+              data-corrida-id="${corrida.id}"
+              data-status-atual="${corrida.status}"
+              title="${corrida.status === "aberta" ? "Encerrar inscrições" : "Abrir inscrições"}"
+              aria-label="${corrida.status === "aberta" ? "Encerrar inscrições" : "Abrir inscrições"}"
+            >
+              ${corrida.status === "aberta" ? "🔒" : "🔓"}
+            </button>
+          </div>
+
           ${vagasTotal > 0 ? `
             <div class="corrida-progresso-vagas" aria-label="Preenchimento das vagas">
               <div class="corrida-progresso-topo">
@@ -368,24 +384,6 @@ async function carregarCorridasAdmin() {
           ${totalInscritos}
         </p>
 
-        <div class="admin-corrida-status-acoes">
-          <span class="admin-status ${corrida.status}">
-            ${corrida.status === "aberta" ? "ABERTA" : "ENCERRADA"}
-          </span>
-
-          <button
-            class="botao-alterar-status-corrida ${corrida.status === "aberta" ? "acao-encerrar" : "acao-abrir"}"
-            data-corrida-id="${corrida.id}"
-            data-status-atual="${corrida.status}"
-          >
-            ${
-              corrida.status === "aberta"
-                ? "Encerrar inscrições"
-                : "Abrir inscrições"
-            }
-          </button>
-        </div>
-
         <div class="gerenciar-dias">
           <button
             type="button"
@@ -398,14 +396,7 @@ async function carregarCorridasAdmin() {
           <div id="dias-corrida-${corrida.id}" class="dias-corrida-container hidden"></div>
         </div>
 
-        <div class="admin-card-footer">
-
-          <button
-            class="botao-ver-inscritos"
-            data-corrida-id="${corrida.id}"
-          >
-            Ver inscritos
-          </button>
+        <div class="admin-card-footer admin-card-footer-v128">
 
           <button
             class="botao-editar-corrida botao-admin-secundario"
@@ -438,6 +429,21 @@ async function carregarCorridasAdmin() {
             Exportar Excel
           </button>
 
+          <button
+            type="button"
+            class="botao-gerar-pagamento-pix botao-admin-secundario"
+            data-corrida-id="${corrida.id}"
+          >
+            Gerar pagamento Pix
+          </button>
+
+          <button
+            class="botao-ver-inscritos"
+            data-corrida-id="${corrida.id}"
+          >
+            Ver inscritos
+          </button>
+
         </div>
 
         <section
@@ -458,6 +464,7 @@ ativarBotoesExcluirCorrida();
 ativarBotoesVerInscritos();
 ativarBotoesExportarPlanilha();
 ativarBotoesStatusCorrida();
+ativarBotoesGerarPagamentoPix();
 ativarBotoesToggleDias();
 }
 
@@ -2037,6 +2044,243 @@ function obterDiaSemana(dataISO) {
 }
 
 
+
+function ativarBotoesGerarPagamentoPix() {
+  document.querySelectorAll(".botao-gerar-pagamento-pix").forEach(botao => {
+    botao.addEventListener("click", async () => {
+      const corridaId = Number(botao.dataset.corridaId);
+      await exportarRelatorioPagamentoPix(corridaId);
+    });
+  });
+}
+
+function normalizarTextoPix(valor, limite) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase()
+    .slice(0, limite);
+}
+
+function formatarCampoPix(id, valor) {
+  const texto = String(valor || "");
+  const tamanho = String(texto.length).padStart(2, "0");
+  return `${id}${tamanho}${texto}`;
+}
+
+function crc16Pix(payload) {
+  let crc = 0xffff;
+  for (let i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+      crc &= 0xffff;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+function normalizarChavePixParaQRCode(staff) {
+  const chave = String(staff.chave_pix || "").trim();
+  const cpf = String(staff.cpf || "").replace(/\D/g, "");
+  const telefone = String(staff.telefone || "").replace(/\D/g, "");
+  const email = String(staff.email || "").trim().toLowerCase();
+
+  if (!chave) return "";
+  if (chave.replace(/\D/g, "") === cpf && cpf.length === 11) return cpf;
+  if (email && chave.trim().toLowerCase() === email) return email;
+
+  const digitosChave = chave.replace(/\D/g, "");
+  if (telefone && digitosChave === telefone) {
+    return telefone.startsWith("55") ? `+${telefone}` : `+55${telefone}`;
+  }
+
+  return chave;
+}
+
+function identificarTipoPix(staff) {
+  const chave = String(staff.chave_pix || "").trim();
+  const cpf = String(staff.cpf || "").replace(/\D/g, "");
+  const telefone = String(staff.telefone || "").replace(/\D/g, "");
+  const email = String(staff.email || "").trim().toLowerCase();
+  const chaveDigitos = chave.replace(/\D/g, "");
+
+  if (cpf && chaveDigitos === cpf) return "CPF";
+  if (email && chave.toLowerCase() === email) return "E-mail";
+  if (telefone && chaveDigitos === telefone) return "Telefone";
+  return "Outra";
+}
+
+function gerarPayloadPix({ chave, nome, cidade, valor, txid }) {
+  const chavePix = String(chave || "").trim();
+  if (!chavePix) return "";
+
+  const valorNumerico = Number(valor || 0);
+  const valorFormatado = valorNumerico > 0 ? valorNumerico.toFixed(2) : "";
+  const merchantAccount = formatarCampoPix("00", "br.gov.bcb.pix") + formatarCampoPix("01", chavePix);
+  const campos = [
+    formatarCampoPix("00", "01"),
+    formatarCampoPix("26", merchantAccount),
+    formatarCampoPix("52", "0000"),
+    formatarCampoPix("53", "986")
+  ];
+
+  if (valorFormatado) campos.push(formatarCampoPix("54", valorFormatado));
+
+  campos.push(
+    formatarCampoPix("58", "BR"),
+    formatarCampoPix("59", normalizarTextoPix(nome || "STAFF", 25) || "STAFF"),
+    formatarCampoPix("60", normalizarTextoPix(cidade || "SAO PAULO", 15) || "SAO PAULO"),
+    formatarCampoPix("62", formatarCampoPix("05", normalizarTextoPix(txid || "STAFF", 25) || "STAFF"))
+  );
+
+  const semCRC = campos.join("") + "6304";
+  return semCRC + crc16Pix(semCRC);
+}
+
+function montarPagamentosPix(dadosExportacao) {
+  const confirmados = (dadosExportacao.inscritos || [])
+    .filter(inscrito => normalizarStatusInscricao(inscrito.status) === "confirmado")
+    .map(inscrito => {
+      const staff = inscrito.staff || {};
+      const dias = removerDiasDuplicados(inscrito.diasDisponiveis || []);
+      const valorTotal = dias.reduce((total, dia) => total + Number(dia.valor_ajuda_custo || 0), 0);
+      const chavePixQRCode = normalizarChavePixParaQRCode(staff);
+      const txid = `COR${dadosExportacao.corrida.id || ""}STA${inscrito.inscricao_id || ""}`.slice(0, 25);
+      const payloadPix = gerarPayloadPix({
+        chave: chavePixQRCode,
+        nome: staff.nome_completo || "STAFF",
+        cidade: staff.cidade || "SAO PAULO",
+        valor: valorTotal,
+        txid
+      });
+
+      return {
+        inscricao_id: inscrito.inscricao_id,
+        staff,
+        dias,
+        tipoPix: identificarTipoPix(staff),
+        chavePixQRCode,
+        valorTotal,
+        payloadPix
+      };
+    })
+    .sort((a, b) => (a.staff.nome_completo || "").localeCompare(b.staff.nome_completo || "", "pt-BR"));
+
+  return confirmados;
+}
+
+async function gerarQRCodeDataURLPix(payload) {
+  if (!payload) return "";
+  if (!window.QRCode || !window.QRCode.toDataURL) {
+    throw new Error("Biblioteca de QR Code não carregada. Confira sua conexão e tente novamente.");
+  }
+
+  return await window.QRCode.toDataURL(payload, {
+    errorCorrectionLevel: "M",
+    margin: 1,
+    width: 220
+  });
+}
+
+async function exportarRelatorioPagamentoPix(corridaId) {
+  try {
+    const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
+
+    if (!jsPDFConstructor) {
+      alert("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
+      return;
+    }
+
+    const dadosExportacao = await buscarDadosExportacao(corridaId);
+    const pagamentos = montarPagamentosPix(dadosExportacao);
+
+    if (!pagamentos.length) {
+      alert("Não há staffs confirmados para gerar pagamento Pix.");
+      return;
+    }
+
+    const doc = new jsPDFConstructor({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let y = 18;
+
+    doc.setFontSize(16);
+    doc.setFont(undefined, "bold");
+    doc.text("Relatório de Pagamento Pix", pageWidth / 2, y, { align: "center" });
+    y += 7;
+    doc.setFontSize(11);
+    doc.setFont(undefined, "normal");
+    doc.text(dadosExportacao.corrida.nome || "Corrida", pageWidth / 2, y, { align: "center" });
+    y += 12;
+
+    for (let index = 0; index < pagamentos.length; index++) {
+      const pagamento = pagamentos[index];
+      const staff = pagamento.staff || {};
+      const alturaBloco = 66;
+
+      if (y + alturaBloco > pageHeight - 12) {
+        doc.addPage();
+        y = 16;
+      }
+
+      const x = 12;
+      const largura = pageWidth - 24;
+      const qrDataUrl = await gerarQRCodeDataURLPix(pagamento.payloadPix);
+      const diasTexto = pagamento.dias.length
+        ? pagamento.dias.map(dia => `${dia.nome || dia.tipo || "Dia"} (${formatarMoeda(dia.valor_ajuda_custo)})`).join("; ")
+        : "Nenhum dia encontrado";
+
+      doc.setDrawColor(226, 232, 240);
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(x, y, largura, alturaBloco, 3, 3, "FD");
+
+      doc.setFontSize(12);
+      doc.setFont(undefined, "bold");
+      doc.text(staff.nome_completo || "Nome não informado", x + 5, y + 8);
+
+      doc.setFontSize(8.5);
+      doc.setFont(undefined, "normal");
+      doc.text(`CPF: ${staff.cpf || "Não informado"}`, x + 5, y + 15);
+      doc.text(`Tipo Pix: ${pagamento.tipoPix}`, x + 5, y + 21);
+      doc.text(`Chave Pix: ${staff.chave_pix || "Não informada"}`, x + 5, y + 27, { maxWidth: 105 });
+      doc.text(`Dias/ajuda: ${diasTexto}`, x + 5, y + 36, { maxWidth: 105 });
+
+      doc.setFontSize(13);
+      doc.setFont(undefined, "bold");
+      doc.text(`Total: ${formatarMoeda(pagamento.valorTotal)}`, x + 5, y + 51);
+
+      doc.setFontSize(8);
+      doc.setFont(undefined, "normal");
+      doc.text("Pago: (   ) Sim    (   ) Não", x + 5, y + 59);
+
+      if (qrDataUrl) {
+        doc.addImage(qrDataUrl, "PNG", x + largura - 50, y + 8, 42, 42);
+        doc.setFontSize(7);
+        doc.text("Pix QR Code", x + largura - 29, y + 55, { align: "center" });
+      } else {
+        doc.setFontSize(8);
+        doc.text("QR indisponível", x + largura - 29, y + 30, { align: "center" });
+      }
+
+      y += alturaBloco + 6;
+    }
+
+    doc.save(`${nomeArquivoSeguro(dadosExportacao.corrida.nome)}-pagamento-pix.pdf`);
+  } catch (error) {
+    console.error(error);
+    alert(error.message || "Erro ao gerar relatório de pagamento Pix.");
+  }
+}
+
 function ativarBotoesExportarPlanilha() {
 
   const botoes = document.querySelectorAll(
@@ -2060,7 +2304,7 @@ function ativarBotoesExportarPlanilha() {
 
 async function abrirFluxoExportacao(corridaId, formato = "pdf") {
   const filtro = prompt(
-    "Escolha o filtro de exportação:\n\n1 - Todos em ordem alfabética\n2 - Por prioridade\n3 - Por dia",
+    "Escolha o filtro de exportação:\n\n1 - Todos em ordem alfabética\n2 - Por tipo\n3 - Por dia",
     "1"
   );
 
@@ -2093,7 +2337,7 @@ async function buscarDadosExportacao(corridaId) {
 
   const { data: diasCorrida, error: erroDias } = await supabaseClient
     .from("corrida_dias")
-    .select("id, nome, data_dia, tipo, horario_inicio, horario_fim")
+    .select("id, nome, data_dia, tipo, horario_inicio, horario_fim, valor_ajuda_custo")
     .eq("corrida_id", corridaId)
     .order("data_dia", { ascending: true });
 
@@ -2114,6 +2358,8 @@ async function buscarDadosExportacao(corridaId) {
           rg,
           telefone,
           cidade,
+          email,
+          foto_url,
           chave_pix
         )
       `)
@@ -2140,7 +2386,8 @@ async function buscarDadosExportacao(corridaId) {
           data_dia,
           tipo,
           horario_inicio,
-          horario_fim
+          horario_fim,
+          valor_ajuda_custo
         )
       `)
       .in("inscricao_id", inscricaoIds);
