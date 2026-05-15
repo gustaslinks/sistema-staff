@@ -3966,3 +3966,50 @@ button.floating-calendar-day {
     box-shadow: 0 6px 14px rgba(15, 23, 42, 0.10) !important;
   }
 }
+
+/* v138 - polimento visual geral */
+:root{
+  --admin-indigo:#4f46e5;
+  --admin-purple:#7c3aed;
+  --admin-cyan:#0891b2;
+  --soft-border:#dbe3ef;
+}
+body{background:linear-gradient(180deg,#f7f8fc 0%,#eef2f8 42%,#f8fafc 100%);}
+.pagina-admin,.container{animation:fadeInSistema .28s ease-out;}
+@keyframes fadeInSistema{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card-staff{border:1px solid rgba(148,163,184,.22);box-shadow:0 22px 55px rgba(15,23,42,.10);}
+.admin-card-acoes-logado{gap:10px;}
+.admin-card-acao{border:0!important;color:#fff!important;font-weight:800;box-shadow:0 10px 22px rgba(15,23,42,.12);transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;}
+.admin-card-acao:hover{transform:translateY(-1px);filter:saturate(1.08);box-shadow:0 14px 30px rgba(15,23,42,.16);}
+.admin-card-acao-perfil{background:linear-gradient(135deg,#2563eb,#06b6d4)!important;}
+.admin-card-acao-corridas{background:linear-gradient(135deg,#0f766e,#14b8a6)!important;}
+.admin-card-acao-sair,.logout-btn{background:linear-gradient(135deg,#ef4444,#b91c1c)!important;color:#fff!important;}
+.pagina-admin .admin-card-acao-perfil{background:linear-gradient(135deg,var(--admin-indigo),var(--admin-purple))!important;}
+.pagina-admin .admin-card-acao-corridas{background:linear-gradient(135deg,#0e7490,#2563eb)!important;}
+.admin-hero-gerenciamento{background:radial-gradient(circle at top right,rgba(168,85,247,.34),transparent 34%),linear-gradient(135deg,#101827 0%,#1e1b4b 46%,#312e81 100%)!important;box-shadow:0 22px 48px rgba(49,46,129,.22);}
+.admin-hero-btn,.btn-admin{background:linear-gradient(135deg,#22c55e,#0ea5e9)!important;border:0!important;box-shadow:0 16px 32px rgba(14,165,233,.25);}
+.form-area,.form-admin .form-area,.card-corrida-admin,.login-card{border:1px solid rgba(148,163,184,.22);box-shadow:0 20px 50px rgba(15,23,42,.09);}
+.form-area input,.form-area select,.form-area textarea,.login-card input{background:#f8fafc;border:1px solid #dbe3ef!important;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+.form-area input:focus,.form-area select:focus,.form-area textarea:focus,.login-card input:focus{outline:none;border-color:#6366f1!important;box-shadow:0 0 0 4px rgba(99,102,241,.12);background:#fff;}
+.field-checkbox-admin{display:flex;align-items:stretch;}
+.checkbox-admin-card{width:100%;display:flex;gap:12px;align-items:flex-start;padding:15px 16px;border-radius:18px;background:linear-gradient(135deg,#f8fafc,#eef2ff);border:1px solid #c7d2fe;box-shadow:0 10px 24px rgba(79,70,229,.08);cursor:pointer;}
+.checkbox-admin-card input{width:22px;height:22px;margin-top:2px;accent-color:#4f46e5;flex:0 0 auto;}
+.checkbox-admin-card strong{display:block;color:#172033;font-size:15px;line-height:1.25;}
+.checkbox-admin-card small{display:block;margin-top:3px;color:#64748b;font-size:12px;line-height:1.35;}
+.checkbox-admin-card-compacto{min-height:100%;align-items:center;}
+.field-ate-ultimo{align-self:end;}
+.checkbox-admin-linha{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.botao-admin-secundario,.botao-ver-inscritos,.botao-toggle-dias{border:0!important;background:linear-gradient(135deg,#eef2ff,#e0f2fe)!important;color:#1e3a8a!important;font-weight:800;box-shadow:0 10px 22px rgba(37,99,235,.10);}
+.botao-ver-inscritos{background:linear-gradient(135deg,#2563eb,#4f46e5)!important;color:#fff!important;}
+.delete-btn{background:linear-gradient(135deg,#fee2e2,#fecaca)!important;color:#991b1b!important;border:1px solid #fecaca!important;}
+.card-corrida-admin{background:linear-gradient(180deg,#ffffff,#fbfdff);border-radius:28px;}
+.card-corrida-admin h3{letter-spacing:-.03em;}
+.badge-tenis{display:inline-flex;align-items:center;gap:6px;margin:0 0 14px;padding:7px 11px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:13px;font-weight:800;border:1px solid #c7d2fe;}
+.corrida-status-card.aberta{background:linear-gradient(135deg,#ecfdf5,#f0fdfa)!important;border:1px solid #86efac!important;}
+.corrida-status-card.encerrada{background:linear-gradient(135deg,#fef2f2,#fff7ed)!important;border:1px solid #fca5a5!important;}
+.file-preview-foto img{width:78px!important;height:78px!important;border-radius:22px!important;object-fit:cover;object-position:center;}
+.helper-foto{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:14px;padding:10px 12px;margin:8px 0;color:#475569;line-height:1.4;}
+.label-obrigatorio{font-size:12px;color:#2563eb;font-weight:800;}
+#calcado{min-height:48px;}
+.login-card h1,.header h1,.cabecalho-corridas h1{letter-spacing:-.04em;}
+@media (max-width:720px){.admin-card-acoes-logado{grid-template-columns:repeat(3,1fr)!important;display:grid!important}.admin-card-acao{font-size:13px;padding:13px 8px!important}.admin-hero-gerenciamento{gap:18px}.checkbox-admin-card{border-radius:16px}.field-ate-ultimo{align-self:stretch}}

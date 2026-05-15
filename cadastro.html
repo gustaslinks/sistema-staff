@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Staffs</title>
-  <link rel="stylesheet" href="style.css?v=134" />
+  <link rel="stylesheet" href="style.css?v=138" />
 </head>
 <body>
   <div class="container">
@@ -151,6 +151,26 @@
           <input id="cidade" type="text" placeholder="Sua cidade" autocomplete="address-level2" required />
           <div class="error">Digite sua cidade, sem espaços no começo ou no final.</div>
         </div>
+
+        <div class="field" id="fieldCalcado">
+          <label for="calcado">Número do calçado</label>
+          <select id="calcado" required>
+            <option value="">Selecione</option>
+            <option value="34">34</option>
+            <option value="35">35</option>
+            <option value="36">36</option>
+            <option value="37">37</option>
+            <option value="38">38</option>
+            <option value="39">39</option>
+            <option value="40">40</option>
+            <option value="41">41</option>
+            <option value="42">42</option>
+            <option value="43">43</option>
+            <option value="44">44</option>
+            <option value="45">45</option>
+          </select>
+          <div class="error">Selecione o número do calçado.</div>
+        </div>
       </div>
 
       <div class="field" id="fieldIndicado">
@@ -159,7 +179,7 @@
         <div class="error">Informe quem te indicou. Caso ninguém tenha indicado, digite "Não tive indicação".</div>
       </div>
 
-      <div clasection-titleitle">Chave PIX</div>
+      <div class="section-title">Chave PIX</div>
 
       <div class="pix-options">
         <label class="pix-card"><input type="radio" name="pixTipo" value="cpf" checked /><div><strong>CPF</strong><span id="pixCpfPreview">Usar o CPF deste cadastro</span></div></label>
@@ -178,16 +198,17 @@
       <div class="section-title">Foto para cadastro</div>
 
       <div class="field" id="fieldFoto">
-        <label for="foto">Foto</label>
+        <label for="foto">Foto de rosto <span class="label-obrigatorio">obrigatória</span></label>
         <input id="foto" type="file" accept="image/png, image/jpeg" required />
-        <div class="error">Envie uma foto JPG ou PNG.</div>
-        <div class="file-preview" id="fotoPreview"><img id="fotoPreviewImg" src="" alt="Prévia da foto" /><div><strong>Foto selecionada</strong><br /><span id="fotoPreviewText"></span></div></div>
+        <div class="helper helper-foto">Envie uma foto real, atual e legível, de preferência parecida com o documento oficial. Não use emoji, avatar, figurinha, filtro pesado ou imagem feita por inteligência artificial.</div>
+        <div class="error">Envie uma foto JPG ou PNG com rosto legível.</div>
+        <div class="file-preview file-preview-foto" id="fotoPreview"><img id="fotoPreviewImg" src="" alt="Prévia da foto" /><div><strong>Foto selecionada</strong><br /><span id="fotoPreviewText"></span><br><small>Prévia em recorte quadrado centralizado para o cadastro.</small></div></div>
       </div>
 
       <div class="field" id="fieldObservacoes" style="margin-top: 25px;">
         <label for="observacoes">Observações</label>
-        <textarea id="observacoes" rows="4" placeholder="Alguma informação importante? Caso não tenha, digite: Sem observações" required></textarea>
-        <div class="error">Preencha este campo. Caso não tenha observações, digite "Sem observações".</div>
+        <textarea id="observacoes" rows="4" placeholder="Alguma informação importante? Campo opcional."></textarea>
+        <div class="helper">Campo opcional. Use apenas se houver alguma informação importante.</div>
       </div>
 
       <div class="checkbox" id="fieldTermos"><input id="termos" type="checkbox" required /><label for="termos">Declaro que as informações fornecidas são verdadeiras e autorizo o uso dos meus dados para cadastro e convocação em eventos.</label></div>
@@ -200,7 +221,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=134"></script>
-  <script src="floating-tools.js?v=129"></script>
+  <script src="script.js?v=138"></script>
+  <script src="floating-tools.js?v=138"></script>
 </body>
 </html>

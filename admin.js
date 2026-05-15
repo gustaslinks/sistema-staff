@@ -20,6 +20,7 @@ const corridaLocal = document.getElementById("corrida-local");
 const corridaPrazo = document.getElementById("corrida-prazo");
 const corridaVagas = document.getElementById("corrida-vagas");
 const corridaObservacoes = document.getElementById("corrida-observacoes");
+const corridaPatrocinadorTenis = document.getElementById("corrida-patrocinador-tenis");
 
 // CAMPOS DOS DIAS NO CADASTRO
 const novoDiaTipo = document.getElementById("novo-dia-tipo");
@@ -131,7 +132,8 @@ salvarCorridaBtn.addEventListener("click", async function () {
     local: corridaLocal.value.trim() || null,
     vagas_total: Number(corridaVagas.value),
     prazo_inscricao: corridaPrazo.value || null,
-    observacoes: corridaObservacoes.value.trim() || OBSERVACOES_PADRAO
+    observacoes: corridaObservacoes.value.trim() || OBSERVACOES_PADRAO,
+    possui_patrocinador_tenis: corridaPatrocinadorTenis ? corridaPatrocinadorTenis.checked : false
   };
 
   let corridaId = corridaEmEdicaoId;
@@ -400,6 +402,7 @@ async function carregarCorridasAdmin() {
       <article class="card-corrida-admin" data-corrida-id="${corrida.id}">
 
         <h3>${corrida.nome}</h3>
+        ${corrida.possui_patrocinador_tenis ? `<div class="badge-tenis">👟 Patrocinador de tênis</div>` : ""}
 
         <div class="corrida-status-card ${corrida.status}">
           <div class="corrida-status-topo-linha">
@@ -620,6 +623,7 @@ async function carregarCorridaParaEdicao(corridaId) {
   corridaPrazo.value = corrida.prazo_inscricao || "";
   corridaVagas.value = corrida.vagas_total || "";
   corridaObservacoes.value = corrida.observacoes || OBSERVACOES_PADRAO;
+  if (corridaPatrocinadorTenis) corridaPatrocinadorTenis.checked = corrida.possui_patrocinador_tenis === true;
 
   diasCadastroCorrida = (dias || []).map(dia => ({
     id: dia.id,
@@ -839,7 +843,7 @@ async function carregarInscritosDaCorrida(
 
   const { data: corridaAtual } = await supabaseClient
     .from("corridas")
-    .select("id, nome, data_corrida, data_inicio, data_fim, local, prazo_inscricao, observacoes, vagas_total")
+    .select("id, nome, data_corrida, data_inicio, data_fim, local, prazo_inscricao, observacoes, vagas_total, possui_patrocinador_tenis")
     .eq("id", corridaIdNumerico)
     .single();
 
@@ -2051,6 +2055,7 @@ function limparFormularioCorrida() {
   corridaPrazo.value = "";
   corridaVagas.value = "";
   corridaObservacoes.value = OBSERVACOES_PADRAO;
+  if (corridaPatrocinadorTenis) corridaPatrocinadorTenis.checked = false;
 
   novoDiaTipo.value = "Entrega de kit";
   novoDiaAjuda.value = "";
@@ -2691,7 +2696,7 @@ function ativarBotoesExportarPlanilha() {
 
 async function abrirFluxoExportacao(corridaId, formato = "pdf") {
   const filtro = prompt(
-    "Escolha o filtro de exportação:\n\n1 - Todos em ordem alfabética\n2 - Por tipo\n3 - Por dia",
+    "Escolha o filtro de exportação:\n\n1 - Todos em ordem alfabética\n2 - Por tipo\n3 - Por dia\n4 - Resumo de tênis por numeração",
     "1"
   );
 
@@ -2699,7 +2704,7 @@ async function abrirFluxoExportacao(corridaId, formato = "pdf") {
 
   const filtroNormalizado = String(filtro).trim();
 
-  if (!["1", "2", "3"].includes(filtroNormalizado)) {
+  if (!["1", "2", "3", "4"].includes(filtroNormalizado)) {
     alert("Filtro inválido.");
     return;
   }
@@ -2747,7 +2752,8 @@ async function buscarDadosExportacao(corridaId) {
           cidade,
           email,
           foto_url,
-          chave_pix
+          chave_pix,
+          calcado
         )
       `)
       .eq("corrida_id", corridaId)
@@ -2831,6 +2837,19 @@ async function buscarDadosExportacao(corridaId) {
 async function exportarInscritosCorrida(corridaId, opcoes) {
   try {
     const dadosExportacao = await buscarDadosExportacao(corridaId);
+    if (opcoes.filtro === "4") {
+      if (!dadosExportacao.corrida.possui_patrocinador_tenis) {
+        const continuar = confirm("Esta corrida não está marcada como patrocinada por tênis. Gerar o relatório mesmo assim?");
+        if (!continuar) return;
+      }
+      if (opcoes.formato === "pdf") {
+        exportarPDFResumoTenis(dadosExportacao.corrida, dadosExportacao.inscritos);
+      } else {
+        exportarExcelResumoTenis(dadosExportacao.corrida, dadosExportacao.inscritos);
+      }
+      return;
+    }
+
     const secoes = montarSecoesExportacao(dadosExportacao, opcoes.filtro);
 
     if (secoes.every(secao => secao.inscritos.length === 0)) {
@@ -2936,6 +2955,7 @@ function montarLinhasExportacao(inscritos, incluirPrioridade = false) {
       RG: staff.rg || "",
       "Celular/Whatsapp": staff.telefone || "",
       "Chave PIX": staff.chave_pix || "",
+      "Calçado": staff.calcado || "",
       "Dias disponíveis": dias
     };
 
@@ -2970,6 +2990,7 @@ function exportarExcelCorrida(corrida, secoes, filtro) {
       "RG",
       "Celular/Whatsapp",
       "Chave PIX",
+      "Calçado",
       "Dias disponíveis",
       ...(incluirPrioridade ? ["Prioridade"] : []),
       "Assinatura"
@@ -2998,6 +3019,7 @@ function exportarExcelCorrida(corrida, secoes, filtro) {
         RG: 16,
         "Celular/Whatsapp": 22,
         "Chave PIX": 28,
+        "Calçado": 12,
         "Dias disponíveis": 42,
         Assinatura: 24,
         Prioridade: 20
@@ -3068,8 +3090,8 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
 
   const incluirPrioridade = false;
   const headers = incluirPrioridade
-    ? ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Prioridade", "Assinatura"]
-    : ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Assinatura"];
+    ? ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Calçado", "Prioridade", "Assinatura"]
+    : ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", "Calçado", "Assinatura"];
 
   const pageWidth = doc.internal.pageSize.getWidth();
   const larguraTabela = incluirPrioridade ? 260 : 238;
@@ -3093,7 +3115,8 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
         staff.cpf || "",
         staff.rg || "",
         staff.telefone || "",
-        staff.chave_pix || ""
+        staff.chave_pix || "",
+        staff.calcado || ""
       ];
 
       if (incluirPrioridade) {
@@ -3149,6 +3172,79 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
   });
 
   doc.save(`${nomeArquivoSeguro(corrida.nome)}.pdf`);
+}
+
+
+function agruparTenisPorNumeracao(inscritos) {
+  const mapa = {};
+  (inscritos || []).forEach(inscrito => {
+    const numero = String((inscrito.staff && inscrito.staff.calcado) || "Não informado");
+    mapa[numero] = (mapa[numero] || 0) + 1;
+  });
+  return Object.entries(mapa)
+    .map(([numero, quantidade]) => ({ numero, quantidade }))
+    .sort((a, b) => {
+      const na = Number(a.numero);
+      const nb = Number(b.numero);
+      if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
+      return a.numero.localeCompare(b.numero, "pt-BR");
+    });
+}
+
+function exportarPDFResumoTenis(corrida, inscritos) {
+  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
+  if (!jsPDFConstructor) {
+    alert("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
+    return;
+  }
+
+  const resumo = agruparTenisPorNumeracao(inscritos);
+  if (resumo.length === 0) {
+    alert("Não há inscritos para gerar o relatório de tênis.");
+    return;
+  }
+
+  const doc = new jsPDFConstructor({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  doc.setFontSize(18);
+  doc.setFont(undefined, "bold");
+  doc.text(corrida.nome || "Corrida", pageWidth / 2, 18, { align: "center" });
+  doc.setFontSize(12);
+  doc.setFont(undefined, "normal");
+  doc.text("Resumo de tênis por numeração", pageWidth / 2, 26, { align: "center" });
+
+  doc.autoTable({
+    head: [["Numeração", "Quantidade de pares"]],
+    body: resumo.map(item => [item.numero, item.quantidade]),
+    startY: 36,
+    theme: "grid",
+    margin: { left: 45, right: 45 },
+    styles: { fontSize: 11, cellPadding: 3, halign: "center", valign: "middle" },
+    headStyles: { fillColor: [79, 70, 229], textColor: [255,255,255], fontStyle: "bold" },
+    columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 70 } }
+  });
+
+  const total = resumo.reduce((acc, item) => acc + Number(item.quantidade || 0), 0);
+  const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 50;
+  doc.setFont(undefined, "bold");
+  doc.text(`Total de pares: ${total}`, pageWidth / 2, finalY, { align: "center" });
+  doc.save(`${nomeArquivoSeguro(corrida.nome)}-resumo-tenis.pdf`);
+}
+
+function exportarExcelResumoTenis(corrida, inscritos) {
+  const resumo = agruparTenisPorNumeracao(inscritos);
+  if (resumo.length === 0) {
+    alert("Não há inscritos para gerar o relatório de tênis.");
+    return;
+  }
+  const dados = resumo.map(item => ({ "Numeração": item.numero, "Quantidade de pares": item.quantidade }));
+  const worksheet = XLSX.utils.json_to_sheet(dados, { origin: "A4" });
+  XLSX.utils.sheet_add_aoa(worksheet, [[corrida.nome || "Corrida"], ["Resumo de tênis por numeração"]], { origin: "A1" });
+  worksheet["!cols"] = [{ wch: 18 }, { wch: 24 }];
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Resumo tênis");
+  XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)}-resumo-tenis.xlsx`);
 }
 
 // INICIALIZAÇÃO

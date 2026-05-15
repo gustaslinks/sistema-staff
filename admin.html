@@ -6,7 +6,7 @@
 
   <title>Painel Admin | Sistema Staff</title>
 
-  <link rel="stylesheet" href="style.css?v=137">
+  <link rel="stylesheet" href="style.css?v=138">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -93,6 +93,15 @@
             <input type="number" id="corrida-vagas" min="1" placeholder="Ex.: 30">
           </div>
 
+          <div class="field field-checkbox-admin">
+            <label class="checkbox-admin-card">
+              <input type="checkbox" id="corrida-patrocinador-tenis">
+              <span>
+                <strong>Corrida com patrocinador de tênis</strong>
+                <small>Habilita relatórios de numeração para entrega de tênis aos staffs.</small>
+              </span>
+            </label>
+          </div>
 
         </div>
 
@@ -143,10 +152,15 @@
           <div class="field">
             <label>Horário fim <span class="label-opcional">(opcional)</span></label>
             <input type="time" id="novo-dia-horario-fim">
+          </div>
 
-            <label class="checkbox-admin-linha">
+          <div class="field field-checkbox-admin field-ate-ultimo">
+            <label class="checkbox-admin-card checkbox-admin-card-compacto">
               <input type="checkbox" id="novo-dia-ate-ultimo">
-              <span>Até o último atleta chegar</span>
+              <span>
+                <strong>Até o último atleta chegar</strong>
+                <small>Desativa o horário final fixo deste período.</small>
+              </span>
             </label>
           </div>
 
@@ -181,8 +195,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
-  <script src="qrcode.min.js?v=137"></script>
-  <script src="admin.js?v=137"></script>
-  <script src="floating-tools.js?v=137"></script>
+  <script src="qrcode.min.js?v=138"></script>
+  <script src="admin.js?v=138"></script>
+  <script src="floating-tools.js?v=138"></script>
 </body>
 </html>

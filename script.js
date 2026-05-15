@@ -17,6 +17,7 @@ const nascimento = document.getElementById('nascimento');
 const telefone = document.getElementById('telefone');
 const email = document.getElementById('email');
 const cidade = document.getElementById('cidade');
+const calcado = document.getElementById('calcado');
 const indicado = document.getElementById('indicado');
 const pixOutro = document.getElementById('pixOutro');
 const foto = document.getElementById('foto');
@@ -218,8 +219,9 @@ function getValidationState(showAll=false){
     fieldTelefone:isValidPhone(telefone.value),
     fieldEmail:isValidEmail(email.value),
     fieldCidade:cidade.value.trim().length>=2,
+    fieldCalcado: calcado ? calcado.value !== "" : true,
     fieldIndicado:indicado.value.trim().length>=2,
-    fieldObservacoes:observacoes.value.trim().length>=2,
+    fieldObservacoes:true,
     fieldFoto: modoEdicao ? (foto.files.length===0 || ['image/jpeg','image/png'].includes(foto.files[0].type)) : (foto.files.length>0 && ['image/jpeg','image/png'].includes(foto.files[0].type)),
     fieldPixOutro:selectedPix!=='outro' || isValidPixOutro(pixOutro.value),
     fieldTermos:termos.checked
@@ -268,6 +270,7 @@ indicado.addEventListener('input',()=>{indicado.value=indicado.value.replace(/^\
 indicado.addEventListener('blur',()=>{cleanTextField(indicado,true);markTouched('fieldIndicado');refreshSubmitState();});
 
 observacoes.addEventListener('input',()=>{observacoes.value=observacoes.value.replace(/^\s+/,'').replace(/\s{3,}/g,' ');markTouched('fieldObservacoes');refreshSubmitState();});
+if (calcado) calcado.addEventListener('change',()=>{markTouched('fieldCalcado');refreshSubmitState();});
 observacoes.addEventListener('blur',()=>{observacoes.value=removeExtraSpaces(observacoes.value);markTouched('fieldObservacoes');refreshSubmitState();});
 
 cpf.addEventListener('input',()=>{cpf.value=maskCPF(cpf.value);markTouched('fieldCpf');updatePixPreviews();refreshSubmitState();});
@@ -457,7 +460,7 @@ form.addEventListener('submit',async function(event){
     if(pixTipo==='telefone') chavePixFinal=telefone.value;
     if(pixTipo==='outro') chavePixFinal=pixOutro.value;
 
-    const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value,foto_url:fotoUrlFinal};
+    const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,calcado: calcado ? calcado.value : null,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value || null,foto_url:fotoUrlFinal};
     let cadastroSalvo = null;
 
     if (modoEdicao) {
