@@ -490,7 +490,9 @@ form.addEventListener('submit',async function(event){
         throw new Error('Sessão expirada. Faça login novamente.');
       }
 
-      // Atualiza pelo ID carregado. O retorno do Supabase é usado como fonte principal.
+      // Atualiza pelo ID carregado e CONFIRMA no banco antes de mostrar sucesso.
+      // Importante: não criamos mais um objeto local falso, porque isso fazia parecer que salvou
+      // mesmo quando o Supabase não tinha atualizado a linha.
       let respostaUpdate = null;
 
       if (idParaAtualizar) {
@@ -503,9 +505,20 @@ form.addEventListener('submit',async function(event){
 
         if (respostaUpdate.error) throw respostaUpdate.error;
         cadastroSalvo = respostaUpdate.data;
+
+        // Alguns ambientes podem não devolver a linha atualizada no update.
+        // Então fazemos uma leitura explícita pelo ID para validar o dado salvo.
+        const confirmarUpdate = await supabaseClient
+          .from('staffs')
+          .select('*')
+          .eq('id', idParaAtualizar)
+          .maybeSingle();
+
+        if (confirmarUpdate.error) throw confirmarUpdate.error;
+        if (confirmarUpdate.data) cadastroSalvo = confirmarUpdate.data;
       }
 
-      // Fallback: se o ID do localStorage estiver antigo/inconsistente, atualiza pelo CPF + nascimento
+      // Fallback: se o ID do localStorage estiver antigo/inconsistente, tenta localizar pela chave antiga
       // do cadastro carregado na própria tela.
       if (!cadastroSalvo && cpfOriginalEdicao) {
         respostaUpdate = await supabaseClient
@@ -518,18 +531,33 @@ form.addEventListener('submit',async function(event){
 
         if (respostaUpdate.error) throw respostaUpdate.error;
         cadastroSalvo = respostaUpdate.data;
+
+        if (cadastroSalvo && cadastroSalvo.id) {
+          const confirmarFallback = await supabaseClient
+            .from('staffs')
+            .select('*')
+            .eq('id', cadastroSalvo.id)
+            .maybeSingle();
+
+          if (confirmarFallback.error) throw confirmarFallback.error;
+          if (confirmarFallback.data) cadastroSalvo = confirmarFallback.data;
+        }
       }
 
-      // Se o banco atualizou mas não retornou a linha por política/retorno vazio, mantém a sessão local
-      // coerente com o que foi enviado, sem bloquear o fluxo do usuário.
       if (!cadastroSalvo) {
-        cadastroSalvo = {
-          id: idParaAtualizar,
-          ...(staffLogadoEdicao || {}),
-          ...(staffAtualEdicao || {}),
-          ...dadosCadastro
-        };
+        throw new Error('Não foi possível atualizar seu cadastro no banco. Faça login novamente e tente outra vez.');
       }
+
+      const calcadoEsperado = dadosCadastro.numero_calcado === null ? null : Number(dadosCadastro.numero_calcado);
+      const calcadoSalvo = cadastroSalvo.numero_calcado === null || cadastroSalvo.numero_calcado === undefined || cadastroSalvo.numero_calcado === ''
+        ? null
+        : Number(cadastroSalvo.numero_calcado);
+
+      if (calcadoEsperado !== calcadoSalvo) {
+        throw new Error('O cadastro foi enviado, mas o número do calçado não foi confirmado no banco. Recarregue a página e tente novamente.');
+      }
+
+      staffAtualEdicao = cadastroSalvo;
     } else {
       const inserirCadastro = await supabaseClient
         .from('staffs')
