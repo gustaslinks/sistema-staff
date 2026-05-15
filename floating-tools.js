@@ -240,12 +240,67 @@
     renderizarCalendario();
   }
 
+
+  function criarBotaoYescom() {
+    if (document.querySelector(".floating-yescom-btn")) return;
+
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "floating-yescom-btn";
+    botao.setAttribute("aria-label", "Abrir calendário Yescom");
+    botao.innerHTML = `<span aria-hidden="true">🏁</span>`;
+
+    const modal = document.createElement("div");
+    modal.className = "floating-yescom-modal hidden";
+    modal.setAttribute("aria-hidden", "true");
+    modal.innerHTML = `
+      <div class="floating-yescom-backdrop" data-fechar-yescom="true"></div>
+      <section class="floating-yescom-box" role="dialog" aria-modal="true" aria-labelledby="floating-yescom-title">
+        <div class="floating-yescom-header">
+          <h2 id="floating-yescom-title">Calendário Yescom</h2>
+          <button type="button" class="floating-calendar-close" data-fechar-yescom="true" aria-label="Fechar calendário Yescom">×</button>
+        </div>
+        <p class="floating-yescom-help">Se a página não carregar dentro do sistema, use o botão abaixo para abrir em nova aba.</p>
+        <iframe class="floating-yescom-frame" src="${YESCOM_URL}" title="Calendário Yescom"></iframe>
+        <a class="floating-yescom-link" href="${YESCOM_URL}" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+      </section>
+    `;
+
+    function abrirYescom() {
+      modal.classList.remove("hidden");
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function fecharYescom() {
+      modal.classList.add("hidden");
+      modal.setAttribute("aria-hidden", "true");
+      botao.focus();
+    }
+
+    botao.addEventListener("click", abrirYescom);
+    modal.addEventListener("click", (event) => {
+      if (event.target?.dataset?.fecharYescom === "true") {
+        fecharYescom();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !modal.classList.contains("hidden")) {
+        fecharYescom();
+      }
+    });
+
+    document.body.appendChild(botao);
+    document.body.appendChild(modal);
+  }
+
   function iniciarFloatingTools() {
     const pagina = getPaginaAtual();
     const staff = getStaffLogado();
 
     if (pagina === "admin.html") {
       criarCalendarioAdmin();
+      criarBotaoYescom();
       return;
     }
 

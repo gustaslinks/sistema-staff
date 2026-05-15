@@ -4630,3 +4630,203 @@ body{background:linear-gradient(180deg,#f7f8fc 0%,#eef2f8 42%,#f8fafc 100%);}
     border-radius: 18px !important;
   }
 }
+
+/* v144 - ajustes visuais relatórios, checkbox e atalhos flutuantes */
+.admin-card-footer,
+.admin-card-footer-v128 {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  align-items: stretch !important;
+}
+
+.admin-card-footer > .relatorios-admin,
+.admin-card-footer-v128 > .relatorios-admin {
+  grid-column: 1 / -1 !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 2px 0 0 !important;
+  justify-self: stretch !important;
+}
+
+.admin-card-footer > .relatorios-admin > .botao-relatorios-toggle,
+.admin-card-footer-v128 > .relatorios-admin > .botao-relatorios-toggle {
+  width: 100% !important;
+  max-width: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 56px !important;
+  border-radius: 18px !important;
+  background: linear-gradient(135deg, #5638f2 0%, #2364e8 58%, #07a5b8 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, .24) !important;
+}
+
+.admin-card-footer > .relatorios-admin > .relatorios-painel,
+.admin-card-footer-v128 > .relatorios-admin > .relatorios-painel {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+.relatorios-formato-toggle,
+.relatorios-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.relatorio-formato-opcao,
+.relatorio-acao {
+  border: 1px solid rgba(148, 163, 184, .45) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, .08) !important;
+  color: #172033 !important;
+  font-weight: 900 !important;
+}
+
+.relatorio-formato-opcao.ativo {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 12px 28px rgba(79, 70, 229, .28) !important;
+}
+
+.field-checkbox-admin,
+.field-ate-ultimo,
+.field-ate-ultimo-inline {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.field-checkbox-admin > .checkbox-admin-card,
+.field-checkbox-admin > .checkbox-admin-inline,
+.field-checkbox-admin label.checkbox-admin-card,
+.field-checkbox-admin label.checkbox-admin-inline,
+label.checkbox-admin-card.checkbox-admin-inline,
+label.checkbox-admin-card.checkbox-admin-card-compacto {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 62px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+}
+
+.field-checkbox-admin input[type="checkbox"],
+.checkbox-admin-card input[type="checkbox"],
+.checkbox-admin-inline input[type="checkbox"],
+#corrida-patrocinador-tenis,
+#novo-dia-ate-ultimo {
+  position: relative !important;
+  inset: auto !important;
+  display: inline-block !important;
+  float: none !important;
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  flex: 0 0 22px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  align-self: center !important;
+}
+
+.field-checkbox-admin span,
+.checkbox-admin-card span,
+.checkbox-admin-inline span {
+  display: block !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+.field-checkbox-admin strong,
+.checkbox-admin-card strong,
+.checkbox-admin-inline strong {
+  display: block !important;
+  margin: 0 !important;
+  line-height: 1.22 !important;
+}
+
+.floating-calendar-btn,
+.floating-yescom-btn {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  border-radius: 999px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 22px !important;
+}
+
+.floating-calendar-btn span:not(:first-child),
+.floating-yescom-btn span:not(:first-child) {
+  display: none !important;
+}
+
+.floating-yescom-btn {
+  position: fixed !important;
+  right: 92px !important;
+  bottom: 24px !important;
+  z-index: 999 !important;
+  border: 0 !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0891b2, #14b8a6) !important;
+  box-shadow: 0 14px 28px rgba(8, 145, 178, .28) !important;
+  cursor: pointer !important;
+}
+
+@media (max-width: 720px) {
+  .admin-card-footer,
+  .admin-card-footer-v128 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-card-footer > .botao-toggle-dias,
+  .admin-card-footer-v128 > .botao-toggle-dias,
+  .admin-card-footer > .relatorios-admin,
+  .admin-card-footer-v128 > .relatorios-admin,
+  .admin-card-footer > .botao-ver-inscritos,
+  .admin-card-footer-v128 > .botao-ver-inscritos {
+    grid-column: 1 / -1 !important;
+  }
+
+  .relatorios-formato-toggle,
+  .relatorios-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .relatorio-formato-opcao,
+  .relatorio-acao {
+    min-height: 52px !important;
+    font-size: 13px !important;
+    padding: 11px 8px !important;
+  }
+
+  .floating-calendar-btn {
+    right: 20px !important;
+    bottom: 24px !important;
+  }
+
+  .floating-yescom-btn {
+    right: 86px !important;
+    bottom: 24px !important;
+  }
+}
