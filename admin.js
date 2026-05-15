@@ -2173,11 +2173,67 @@ function montarPagamentosPix(dadosExportacao) {
   return confirmados;
 }
 
+function carregarScriptQRCode(url) {
+  return new Promise((resolve, reject) => {
+    const existente = Array.from(document.scripts).find((script) => script.src === url);
+
+    if (existente && window.QRCode && window.QRCode.toDataURL) {
+      resolve();
+      return;
+    }
+
+    const script = existente || document.createElement("script");
+    const timeout = setTimeout(() => {
+      reject(new Error("Tempo esgotado ao carregar QR Code."));
+    }, 8000);
+
+    script.onload = () => {
+      clearTimeout(timeout);
+      if (window.QRCode && window.QRCode.toDataURL) {
+        resolve();
+      } else {
+        reject(new Error("Biblioteca carregada, mas QRCode.toDataURL não foi encontrado."));
+      }
+    };
+
+    script.onerror = () => {
+      clearTimeout(timeout);
+      reject(new Error("Falha ao carregar QR Code."));
+    };
+
+    if (!existente) {
+      script.src = url;
+      script.async = true;
+      document.head.appendChild(script);
+    }
+  });
+}
+
+async function garantirBibliotecaQRCode() {
+  if (window.QRCode && window.QRCode.toDataURL) return;
+
+  const urls = [
+    "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js",
+    "https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.4/qrcode.min.js"
+  ];
+
+  for (const url of urls) {
+    try {
+      await carregarScriptQRCode(url);
+      if (window.QRCode && window.QRCode.toDataURL) return;
+    } catch (erro) {
+      console.warn("Falha ao carregar biblioteca QR Code:", url, erro);
+    }
+  }
+
+  throw new Error("Biblioteca de QR Code não carregada. Confira sua conexão e tente novamente.");
+}
+
 async function gerarQRCodeDataURLPix(payload) {
   if (!payload) return "";
-  if (!window.QRCode || !window.QRCode.toDataURL) {
-    throw new Error("Biblioteca de QR Code não carregada. Confira sua conexão e tente novamente.");
-  }
+
+  await garantirBibliotecaQRCode();
 
   return await window.QRCode.toDataURL(payload, {
     errorCorrectionLevel: "M",
