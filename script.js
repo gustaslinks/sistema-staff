@@ -443,105 +443,159 @@ function normalizarNumeroCalcadoValor(valor){
   return Number.isFinite(numero) ? numero : null;
 }
 
-function confirmarNumeroCalcado(cadastroSalvo, numeroEsperado){
+function normalizarTextoBusca(valor){
+  return valor === null || valor === undefined ? '' : String(valor).trim();
+}
+
+function normalizarCpfSomenteNumeros(valor){
+  return normalizarTextoBusca(valor).replace(/\D/g, '');
+}
+
+function cadastroConfirmaNumeroCalcado(cadastroSalvo, numeroEsperado){
   if (!cadastroSalvo) return false;
   return normalizarNumeroCalcadoValor(cadastroSalvo.numero_calcado) === normalizarNumeroCalcadoValor(numeroEsperado);
 }
 
-function coletarCandidatosBuscaCadastro(dadosCadastro){
-  const candidatos = [];
-  const adicionar = (origem, campo, valor) => {
-    if (valor !== null && valor !== undefined && String(valor).trim() !== '') {
-      candidatos.push({ origem, campo, valor: String(valor).trim() });
+function getCandidatosIdCadastro(){
+  const candidatos = [
+    staffIdInput && staffIdInput.value,
+    staffAtualEdicao && staffAtualEdicao.id,
+    staffIdEdicao,
+    staffLogadoEdicao && staffLogadoEdicao.id,
+    staffIdUrlEdicao
+  ];
+  return [...new Set(candidatos.map(normalizarTextoBusca).filter(Boolean))];
+}
+
+function getCandidatosCpfNascimento(dadosCadastro){
+  const candidatos = [
+    {
+      cpf: staffCpfOriginalInput && staffCpfOriginalInput.value,
+      nascimento: staffNascimentoOriginalInput && staffNascimentoOriginalInput.value
+    },
+    {
+      cpf: staffAtualEdicao && staffAtualEdicao.cpf,
+      nascimento: staffAtualEdicao && staffAtualEdicao.data_nascimento
+    },
+    {
+      cpf: staffLogadoEdicao && staffLogadoEdicao.cpf,
+      nascimento: staffLogadoEdicao && staffLogadoEdicao.data_nascimento
+    },
+    {
+      cpf: dadosCadastro && dadosCadastro.cpf,
+      nascimento: dadosCadastro && dadosCadastro.data_nascimento
     }
-  };
+  ];
 
-  adicionar('campo oculto', 'id', staffIdInput && staffIdInput.value);
-  adicionar('cadastro carregado', 'id', staffAtualEdicao && staffAtualEdicao.id);
-  adicionar('url/localStorage', 'id', staffIdEdicao);
-  adicionar('sessão', 'id', staffLogadoEdicao && staffLogadoEdicao.id);
-  adicionar('url', 'id', staffIdUrlEdicao);
+  const vistos = new Set();
+  return candidatos
+    .map(item => ({
+      cpf: normalizarTextoBusca(item && item.cpf),
+      cpfNumeros: normalizarCpfSomenteNumeros(item && item.cpf),
+      nascimento: normalizarTextoBusca(item && item.nascimento)
+    }))
+    .filter(item => item.cpf && item.nascimento)
+    .filter(item => {
+      const chave = `${item.cpf}|${item.nascimento}`;
+      if (vistos.has(chave)) return false;
+      vistos.add(chave);
+      return true;
+    });
+}
 
-  adicionar('cpf original', 'cpf_nascimento', JSON.stringify({
-    cpf: staffCpfOriginalInput && staffCpfOriginalInput.value,
-    nascimento: staffNascimentoOriginalInput && staffNascimentoOriginalInput.value
-  }));
+async function buscarCadastroPorId(id){
+  const idBusca = normalizarTextoBusca(id);
+  if (!idBusca) return null;
 
-  adicionar('cadastro carregado', 'cpf_nascimento', JSON.stringify({
-    cpf: staffAtualEdicao && staffAtualEdicao.cpf,
-    nascimento: staffAtualEdicao && staffAtualEdicao.data_nascimento
-  }));
+  const { data, error } = await supabaseClient
+    .from('staffs')
+    .select('*')
+    .eq('id', idBusca)
+    .maybeSingle();
 
-  adicionar('sessão', 'cpf_nascimento', JSON.stringify({
-    cpf: staffLogadoEdicao && staffLogadoEdicao.cpf,
-    nascimento: staffLogadoEdicao && staffLogadoEdicao.data_nascimento
-  }));
+  if (error) throw error;
+  return data || null;
+}
 
-  adicionar('formulário', 'cpf_nascimento', JSON.stringify({
-    cpf: dadosCadastro && dadosCadastro.cpf,
-    nascimento: dadosCadastro && dadosCadastro.data_nascimento
-  }));
+async function buscarCadastroPorCpfNascimento(cpf, nascimento){
+  const cpfBusca = normalizarTextoBusca(cpf);
+  const nascimentoBusca = normalizarTextoBusca(nascimento);
+  if (!cpfBusca || !nascimentoBusca) return null;
 
-  return candidatos;
+  const { data, error } = await supabaseClient
+    .from('staffs')
+    .select('*')
+    .eq('cpf', cpfBusca)
+    .eq('data_nascimento', nascimentoBusca)
+    .limit(1);
+
+  if (error) throw error;
+  return Array.isArray(data) && data.length ? data[0] : null;
+}
+
+async function buscarCadastroPorEmail(emailBusca){
+  const emailNormalizado = normalizarTextoBusca(emailBusca).toLowerCase();
+  if (!emailNormalizado) return null;
+
+  const { data, error } = await supabaseClient
+    .from('staffs')
+    .select('*')
+    .eq('email', emailNormalizado)
+    .limit(1);
+
+  if (error) throw error;
+  return Array.isArray(data) && data.length ? data[0] : null;
 }
 
 async function localizarCadastroParaAtualizacao(dadosCadastro){
-  const candidatos = coletarCandidatosBuscaCadastro(dadosCadastro);
-  const idsTentados = new Set();
-  const combosTentados = new Set();
-
-  for (const candidato of candidatos) {
-    if (candidato.campo !== 'id') continue;
-    const id = String(candidato.valor || '').trim();
-    if (!id || idsTentados.has(id)) continue;
-    idsTentados.add(id);
-
-    const busca = await supabaseClient
-      .from('staffs')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (busca.error) throw busca.error;
-    if (busca.data) return busca.data;
+  for (const id of getCandidatosIdCadastro()) {
+    const encontrado = await buscarCadastroPorId(id);
+    if (encontrado) return encontrado;
   }
 
-  for (const candidato of candidatos) {
-    if (candidato.campo !== 'cpf_nascimento') continue;
-
-    let payload = null;
-    try { payload = JSON.parse(candidato.valor); } catch (error) { payload = null; }
-    if (!payload || !payload.cpf || !payload.nascimento) continue;
-
-    const cpfBusca = String(payload.cpf).trim();
-    const nascimentoBusca = String(payload.nascimento).trim();
-    const chave = `${cpfBusca}|${nascimentoBusca}`;
-    if (combosTentados.has(chave)) continue;
-    combosTentados.add(chave);
-
-    const busca = await supabaseClient
-      .from('staffs')
-      .select('*')
-      .eq('cpf', cpfBusca)
-      .eq('data_nascimento', nascimentoBusca)
-      .maybeSingle();
-
-    if (busca.error) throw busca.error;
-    if (busca.data) return busca.data;
+  for (const combo of getCandidatosCpfNascimento(dadosCadastro)) {
+    const encontrado = await buscarCadastroPorCpfNascimento(combo.cpf, combo.nascimento);
+    if (encontrado) return encontrado;
   }
 
-  if (dadosCadastro && dadosCadastro.email) {
-    const buscaEmail = await supabaseClient
-      .from('staffs')
-      .select('*')
-      .eq('email', dadosCadastro.email)
-      .maybeSingle();
-
-    if (buscaEmail.error) throw buscaEmail.error;
-    if (buscaEmail.data) return buscaEmail.data;
-  }
+  const porEmail = await buscarCadastroPorEmail(dadosCadastro && dadosCadastro.email);
+  if (porEmail) return porEmail;
 
   return null;
+}
+
+async function updateCadastroPorId(id, dadosCadastro){
+  const idBusca = normalizarTextoBusca(id);
+  if (!idBusca) return null;
+
+  const { data, error } = await supabaseClient
+    .from('staffs')
+    .update(dadosCadastro)
+    .eq('id', idBusca)
+    .select('*');
+
+  if (error) throw error;
+  if (Array.isArray(data) && data.length) return data[0];
+
+  return await buscarCadastroPorId(idBusca);
+}
+
+async function updateCadastroPorCpfNascimento(cpf, nascimento, dadosCadastro){
+  const cpfBusca = normalizarTextoBusca(cpf);
+  const nascimentoBusca = normalizarTextoBusca(nascimento);
+  if (!cpfBusca || !nascimentoBusca) return null;
+
+  const { data, error } = await supabaseClient
+    .from('staffs')
+    .update(dadosCadastro)
+    .eq('cpf', cpfBusca)
+    .eq('data_nascimento', nascimentoBusca)
+    .select('*');
+
+  if (error) throw error;
+  if (Array.isArray(data) && data.length) return data[0];
+
+  return await buscarCadastroPorCpfNascimento(cpfBusca, nascimentoBusca);
 }
 
 async function atualizarCadastroExistente(dadosCadastro){
@@ -559,31 +613,30 @@ async function atualizarCadastroExistente(dadosCadastro){
     throw new Error('Não foi possível localizar o cadastro para atualização. Faça login novamente e tente outra vez.');
   }
 
-  const atualizacao = await supabaseClient
-    .from('staffs')
-    .update(dadosCadastro)
-    .eq('id', cadastroEncontrado.id)
-    .select('*')
-    .maybeSingle();
+  let cadastroSalvo = await updateCadastroPorId(cadastroEncontrado.id, dadosCadastro);
 
-  if (atualizacao.error) throw atualizacao.error;
-
-  if (atualizacao.data) {
-    return atualizacao.data;
+  if (!cadastroConfirmaNumeroCalcado(cadastroSalvo, dadosCadastro.numero_calcado)) {
+    for (const combo of getCandidatosCpfNascimento(dadosCadastro)) {
+      cadastroSalvo = await updateCadastroPorCpfNascimento(combo.cpf, combo.nascimento, dadosCadastro);
+      if (cadastroConfirmaNumeroCalcado(cadastroSalvo, dadosCadastro.numero_calcado)) break;
+    }
   }
 
-  const releitura = await supabaseClient
-    .from('staffs')
-    .select('*')
-    .eq('id', cadastroEncontrado.id)
-    .maybeSingle();
-
-  if (releitura.error) throw releitura.error;
-  if (!releitura.data) {
-    throw new Error('Cadastro atualizado, mas não foi possível reler os dados salvos. Recarregue a página e tente novamente.');
+  if (!cadastroSalvo || !cadastroSalvo.id) {
+    throw new Error('O cadastro foi localizado, mas não retornou dados após a atualização. Recarregue a página e tente novamente.');
   }
 
-  return releitura.data;
+  if (!cadastroConfirmaNumeroCalcado(cadastroSalvo, dadosCadastro.numero_calcado)) {
+    console.warn('Número do calçado não confirmado após update.', {
+      id: cadastroEncontrado.id,
+      esperado: dadosCadastro.numero_calcado,
+      retornado: cadastroSalvo.numero_calcado,
+      cadastroSalvo
+    });
+    throw new Error('O cadastro foi enviado, mas o número do calçado não foi confirmado no banco. Verifique se a coluna numero_calcado existe na tabela staffs e tente novamente.');
+  }
+
+  return cadastroSalvo;
 }
 
 form.addEventListener('submit',async function(event){
@@ -637,9 +690,6 @@ form.addEventListener('submit',async function(event){
     if (modoEdicao) {
       cadastroSalvo = await atualizarCadastroExistente(dadosCadastro);
 
-      if (!confirmarNumeroCalcado(cadastroSalvo, dadosCadastro.numero_calcado)) {
-        throw new Error('O cadastro foi enviado, mas o número do calçado não foi confirmado no banco. Recarregue a página e tente novamente.');
-      }
 
       staffAtualEdicao = cadastroSalvo;
       if (staffIdInput) staffIdInput.value = cadastroSalvo.id || '';
