@@ -588,7 +588,7 @@ async function carregarCorridasAdmin() {
     return `
       <article class="card-corrida-admin" data-corrida-id="${corrida.id}">
 
-        ${corrida.banner_url ? `<img class="corrida-card-banner-admin" src="${escapeHtml(corrida.banner_url)}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">` : ""}
+        ${obterBannerCorridaUrl(corrida) ? `<img class="corrida-card-banner-admin" src="${escapeHtml(obterBannerCorridaUrl(corrida))}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">` : ""}
 
         <h3>${corrida.nome}</h3>
         ${corrida.possui_patrocinador_tenis ? `<div class="badge-tenis">👟 Patrocinador de tênis</div>` : ""}
@@ -742,7 +742,7 @@ async function carregarCorridasAdmin() {
             class="botao-ver-inscritos"
             data-corrida-id="${corrida.id}"
           >
-            <span class="btn-ico">👥</span><span>Ver inscritos</span>
+            <span class="btn-ico" aria-hidden="true">👥</span><span>Ver inscritos</span>
           </button>
 
         </div>
@@ -852,7 +852,8 @@ async function carregarCorridaParaEdicao(corridaId) {
     horario_inicio: dia.horario_inicio,
     horario_fim: dia.horario_fim,
     tipo: dia.tipo,
-    valor_ajuda_custo: dia.valor_ajuda_custo
+    valor_ajuda_custo: dia.valor_ajuda_custo,
+    aberto: false
   }));
 
   renderizarPreviewDiasCadastro();
@@ -977,12 +978,12 @@ function ativarBotoesVerInscritos() {
       if (estaAberto) {
         container.classList.add("hidden");
         container.innerHTML = "";
-        botao.innerHTML = `<span class="btn-ico">👥</span><span>Ver inscritos</span>`;
+        botao.innerHTML = htmlBotaoInscritos(false);
         return;
       }
 
       container.classList.remove("hidden");
-      botao.innerHTML = `<span class="btn-ico">👥</span><span>Ocultar inscritos</span>`;
+      botao.innerHTML = htmlBotaoInscritos(true);
 
       await carregarInscritosDaCorrida(
         corridaId,
@@ -1890,6 +1891,24 @@ function normalizarStatusInscricao(status) {
   return status;
 }
 
+function obterBannerCorridaUrl(corrida) {
+  if (!corrida) return "";
+  if (corrida.banner_url) return corrida.banner_url;
+  if (corrida.banner_path && typeof supabaseClient !== "undefined") {
+    const { data } = supabaseClient.storage
+      .from(BANNER_BUCKET)
+      .getPublicUrl(corrida.banner_path);
+    return data && data.publicUrl ? data.publicUrl : "";
+  }
+  return "";
+}
+
+function htmlBotaoInscritos(aberto) {
+  return aberto
+    ? '<span class="btn-ico" aria-hidden="true">👥</span><span>Ocultar inscritos</span>'
+    : '<span class="btn-ico" aria-hidden="true">👥</span><span>Ver inscritos</span>';
+}
+
 function escapeHtml(valor) {
   return String(valor || "")
     .replace(/&/g, "&amp;")
@@ -1932,7 +1951,8 @@ function adicionarPeriodoCadastro() {
       horario_inicio: horarioInicio,
       horario_fim: horarioFim,
       tipo: tipo,
-      valor_ajuda_custo: ajuda
+      valor_ajuda_custo: ajuda,
+      aberto: true
     });
 
     dataAtual.setDate(dataAtual.getDate() + 1);
@@ -1996,58 +2016,84 @@ function renderizarPreviewDiasCadastro() {
 
   previewDiasCorrida.innerHTML = diasCadastroCorrida.map((dia, index) => {
     const ateUltimo = !dia.horario_fim;
+    const aberto = dia.aberto === true;
+    const resumoData = dia.data_dia ? formatarDataBR(dia.data_dia) : "Data não definida";
+    const resumoHorario = ateUltimo
+      ? `${(dia.horario_inicio || "").slice(0, 5) || "--:--"} até último atleta`
+      : `${(dia.horario_inicio || "").slice(0, 5) || "--:--"} às ${(dia.horario_fim || "").slice(0, 5) || "--:--"}`;
+    const resumoValor = dia.valor_ajuda_custo !== null && dia.valor_ajuda_custo !== undefined && dia.valor_ajuda_custo !== ""
+      ? `R$ ${Number(dia.valor_ajuda_custo).toFixed(2).replace(".", ",")}`
+      : "Sem ajuda informada";
+
     return `
-      <div class="dia-corrida-card dia-corrida-card-editavel">
-        <div class="dia-editavel-topo">
-          <strong>${escapeHtml(dia.nome || "Dia da corrida")}</strong>
-          ${dia.id ? `<span class="badge-dia-existente">Dia cadastrado</span>` : `<span class="badge-dia-novo">Novo dia</span>`}
-        </div>
-
-        <div class="grid grid-dia-editavel">
-          <div class="field">
-            <label>Tipo do período</label>
-            <select onchange="atualizarCampoDiaCadastro(${index}, 'tipo', this.value); renderizarPreviewDiasCadastro();">
-              <option value="Entrega de kit" ${dia.tipo === "Entrega de kit" ? "selected" : ""}>Entrega de kit</option>
-              <option value="Corrida" ${dia.tipo === "Corrida" ? "selected" : ""}>Dia da corrida</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Data</label>
-            <input type="date" value="${dia.data_dia || ""}" onchange="atualizarCampoDiaCadastro(${index}, 'data_dia', this.value); renderizarPreviewDiasCadastro();">
-          </div>
-
-          <div class="field">
-            <label>Horário início</label>
-            <input type="time" value="${(dia.horario_inicio || "").slice(0, 5)}" onchange="atualizarCampoDiaCadastro(${index}, 'horario_inicio', this.value);">
-          </div>
-
-          <div class="field">
-            <label>Horário fim</label>
-            <input type="time" value="${(dia.horario_fim || "").slice(0, 5)}" ${ateUltimo ? "disabled" : ""} onchange="atualizarCampoDiaCadastro(${index}, 'horario_fim', this.value);">
-          </div>
-
-          <div class="field field-checkbox-admin field-ate-ultimo field-ate-ultimo-inline">
-            <label class="checkbox-admin-card checkbox-admin-card-compacto checkbox-admin-inline">
-              <input type="checkbox" ${ateUltimo ? "checked" : ""} onchange="atualizarAteUltimoDiaCadastro(${index}, this.checked);">
-              <span><strong>Até o último atleta chegar</strong></span>
-            </label>
-          </div>
-
-          <div class="field">
-            <label>Ajuda de custo</label>
-            <input type="number" min="0" step="0.01" value="${dia.valor_ajuda_custo ?? ""}" onchange="atualizarCampoDiaCadastro(${index}, 'valor_ajuda_custo', this.value);">
-          </div>
-        </div>
-
-        <div class="dia-corrida-acoes dia-corrida-acoes-editavel">
-          <button type="button" class="delete-btn" onclick="removerDiaCadastro(${index})">
-            Remover dia
+      <div class="dia-corrida-card dia-corrida-card-editavel ${aberto ? "is-open" : "is-collapsed"}">
+        <div class="dia-editavel-resumo">
+          <button type="button" class="dia-resumo-toggle" onclick="alternarDiaCadastro(${index})" aria-expanded="${aberto ? "true" : "false"}">
+            <span class="dia-toggle-ico">${aberto ? "−" : "+"}</span>
+            <span class="dia-resumo-texto">
+              <strong>${escapeHtml(dia.nome || "Dia da corrida")}</strong>
+              <small>${escapeHtml(resumoData)} • ${escapeHtml(resumoHorario)} • ${escapeHtml(resumoValor)}</small>
+            </span>
           </button>
+
+          <button type="button" class="delete-btn delete-btn-dia-resumo" onclick="removerDiaCadastro(${index})">
+            Remover
+          </button>
+        </div>
+
+        <div class="dia-editavel-corpo ${aberto ? "" : "hidden"}">
+          <div class="dia-editavel-topo">
+            <strong>Editar informações do dia</strong>
+            ${dia.id ? `<span class="badge-dia-existente">Dia cadastrado</span>` : `<span class="badge-dia-novo">Novo dia</span>`}
+          </div>
+
+          <div class="grid grid-dia-editavel">
+            <div class="field">
+              <label>Tipo do período</label>
+              <select onchange="atualizarCampoDiaCadastro(${index}, 'tipo', this.value); renderizarPreviewDiasCadastro();">
+                <option value="Entrega de kit" ${dia.tipo === "Entrega de kit" ? "selected" : ""}>Entrega de kit</option>
+                <option value="Corrida" ${dia.tipo === "Corrida" ? "selected" : ""}>Dia da corrida</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Data</label>
+              <input type="date" value="${dia.data_dia || ""}" onchange="atualizarCampoDiaCadastro(${index}, 'data_dia', this.value); renderizarPreviewDiasCadastro();">
+            </div>
+
+            <div class="field">
+              <label>Horário início</label>
+              <input type="time" value="${(dia.horario_inicio || "").slice(0, 5)}" onchange="atualizarCampoDiaCadastro(${index}, 'horario_inicio', this.value); renderizarPreviewDiasCadastro();">
+            </div>
+
+            <div class="field">
+              <label>Horário fim</label>
+              <input type="time" value="${(dia.horario_fim || "").slice(0, 5)}" ${ateUltimo ? "disabled" : ""} onchange="atualizarCampoDiaCadastro(${index}, 'horario_fim', this.value); renderizarPreviewDiasCadastro();">
+            </div>
+
+            <div class="field field-checkbox-admin field-ate-ultimo field-ate-ultimo-inline">
+              <label class="checkbox-admin-card checkbox-admin-card-compacto checkbox-admin-inline">
+                <input type="checkbox" ${ateUltimo ? "checked" : ""} onchange="atualizarAteUltimoDiaCadastro(${index}, this.checked);">
+                <span><strong>Até o último atleta chegar</strong></span>
+              </label>
+            </div>
+
+            <div class="field">
+              <label>Ajuda de custo</label>
+              <input type="number" min="0" step="0.01" value="${dia.valor_ajuda_custo ?? ""}" onchange="atualizarCampoDiaCadastro(${index}, 'valor_ajuda_custo', this.value); renderizarPreviewDiasCadastro();">
+            </div>
+          </div>
         </div>
       </div>
     `;
   }).join("");
+}
+
+function alternarDiaCadastro(index) {
+  const dia = diasCadastroCorrida[index];
+  if (!dia) return;
+  dia.aberto = dia.aberto !== true;
+  renderizarPreviewDiasCadastro();
 }
 
 // CARREGAR DIAS

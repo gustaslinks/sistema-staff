@@ -316,7 +316,7 @@ async function carregarCorridas() {
     return `
       <article class="card-corrida">
 
-        ${corrida.banner_url ? `<img class="corrida-card-banner" src="${escapeHtml(corrida.banner_url)}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">` : ""}
+        ${obterBannerCorridaUrl(corrida) ? `<img class="corrida-card-banner" src="${escapeHtml(obterBannerCorridaUrl(corrida))}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">` : ""}
 
         <h2>${corrida.nome}</h2>
 
@@ -585,8 +585,12 @@ async function carregarMinhasInscricoes() {
         return "";
       }
 
+      const bannerMinhaInscricao = obterBannerCorridaUrl(corrida);
+
       return `
         <article class="card-minha-inscricao">
+
+          ${bannerMinhaInscricao ? `<img class="corrida-card-banner minha-inscricao-banner" src="${escapeHtml(bannerMinhaInscricao)}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">` : ""}
 
           <div class="conteudo-minha-inscricao">
 
@@ -634,6 +638,18 @@ async function carregarMinhasInscricoes() {
 // =========================================================
 // FORMATAÇÕES
 // =========================================================
+
+function obterBannerCorridaUrl(corrida) {
+  if (!corrida) return "";
+  if (corrida.banner_url) return corrida.banner_url;
+  if (corrida.banner_path && typeof supabaseClient !== "undefined") {
+    const { data } = supabaseClient.storage
+      .from("corrida-banners")
+      .getPublicUrl(corrida.banner_path);
+    return data && data.publicUrl ? data.publicUrl : "";
+  }
+  return "";
+}
 
 function escapeHtml(texto) {
   return String(texto || "")

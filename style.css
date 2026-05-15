@@ -4995,3 +4995,149 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
     min-height: 70px !important;
   }
 }
+
+
+/* V148 - ícone de WhatsApp/chat centralizado */
+.floating-whatsapp-icon svg {
+  display: block;
+  width: 30px;
+  height: 30px;
+}
+.botao-ver-inscritos .btn-ico {
+  display: inline-flex !important;
+}
+
+/* =========================================================
+   V149 - AJUSTES BANNER / WHATSAPP / DIAS EDITÁVEIS
+========================================================= */
+.card-minha-inscricao .minha-inscricao-banner,
+.card-minha-inscricao .corrida-card-banner {
+  display: block;
+  width: calc(100% + 48px);
+  margin: -24px -24px 22px;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 24px 24px 0 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.floating-whatsapp {
+  width: 72px;
+  height: 72px;
+  min-height: 72px;
+  padding: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #25d366, #16a34a);
+}
+
+.floating-whatsapp-icon {
+  width: 54px;
+  height: 54px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.whatsapp-logo-svg {
+  display: block;
+  width: 38px;
+  height: 38px;
+}
+
+.dia-corrida-card-editavel {
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: #ffffff;
+}
+
+.dia-editavel-resumo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 14px;
+}
+
+.dia-resumo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111827;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dia-toggle-ico {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #e0f2fe, #ede9fe);
+  color: #2563eb;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.dia-resumo-texto {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dia-resumo-texto strong {
+  font-size: 15px;
+  color: #111827;
+}
+
+.dia-resumo-texto small {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.delete-btn-dia-resumo {
+  padding: 9px 12px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  white-space: nowrap;
+}
+
+.dia-editavel-corpo {
+  padding: 0 14px 16px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.dia-editavel-corpo.hidden {
+  display: none !important;
+}
+
+.dia-corrida-card-editavel.is-open .dia-editavel-resumo {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(124, 58, 237, 0.05));
+}
+
+@media (max-width: 650px) {
+  .card-minha-inscricao .minha-inscricao-banner,
+  .card-minha-inscricao .corrida-card-banner {
+    width: calc(100% + 32px);
+    margin: -16px -16px 18px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .dia-editavel-resumo {
+    grid-template-columns: 1fr;
+  }
+
+  .delete-btn-dia-resumo {
+    width: 100%;
+  }
+}
