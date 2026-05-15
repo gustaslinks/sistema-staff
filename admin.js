@@ -135,6 +135,7 @@ salvarCorridaBtn.addEventListener("click", async function () {
   };
 
   let corridaId = corridaEmEdicaoId;
+  let diasJaSalvos = false;
 
   if (corridaEmEdicaoId) {
     const { error } = await supabaseClient
@@ -150,18 +151,84 @@ salvarCorridaBtn.addEventListener("click", async function () {
       return;
     }
 
-    const { error: erroExcluirDias } = await supabaseClient
+    // Preserva os IDs dos dias já existentes para não quebrar as disponibilidades dos inscritos.
+    const { data: diasExistentes, error: erroBuscarDiasExistentes } = await supabaseClient
       .from("corrida_dias")
-      .delete()
+      .select("id")
       .eq("corrida_id", corridaEmEdicaoId);
 
-    if (erroExcluirDias) {
-      console.error("Erro ao atualizar dias da corrida:", erroExcluirDias);
-      alert("A corrida foi atualizada, mas não foi possível substituir os dias cadastrados.");
+    if (erroBuscarDiasExistentes) {
+      console.error("Erro ao buscar dias existentes da corrida:", erroBuscarDiasExistentes);
+      alert("A corrida foi atualizada, mas não foi possível conferir os dias cadastrados.");
       salvarCorridaBtn.disabled = false;
       salvarCorridaBtn.textContent = "Atualizar corrida";
       return;
     }
+
+    const idsMantidos = diasCadastroCorrida
+      .filter(dia => dia.id)
+      .map(dia => Number(dia.id));
+
+    const idsParaExcluir = (diasExistentes || [])
+      .map(dia => Number(dia.id))
+      .filter(id => !idsMantidos.includes(id));
+
+    if (idsParaExcluir.length > 0) {
+      const { error: erroExcluirDiasRemovidos } = await supabaseClient
+        .from("corrida_dias")
+        .delete()
+        .in("id", idsParaExcluir);
+
+      if (erroExcluirDiasRemovidos) {
+        console.error("Erro ao remover dias excluídos da corrida:", erroExcluirDiasRemovidos);
+        alert("A corrida foi atualizada, mas não foi possível remover alguns dias cadastrados.");
+        salvarCorridaBtn.disabled = false;
+        salvarCorridaBtn.textContent = "Atualizar corrida";
+        return;
+      }
+    }
+
+    for (const dia of diasCadastroCorrida) {
+      const dadosDia = {
+        corrida_id: corridaId,
+        nome: dia.nome,
+        data_dia: dia.data_dia,
+        horario_inicio: dia.horario_inicio || null,
+        horario_fim: dia.horario_fim || null,
+        tipo: dia.tipo || null,
+        valor_ajuda_custo: dia.valor_ajuda_custo,
+        vagas: 0
+      };
+
+      if (dia.id) {
+        const { error: erroAtualizarDia } = await supabaseClient
+          .from("corrida_dias")
+          .update(dadosDia)
+          .eq("id", dia.id);
+
+        if (erroAtualizarDia) {
+          console.error("Erro ao atualizar dia da corrida:", erroAtualizarDia);
+          alert("A corrida foi atualizada, mas não foi possível atualizar um dos dias cadastrados.");
+          salvarCorridaBtn.disabled = false;
+          salvarCorridaBtn.textContent = "Atualizar corrida";
+          return;
+        }
+      } else {
+        const { error: erroInserirDia } = await supabaseClient
+          .from("corrida_dias")
+          .insert(dadosDia);
+
+        if (erroInserirDia) {
+          console.error("Erro ao inserir novo dia da corrida:", erroInserirDia);
+          alert("A corrida foi atualizada, mas não foi possível inserir um novo dia cadastrado.");
+          salvarCorridaBtn.disabled = false;
+          salvarCorridaBtn.textContent = "Atualizar corrida";
+          return;
+        }
+      }
+    }
+
+    diasJaSalvos = true;
   } else {
     const { data: corridaCriada, error } = await supabaseClient
       .from("corridas")
@@ -183,7 +250,7 @@ salvarCorridaBtn.addEventListener("click", async function () {
     corridaId = corridaCriada.id;
   }
 
-  if (diasCadastroCorrida.length > 0) {
+  if (!diasJaSalvos && diasCadastroCorrida.length > 0) {
     const diasParaInserir = diasCadastroCorrida.map(dia => ({
       corrida_id: corridaId,
       nome: dia.nome,
@@ -538,6 +605,7 @@ async function carregarCorridaParaEdicao(corridaId) {
   corridaObservacoes.value = corrida.observacoes || OBSERVACOES_PADRAO;
 
   diasCadastroCorrida = (dias || []).map(dia => ({
+    id: dia.id,
     nome: dia.nome,
     data_dia: dia.data_dia,
     horario_inicio: dia.horario_inicio,
@@ -1290,9 +1358,11 @@ function filtrarInscritosAdmin(areaInscritos) {
       filtroStatus === "todos" ||
       filtroStatus === status ||
       (filtroStatus === "pendente" && (status === "inscrito" || status === "pendente"));
+    const semTipoVinculado = !temKit && !temCorrida;
     const passaTipo =
       (tipoKitAtivo && temKit) ||
-      (tipoCorridaAtivo && temCorrida);
+      (tipoCorridaAtivo && temCorrida) ||
+      (tipoKitAtivo && tipoCorridaAtivo && semTipoVinculado);
 
     linha.classList.toggle("hidden", !(passaBusca && passaStatus && passaTipo));
   });
