@@ -5593,3 +5593,21 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
   color: #2563eb !important;
   border: 1px solid rgba(37, 99, 235, .16) !important;
 }
+
+/* Versão visível do pacote */
+.version-badge {
+  position: fixed;
+  top: 8px;
+  right: 10px;
+  z-index: 9999;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, .18);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}

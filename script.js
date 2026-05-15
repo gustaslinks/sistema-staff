@@ -436,6 +436,59 @@ form.addEventListener('change', () => {
   if (modoEdicao) refreshSubmitState();
 });
 
+
+function normalizarNumeroCalcadoValor(valor){
+  if (valor === null || valor === undefined || valor === '') return null;
+  const numero = Number(valor);
+  return Number.isFinite(numero) ? numero : null;
+}
+
+function confirmarNumeroCalcado(cadastroSalvo, numeroEsperado){
+  if (!cadastroSalvo) return false;
+  return normalizarNumeroCalcadoValor(cadastroSalvo.numero_calcado) === normalizarNumeroCalcadoValor(numeroEsperado);
+}
+
+async function atualizarCadastroExistente(dadosCadastro){
+  const idsParaTentar = [];
+
+  if (staffIdInput && staffIdInput.value) idsParaTentar.push(staffIdInput.value);
+  if (staffAtualEdicao && staffAtualEdicao.id) idsParaTentar.push(staffAtualEdicao.id);
+  if (staffIdEdicao) idsParaTentar.push(staffIdEdicao);
+  if (staffLogadoEdicao && staffLogadoEdicao.id) idsParaTentar.push(staffLogadoEdicao.id);
+
+  const idsUnicos = [...new Set(idsParaTentar.filter(Boolean).map(String))];
+
+  for (const id of idsUnicos) {
+    const resultado = await supabaseClient
+      .from('staffs')
+      .update(dadosCadastro)
+      .eq('id', id)
+      .select('*')
+      .maybeSingle();
+
+    if (resultado.error) throw resultado.error;
+    if (resultado.data) return resultado.data;
+  }
+
+  const cpfOriginal = staffCpfOriginalInput && staffCpfOriginalInput.value ? staffCpfOriginalInput.value : (staffAtualEdicao && staffAtualEdicao.cpf ? staffAtualEdicao.cpf : cpf.value);
+  const nascimentoOriginal = staffNascimentoOriginalInput && staffNascimentoOriginalInput.value ? staffNascimentoOriginalInput.value : (staffAtualEdicao && staffAtualEdicao.data_nascimento ? staffAtualEdicao.data_nascimento : dateToDatabase(nascimento.value));
+
+  if (cpfOriginal && nascimentoOriginal) {
+    const resultadoFallback = await supabaseClient
+      .from('staffs')
+      .update(dadosCadastro)
+      .eq('cpf', cpfOriginal)
+      .eq('data_nascimento', nascimentoOriginal)
+      .select('*')
+      .maybeSingle();
+
+    if (resultadoFallback.error) throw resultadoFallback.error;
+    if (resultadoFallback.data) return resultadoFallback.data;
+  }
+
+  throw new Error('Não foi possível localizar o cadastro para atualização. Faça login novamente e tente outra vez.');
+}
+
 form.addEventListener('submit',async function(event){
   event.preventDefault();
   successMessage.style.display='none';
