@@ -1494,20 +1494,17 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
         </label>
 
         <button type="button" class="botao-expandir-inscrito" aria-label="Ver detalhes">
-          ▸
+          <svg class="icone-expandir-inscrito" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
         </button>
 
         <div class="linha-inscrito-nome">
-          <div class="linha-inscrito-nome-topo">
-            <strong>${escapeHtml(staff.nome_completo || "Nome não informado")}</strong>
-
-            <div class="linha-inscrito-icones" aria-label="Tipos de disponibilidade">
-              <span class="icone-tipo-dia ${possuiEntregaKit ? "ativo" : "inativo"}" title="Entrega de kit">📦</span>
-              <span class="icone-tipo-dia ${possuiDiaCorrida ? "ativo" : "inativo"}" title="Dia da corrida">🏁</span>
-            </div>
-          </div>
-
+          <strong>${escapeHtml(staff.nome_completo || "Nome não informado")}</strong>
           <small>${textoQuantidadeDias}</small>
+        </div>
+
+        <div class="linha-inscrito-icones" aria-label="Tipos de disponibilidade">
+          <span class="icone-tipo-dia ${possuiEntregaKit ? "ativo" : "inativo"}" title="Entrega de kit">📦</span>
+          <span class="icone-tipo-dia ${possuiDiaCorrida ? "ativo" : "inativo"}" title="Dia da corrida">🏁</span>
         </div>
 
         <span class="admin-status-inscricao ${status}">
