@@ -4362,3 +4362,271 @@ body{background:linear-gradient(180deg,#f7f8fc 0%,#eef2f8 42%,#f8fafc 100%);}
     padding: 14px 16px !important;
   }
 }
+
+/* v143 - acabamento relatórios, checkbox mobile e atalhos flutuantes */
+.admin-card-footer .relatorios-admin,
+.admin-card-footer-v128 .relatorios-admin {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  margin-top: 4px !important;
+}
+
+.botao-relatorios-toggle {
+  width: 100% !important;
+  min-height: 56px !important;
+  border: none !important;
+  border-radius: 18px !important;
+  padding: 15px 18px !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  font-size: 15px !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #2563eb 55%, #0891b2 100%) !important;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, .24) !important;
+}
+
+.relatorios-painel {
+  margin-top: 12px !important;
+  padding: 16px !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(99, 102, 241, .18) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, .10) !important;
+}
+
+.relatorios-label {
+  margin-bottom: 10px !important;
+  color: #334155 !important;
+  font-size: 13px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.relatorios-formato-toggle,
+.relatorios-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.relatorio-formato-opcao,
+.relatorio-acao {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-height: 52px !important;
+  padding: 12px 10px !important;
+  border: 1px solid #dbe4f0 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  color: #172033 !important;
+  font-size: 14px !important;
+  font-weight: 850 !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .06) !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+.relatorio-formato-opcao.ativo {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  box-shadow: 0 12px 26px rgba(79, 70, 229, .26) !important;
+}
+
+.relatorio-acao:hover,
+.relatorio-formato-opcao:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, .10) !important;
+}
+
+.relatorio-feedback.ativo {
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+}
+
+.form-admin .field-checkbox-admin,
+.form-admin .field-ate-ultimo,
+.grid .field-checkbox-admin,
+.grid-dia-editavel .field-checkbox-admin {
+  display: block !important;
+  width: 100% !important;
+}
+
+.form-admin .field-checkbox-admin > label.checkbox-admin-card,
+.form-admin .field-checkbox-admin > label.checkbox-admin-inline,
+.grid .field-checkbox-admin > label.checkbox-admin-card,
+.grid-dia-editavel .field-checkbox-admin > label.checkbox-admin-card,
+.field-checkbox-admin > label.checkbox-admin-card.checkbox-admin-inline {
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr) !important;
+  align-items: center !important;
+  column-gap: 12px !important;
+  row-gap: 0 !important;
+  width: 100% !important;
+  min-height: 64px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+}
+
+.form-admin .field-checkbox-admin > label.checkbox-admin-card > input[type="checkbox"],
+.form-admin .field-checkbox-admin > label.checkbox-admin-inline > input[type="checkbox"],
+.grid .field-checkbox-admin > label.checkbox-admin-card > input[type="checkbox"],
+.grid-dia-editavel .field-checkbox-admin > label.checkbox-admin-card > input[type="checkbox"],
+.field-checkbox-admin > label.checkbox-admin-card.checkbox-admin-inline > input[type="checkbox"],
+#corrida-patrocinador-tenis,
+#novo-dia-ate-ultimo {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  position: static !important;
+  display: block !important;
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 5px !important;
+  flex: none !important;
+  transform: none !important;
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+}
+
+.form-admin .field-checkbox-admin > label.checkbox-admin-card > span,
+.form-admin .field-checkbox-admin > label.checkbox-admin-inline > span,
+.grid .field-checkbox-admin > label.checkbox-admin-card > span,
+.grid-dia-editavel .field-checkbox-admin > label.checkbox-admin-card > span,
+.field-checkbox-admin > label.checkbox-admin-card.checkbox-admin-inline > span {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  display: block !important;
+  margin: 0 !important;
+  min-width: 0 !important;
+}
+
+.field-checkbox-admin > label.checkbox-admin-card.checkbox-admin-inline strong {
+  display: block !important;
+  margin: 0 !important;
+  line-height: 1.25 !important;
+}
+
+.floating-calendar-btn,
+.floating-yescom-btn {
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  border-radius: 999px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 23px !important;
+  gap: 0 !important;
+}
+
+.floating-calendar-btn span:not(:first-child) {
+  display: none !important;
+}
+
+.floating-yescom-btn {
+  position: fixed !important;
+  right: 94px !important;
+  bottom: 24px !important;
+  z-index: 999 !important;
+  border: none !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
+  box-shadow: 0 14px 28px rgba(15, 118, 110, .28) !important;
+  cursor: pointer !important;
+}
+
+.floating-yescom-modal.hidden { display: none !important; }
+.floating-yescom-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1001 !important;
+}
+.floating-yescom-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, .46) !important;
+}
+.floating-yescom-box {
+  position: relative !important;
+  width: min(1040px, calc(100vw - 28px)) !important;
+  height: min(760px, calc(100vh - 52px)) !important;
+  margin: 26px auto !important;
+  background: #ffffff !important;
+  border-radius: 22px !important;
+  box-shadow: 0 28px 70px rgba(15, 23, 42, .34) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+.floating-yescom-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  padding: 16px 18px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+.floating-yescom-header h2 { margin: 0 !important; font-size: 20px !important; color: #172033 !important; }
+.floating-yescom-frame {
+  width: 100% !important;
+  flex: 1 1 auto !important;
+  border: 0 !important;
+  background: #ffffff !important;
+}
+.floating-yescom-help {
+  margin: 0 !important;
+  padding: 10px 16px 4px !important;
+  font-size: 12px !important;
+  color: #64748b !important;
+}
+.floating-yescom-link {
+  margin: 0 16px 14px !important;
+  display: inline-flex !important;
+  align-self: flex-start !important;
+  padding: 10px 14px !important;
+  border-radius: 999px !important;
+  background: #eef2ff !important;
+  color: #3730a3 !important;
+  font-weight: 800 !important;
+  text-decoration: none !important;
+}
+
+@media (max-width: 720px) {
+  .relatorios-formato-toggle,
+  .relatorios-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .relatorio-formato-opcao,
+  .relatorio-acao {
+    min-height: 50px !important;
+    padding: 11px 8px !important;
+    font-size: 13px !important;
+  }
+
+  .floating-calendar-btn {
+    right: 22px !important;
+    bottom: 24px !important;
+  }
+
+  .floating-yescom-btn {
+    right: 90px !important;
+    bottom: 24px !important;
+  }
+
+  .floating-yescom-box {
+    width: calc(100vw - 20px) !important;
+    height: calc(100vh - 38px) !important;
+    margin: 19px auto !important;
+    border-radius: 18px !important;
+  }
+}

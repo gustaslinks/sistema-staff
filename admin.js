@@ -2659,8 +2659,7 @@ async function buscarDadosExportacao(corridaId) {
           cidade,
           email,
           foto_url,
-          chave_pix,
-          calcado
+          chave_pix
         )
       `)
       .eq("corrida_id", corridaId)
@@ -3232,7 +3231,7 @@ function ativarBotoesRelatoriosAdmin() {
 }
 
 async function buscarInscricoesExportacaoComFallback(corridaId) {
-  const colunasStaff = "id, nome_completo, cpf, rg, telefone, cidade, email, foto_url, chave_pix, calcado";
+  const colunasStaff = "id, nome_completo, cpf, rg, telefone, cidade, email, foto_url, chave_pix";
   const consultaComRelacao = await supabaseClient
     .from("inscricoes")
     .select(`

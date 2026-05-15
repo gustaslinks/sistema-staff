@@ -1,6 +1,7 @@
 (function () {
   const WHATSAPP_NUMBER = "5511986238604";
   const WHATSAPP_TEXT = "Olá, tenho uma dúvida sobre o cadastro/inscrição no Sistema Staff.";
+  const YESCOM_URL = "https://www.yescom.com.br/site/calendario.html";
 
   const meses = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -50,7 +51,7 @@
     botao.type = "button";
     botao.className = "floating-calendar-btn";
     botao.setAttribute("aria-label", "Abrir calendário");
-    botao.innerHTML = `<span aria-hidden="true">📅</span><span>Calendário</span>`;
+    botao.innerHTML = `<span aria-hidden="true">📅</span>`;
 
     const modal = document.createElement("div");
     modal.className = "floating-calendar-modal hidden";
