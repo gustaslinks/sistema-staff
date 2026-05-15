@@ -1466,16 +1466,8 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
   });
   const linkWhatsappConfirmacao = criarLinkWhatsapp(staff.telefone, mensagemWhatsappConfirmacao);
   const botaoWhatsappConfirmacao = status === "confirmado" && linkWhatsappConfirmacao
-    ? `<a class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-confirmado" href="${escapeHtml(linkWhatsappConfirmacao)}" target="_blank" rel="noopener" title="Enviar WhatsApp de confirmação" aria-label="Enviar WhatsApp de confirmação"><svg class="icone-whatsapp-oficial" viewBox="0 0 32 32" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <path d="M16.02 3.35C9.07 3.35 3.43 8.88 3.43 15.68c0 2.18.59 4.3 1.7 6.16L3.38 28.65l7.05-1.78a12.9 12.9 0 0 0 5.59 1.27c6.95 0 12.6-5.53 12.6-12.34S22.97 3.35 16.02 3.35Z" fill="white"/>
-  <path d="M16.02 5.24c5.88 0 10.66 4.7 10.66 10.47 0 5.78-4.78 10.48-10.66 10.48-1.78 0-3.53-.44-5.08-1.27l-.36-.2-4.15 1.05 1.02-3.95-.24-.39a10.25 10.25 0 0 1-1.84-5.72c0-5.77 4.78-10.47 10.65-10.47Z" fill="#20C263"/>
-  <path d="M12.5 10.15c-.25-.55-.51-.57-.75-.58h-.64c-.22 0-.58.08-.88.4-.3.33-1.16 1.1-1.16 2.7 0 1.58 1.19 3.12 1.35 3.34.16.22 2.3 3.58 5.7 4.88 2.82 1.08 3.4.86 4.02.8.61-.05 1.98-.78 2.26-1.54.28-.76.28-1.4.2-1.54-.08-.14-.3-.22-.64-.38-.33-.16-1.98-.95-2.29-1.06-.3-.1-.52-.16-.75.16-.22.33-.86 1.06-1.05 1.28-.2.22-.39.24-.72.08-.33-.16-1.4-.5-2.67-1.61-.99-.86-1.65-1.93-1.84-2.26-.2-.32-.02-.5.15-.66.15-.14.33-.38.5-.57.16-.19.22-.32.33-.54.11-.22.06-.41-.03-.57-.08-.16-.73-1.73-1.09-2.33Z" fill="white"/>
-</svg></a>`
-    : `<button type="button" class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-bloqueado" disabled title="WhatsApp liberado após confirmar" aria-label="WhatsApp liberado após confirmar"><svg class="icone-whatsapp-oficial" viewBox="0 0 32 32" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <path d="M16.02 3.35C9.07 3.35 3.43 8.88 3.43 15.68c0 2.18.59 4.3 1.7 6.16L3.38 28.65l7.05-1.78a12.9 12.9 0 0 0 5.59 1.27c6.95 0 12.6-5.53 12.6-12.34S22.97 3.35 16.02 3.35Z" fill="white"/>
-  <path d="M16.02 5.24c5.88 0 10.66 4.7 10.66 10.47 0 5.78-4.78 10.48-10.66 10.48-1.78 0-3.53-.44-5.08-1.27l-.36-.2-4.15 1.05 1.02-3.95-.24-.39a10.25 10.25 0 0 1-1.84-5.72c0-5.77 4.78-10.47 10.65-10.47Z" fill="#20C263"/>
-  <path d="M12.5 10.15c-.25-.55-.51-.57-.75-.58h-.64c-.22 0-.58.08-.88.4-.3.33-1.16 1.1-1.16 2.7 0 1.58 1.19 3.12 1.35 3.34.16.22 2.3 3.58 5.7 4.88 2.82 1.08 3.4.86 4.02.8.61-.05 1.98-.78 2.26-1.54.28-.76.28-1.4.2-1.54-.08-.14-.3-.22-.64-.38-.33-.16-1.98-.95-2.29-1.06-.3-.1-.52-.16-.75.16-.22.33-.86 1.06-1.05 1.28-.2.22-.39.24-.72.08-.33-.16-1.4-.5-2.67-1.61-.99-.86-1.65-1.93-1.84-2.26-.2-.32-.02-.5.15-.66.15-.14.33-.38.5-.57.16-.19.22-.32.33-.54.11-.22.06-.41-.03-.57-.08-.16-.73-1.73-1.09-2.33Z" fill="white"/>
-</svg></button>`;
+    ? `<a class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-confirmado" href="${escapeHtml(linkWhatsappConfirmacao)}" target="_blank" rel="noopener" title="Enviar WhatsApp de confirmação" aria-label="Enviar WhatsApp de confirmação"><svg class="icone-whatsapp-outline" viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.2 11.8a8.1 8.1 0 0 1-12 7.1L4 20l1.15-4.05A8.1 8.1 0 1 1 20.2 11.8Z"/><path d="M8.95 8.35c.22-.45.42-.48.7-.48h.48c.17 0 .42.05.62.47.22.48.72 1.65.78 1.78.07.15.04.32-.06.5-.12.18-.18.3-.35.48-.15.16-.31.35-.13.64.18.3.8 1.32 1.72 2.02 1.18.9 2.05 1.18 2.38 1.03.32-.14.75-.87.95-1.16.2-.3.4-.25.67-.14.28.1 1.78.82 2.08.97.3.15.5.22.57.35.07.13.07.78-.16 1.43-.23.65-1.36 1.24-1.9 1.29-.52.05-1.2.23-3.9-.86-3.29-1.32-5.35-4.52-5.5-4.72-.15-.2-1.32-1.72-1.32-3.28 0-1.56.82-2.32 1.1-2.64.28-.31.6-.4.8-.4Z"/></svg></a>`
+    : `<button type="button" class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-bloqueado" disabled title="WhatsApp liberado após confirmar" aria-label="WhatsApp liberado após confirmar"><svg class="icone-whatsapp-outline" viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.2 11.8a8.1 8.1 0 0 1-12 7.1L4 20l1.15-4.05A8.1 8.1 0 1 1 20.2 11.8Z"/><path d="M8.95 8.35c.22-.45.42-.48.7-.48h.48c.17 0 .42.05.62.47.22.48.72 1.65.78 1.78.07.15.04.32-.06.5-.12.18-.18.3-.35.48-.15.16-.31.35-.13.64.18.3.8 1.32 1.72 2.02 1.18.9 2.05 1.18 2.38 1.03.32-.14.75-.87.95-1.16.2-.3.4-.25.67-.14.28.1 1.78.82 2.08.97.3.15.5.22.57.35.07.13.07.78-.16 1.43-.23.65-1.36 1.24-1.9 1.29-.52.05-1.2.23-3.9-.86-3.29-1.32-5.35-4.52-5.5-4.72-.15-.2-1.32-1.72-1.32-3.28 0-1.56.82-2.32 1.1-2.64.28-.31.6-.4.8-.4Z"/></svg></button>`;
 
   return `
     <article
@@ -2726,8 +2718,6 @@ function formatarDataCurtaParaMensagem(valor) {
 }
 
 function formatarDiaParaMensagem(dia) {
-  const tipoBase = dia.tipo || dia.nome || "Dia";
-  const tipo = ehTipoEntregaKit(tipoBase) ? "Entrega de kit" : ehTipoDiaCorrida(tipoBase) ? "Corrida" : tipoBase;
   const data = formatarDataCurtaParaMensagem(dia.data_dia);
   const diaSemana = dia.data_dia ? obterDiaSemana(dia.data_dia) : "dia a confirmar";
   const horario = formatarHorarioPeriodo(dia.horario_inicio, dia.horario_fim);
@@ -2738,12 +2728,46 @@ function formatarDiaParaMensagem(dia) {
   ].join("\n");
 }
 
+function agruparDiasConfirmacaoWhatsapp(dias) {
+  const diasKit = [];
+  const diasCorrida = [];
+  const diasOutros = [];
+
+  (dias || []).forEach(dia => {
+    const tipoBase = dia.tipo || dia.nome || "";
+    if (ehTipoEntregaKit(tipoBase)) {
+      diasKit.push(dia);
+    } else if (ehTipoDiaCorrida(tipoBase)) {
+      diasCorrida.push(dia);
+    } else {
+      diasOutros.push(dia);
+    }
+  });
+
+  return { diasKit, diasCorrida, diasOutros };
+}
+
+function montarBlocoDiasWhatsapp(titulo, emoji, dias) {
+  if (!dias || !dias.length) return "";
+
+  return [
+    "────────────────────",
+    `${emoji} ${titulo}`,
+    "────────────────────",
+    dias.map(formatarDiaParaMensagem).join("\n\n")
+  ].join("\n");
+}
+
 function gerarMensagemConfirmacaoWhatsapp({ staff, corrida, dias }) {
   const nome = staff && staff.nome_completo ? staff.nome_completo.split(" ")[0] : "tudo bem";
   const diasUnicos = removerDiasDuplicados(dias || []);
-  const diasTexto = diasUnicos.length
-    ? diasUnicos.map(formatarDiaParaMensagem).join("\n────────────────────\n")
-    : "• Dias/horários: conferir com a organização.";
+  const grupos = agruparDiasConfirmacaoWhatsapp(diasUnicos);
+  const blocosDias = [
+    montarBlocoDiasWhatsapp("Entrega de kit", "📦", grupos.diasKit),
+    montarBlocoDiasWhatsapp("Corrida", "🏁", grupos.diasCorrida),
+    montarBlocoDiasWhatsapp("Outros dias", "📌", grupos.diasOutros)
+  ].filter(Boolean).join("\n\n");
+  const diasTexto = blocosDias || "• Dias/horários: conferir com a organização.";
   const valorTotal = diasUnicos.reduce((total, dia) => total + Number(dia.valor_ajuda_custo || 0), 0);
   const valorTexto = valorTotal > 0 ? formatarMoeda(valorTotal) : "conforme dias confirmados";
   const observacoes = corrida && corrida.observacoes
@@ -2766,6 +2790,7 @@ function gerarMensagemConfirmacaoWhatsapp({ staff, corrida, dias }) {
     `📌 Observações importantes:\n${observacoes}`,
     "",
     `💳 Pagamento: será feito via Pix na chave escolhida no seu cadastro (${formatarPixParaMensagem(staff)}).`,
+    "",
     "",
     "Se essa chave Pix estiver antiga, incorreta ou for de uma conta sem acesso, revise seu cadastro antes do evento ou avise a organização.",
     "",

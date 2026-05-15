@@ -5868,3 +5868,134 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 
 /* v165 */
 .gerenciar-dias .dia-editavel-resumo * { border-color: transparent !important; }
+
+
+/* v166 - refinamento real dos botões rápidos e dias editáveis */
+.linha-inscrito-acoes-rapidas {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  margin-top: 2px !important;
+  padding: 0 !important;
+}
+
+.linha-inscrito-principal .admin-status-inscricao {
+  margin-bottom: 2px !important;
+}
+
+.botao-acao-inscrito,
+.linha-inscrito-acoes .botao-acao-inscrito,
+.botao-whatsapp-inscrito.botao-acao-inscrito {
+  width: 100% !important;
+  height: 32px !important;
+  min-width: 0 !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border-radius: 10px !important;
+  border: 1.5px solid currentColor !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.botao-acao-inscrito:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, .08) !important;
+}
+
+.botao-confirmar-inscrito.botao-acao-inscrito {
+  color: #16a34a !important;
+  background: transparent !important;
+}
+
+.botao-lista-espera-inscrito.botao-acao-inscrito {
+  color: #2563eb !important;
+  background: transparent !important;
+}
+
+.botao-cancelar-inscrito.botao-acao-inscrito {
+  color: #dc2626 !important;
+  background: transparent !important;
+}
+
+.botao-whatsapp-confirmado.botao-acao-inscrito {
+  color: #16a34a !important;
+  background: transparent !important;
+}
+
+.botao-whatsapp-bloqueado.botao-acao-inscrito,
+.botao-whatsapp-bloqueado.botao-acao-inscrito:disabled {
+  color: #9ca3af !important;
+  background: transparent !important;
+  opacity: .55 !important;
+}
+
+.icone-acao-svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor !important;
+  stroke-width: 3 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: none !important;
+}
+
+.icone-whatsapp-outline {
+  width: 19px !important;
+  height: 19px !important;
+  display: block !important;
+  stroke: currentColor !important;
+  stroke-width: 1.85 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: none !important;
+}
+
+.linha-inscrito-acoes-rapidas .botao-acao-inscrito:disabled:not(.botao-whatsapp-bloqueado) {
+  opacity: .38 !important;
+  background: transparent !important;
+}
+
+.gerenciar-dias .dia-corrida-card-editavel,
+.gerenciar-dias .dia-corrida-card-editavel.is-open {
+  background: #ffffff !important;
+  background-image: none !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, .05) !important;
+}
+
+.gerenciar-dias .dia-corrida-card-editavel .dia-editavel-resumo,
+.gerenciar-dias .dia-corrida-card-editavel.is-open .dia-editavel-resumo,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle,
+.gerenciar-dias .dia-corrida-card-editavel.is-open .dia-resumo-toggle,
+.gerenciar-dias .dia-editavel-resumo,
+.gerenciar-dias .dia-resumo-toggle {
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.gerenciar-dias .dia-editavel-resumo::before,
+.gerenciar-dias .dia-editavel-resumo::after,
+.gerenciar-dias .dia-resumo-toggle::before,
+.gerenciar-dias .dia-resumo-toggle::after {
+  display: none !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+@media (max-width: 520px) {
+  .linha-inscrito-acoes-rapidas {
+    gap: 7px !important;
+    margin-top: 2px !important;
+  }
+
+  .botao-acao-inscrito,
+  .linha-inscrito-acoes .botao-acao-inscrito,
+  .botao-whatsapp-inscrito.botao-acao-inscrito {
+    height: 32px !important;
+    min-height: 32px !important;
+    border-radius: 10px !important;
+  }
+}
