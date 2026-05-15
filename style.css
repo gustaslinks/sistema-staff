@@ -3165,3 +3165,89 @@ button.floating-calendar-day {
     width: 100% !important;
   }
 }
+
+
+/* =========================================================
+   AJUSTES V131 - CARD ADMIN LOGADO E VAGAS ATUALIZADAS
+========================================================= */
+
+.pagina-admin .card-staff {
+  grid-template-columns: auto minmax(0, 1fr) minmax(230px, auto) !important;
+}
+
+.admin-card-acoes-logado {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-items: center;
+  min-width: 250px;
+}
+
+.admin-card-acao,
+.pagina-admin .admin-card-acao.logout-btn {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+  font-size: 12.5px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  text-align: center !important;
+  cursor: pointer;
+}
+
+.admin-card-acao-perfil,
+.admin-card-acao-corridas {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.admin-card-acao-perfil:hover,
+.admin-card-acao-corridas:hover {
+  background: #e2e8f0 !important;
+}
+
+.pagina-admin .admin-card-acao-sair.logout-btn {
+  background: #fee2e2 !important;
+  border-color: #fecaca !important;
+  color: #991b1b !important;
+}
+
+.pagina-admin .admin-card-acao-sair.logout-btn:hover {
+  background: #fecaca !important;
+}
+
+@media (max-width: 760px) {
+  .pagina-admin .card-staff {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+  }
+
+  .admin-card-acoes-logado {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-card-acao,
+  .pagina-admin .admin-card-acao.logout-btn {
+    min-height: 36px !important;
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+  }
+}
+
+.pagina-admin .admin-card-acoes-logado .logout-btn {
+  grid-column: auto !important;
+}
+
+@media (max-width: 700px) {
+  .pagina-admin .admin-card-acoes-logado .logout-btn {
+    grid-column: auto !important;
+    width: 100% !important;
+  }
+}

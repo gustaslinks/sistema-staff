@@ -213,7 +213,7 @@ salvarCorridaBtn.addEventListener("click", async function () {
   salvarCorridaBtn.disabled = false;
   salvarCorridaBtn.textContent = "Salvar corrida";
 
-  carregarCorridasAdmin();
+  await carregarCorridasAdmin();
 });
 
 
@@ -753,12 +753,12 @@ async function carregarInscritosDaCorrida(
 
   const { data: corridaAtual } = await supabaseClient
     .from("corridas")
-    .select("id, nome, vagas")
+    .select("id, nome, vagas_total")
     .eq("id", corridaIdNumerico)
     .single();
 
-  const totalVagasCorrida = corridaAtual && corridaAtual.vagas
-    ? Number(corridaAtual.vagas)
+  const totalVagasCorrida = corridaAtual && corridaAtual.vagas_total
+    ? Number(corridaAtual.vagas_total)
     : 0;
 
   const { data: diasCorrida, error: erroDiasCorrida } =
@@ -1300,7 +1300,7 @@ async function atualizarResumoCorridaCard(corridaId) {
 
   const { data: corrida, error: erroCorrida } = await supabaseClient
     .from("corridas")
-    .select("id, status, vagas")
+    .select("id, status, vagas_total")
     .eq("id", Number(corridaId))
     .maybeSingle();
 
@@ -1321,7 +1321,7 @@ async function atualizarResumoCorridaCard(corridaId) {
 
   const totalInscritos = contarInscritosValidos(inscricoes || [], Number(corridaId));
   const confirmadosCorrida = contarInscritosPorStatus(inscricoes || [], Number(corridaId), "confirmado");
-  const vagasTotal = Number(corrida.vagas || 0);
+  const vagasTotal = Number(corrida.vagas_total || 0);
   const percentualVagas = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
   const classeProgresso = obterClasseProgressoVagas(percentualVagas);
   const textoVagas = vagasTotal > 0
@@ -2822,6 +2822,15 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
 // INICIALIZAÇÃO
 inserirEstilosPrioridadeAdmin();
 carregarCorridasAdmin();
+
+const editarPerfilAdminBtn = document.getElementById("editarPerfilAdminBtn");
+
+if (editarPerfilAdminBtn) {
+  editarPerfilAdminBtn.addEventListener("click", function () {
+    const idAdmin = staffLogado && staffLogado.id ? `&id=${encodeURIComponent(staffLogado.id)}` : "";
+    window.location.href = `cadastro.html?editar=1${idAdmin}`;
+  });
+}
 
 const abrirCorridasBtn = document.getElementById("abrir-corridas-btn");
 
