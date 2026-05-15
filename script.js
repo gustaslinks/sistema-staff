@@ -57,7 +57,12 @@ const botaoCorridasCadastro = document.getElementById('botao-corridas-cadastro')
 const botaoSairCadastro = document.getElementById('botao-sair-cadastro');
 
 function renderizarCardLogadoCadastro(){
-  if(!cardStaffCadastro || !staffLogadoEdicao) return;
+  if(!cardStaffCadastro) return;
+
+  if(!modoEdicao || !staffLogadoEdicao){
+    cardStaffCadastro.classList.add('hidden');
+    return;
+  }
 
   cardStaffCadastro.classList.remove('hidden');
 

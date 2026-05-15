@@ -531,7 +531,7 @@ async function carregarCorridasAdmin() {
             class="botao-toggle-dias"
             data-corrida-id="${corrida.id}"
           >
-            Mostrar dias cadastrados
+            <span class="btn-ico">📅</span><span>Mostrar dias cadastrados</span>
           </button>
 
           <div id="dias-corrida-${corrida.id}" class="dias-corrida-container hidden"></div>
@@ -543,7 +543,7 @@ async function carregarCorridasAdmin() {
             class="botao-editar-corrida botao-admin-secundario"
             data-corrida-id="${corrida.id}"
           >
-            Editar corrida
+            <span class="btn-ico">✏️</span><span>Editar corrida</span>
           </button>
 
           <button
@@ -551,7 +551,7 @@ async function carregarCorridasAdmin() {
             data-corrida-id="${corrida.id}"
             data-total-inscritos="${totalInscritos}"
           >
-            Excluir corrida
+            <span class="btn-ico">🗑️</span><span>Excluir corrida</span>
           </button>
 
           <div class="relatorios-admin" data-corrida-id="${corrida.id}" data-formato="pdf">
@@ -561,7 +561,7 @@ async function carregarCorridasAdmin() {
               data-corrida-id="${corrida.id}"
               aria-expanded="false"
             >
-              Relatórios / Impressão
+              <span class="btn-ico">📄</span><span>Relatórios / Impressão</span>
             </button>
 
             <div class="relatorios-painel hidden" id="relatorios-painel-${corrida.id}">
@@ -607,7 +607,7 @@ async function carregarCorridasAdmin() {
             class="botao-ver-inscritos"
             data-corrida-id="${corrida.id}"
           >
-            Ver inscritos
+            <span class="btn-ico">👥</span><span>Ver inscritos</span>
           </button>
 
         </div>
@@ -1149,6 +1149,10 @@ async function carregarInscritosDaCorrida(
         </div>
       </div>
 
+      <div class="admin-inscritos-contagem-exibidos" aria-live="polite">
+        Exibindo 0 de ${inscricoesComPrioridade.length} inscritos
+      </div>
+
       <div class="admin-inscritos-acoes-massa admin-inscritos-acoes-v127">
         <label class="admin-selecionar-exibidos">
           <input type="checkbox" class="checkbox-selecionar-exibidos">
@@ -1448,7 +1452,11 @@ function filtrarInscritosAdmin(areaInscritos) {
   const tipoKitAtivo = !!areaInscritos.querySelector('.admin-toggle-tipo[data-tipo="kit"].ativo');
   const tipoCorridaAtivo = !!areaInscritos.querySelector('.admin-toggle-tipo[data-tipo="corrida"].ativo');
 
+  let totalLinhas = 0;
+  let totalExibidos = 0;
+
   areaInscritos.querySelectorAll(".linha-inscrito-admin").forEach(linha => {
+    totalLinhas += 1;
     const nome = linha.dataset.nome || "";
     const status = linha.dataset.status || "";
     const temKit = linha.dataset.temKit === "1";
@@ -1465,8 +1473,15 @@ function filtrarInscritosAdmin(areaInscritos) {
       (tipoCorridaAtivo && temCorrida) ||
       (tipoKitAtivo && tipoCorridaAtivo && semTipoVinculado);
 
-    linha.classList.toggle("hidden", !(passaBusca && passaStatus && passaTipo));
+    const exibido = passaBusca && passaStatus && passaTipo;
+    linha.classList.toggle("hidden", !exibido);
+    if (exibido) totalExibidos += 1;
   });
+
+  const contadorExibidos = areaInscritos.querySelector(".admin-inscritos-contagem-exibidos");
+  if (contadorExibidos) {
+    contadorExibidos.textContent = `Exibindo ${totalExibidos} de ${totalLinhas} inscritos`;
+  }
 }
 
 function atualizarContadorSelecao(areaInscritos, totalVagasCorrida) {

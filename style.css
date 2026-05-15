@@ -4830,3 +4830,61 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
     bottom: 24px !important;
   }
 }
+
+/* =====================================================
+   V146 - Ajustes visuais e operacionais
+   ===================================================== */
+
+/* Cadeado sempre com fundo branco; o card mantém cor por status */
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto {
+  background: #ffffff !important;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14) !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto.acao-encerrar {
+  background: #ffffff !important;
+  border-color: #86efac !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto.acao-abrir {
+  background: #ffffff !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Ícones nos botões dos cards */
+.admin-card-footer-v128 button,
+.gerenciar-dias .botao-toggle-dias,
+.relatorios-admin .botao-relatorios-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.btn-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15em;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+/* Quantidade exibida nos filtros de inscritos */
+.admin-inscritos-contagem-exibidos {
+  margin: 14px 0 10px;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  color: #475569;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* Novo cadastro não deve reservar espaço visual para card logado */
+.card-staff-cadastro.hidden {
+  display: none !important;
+}
