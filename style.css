@@ -5480,3 +5480,116 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
     padding-right: 52px !important;
   }
 }
+
+/* v156 - correções finais: semáforo sem disco branco, cabeçalho padronizado e dias editáveis */
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  right: 24px !important;
+  top: 24px !important;
+  overflow: visible !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto::before,
+.botao-alterar-status-corrida.botao-status-compacto::after,
+.botao-status-compacto::before,
+.botao-status-compacto::after {
+  display: none !important;
+  content: none !important;
+}
+
+.status-semaforo-indicador {
+  display: block !important;
+  position: relative !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.45), 0 7px 16px rgba(15,23,42,.18) !important;
+}
+
+.status-semaforo-indicador.status-aberto {
+  background: #18d957 !important;
+}
+
+.status-semaforo-indicador.status-fechado {
+  background: #ff1f35 !important;
+}
+
+.status-semaforo-indicador.status-aberto::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -6px !important;
+  width: auto !important;
+  height: auto !important;
+  left: -6px !important;
+  top: -6px !important;
+  border-radius: 999px !important;
+  background: rgba(24,217,87,.18) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  animation: statusPulseVerde 1.8s ease-out infinite !important;
+}
+
+.status-semaforo-indicador.status-fechado::after {
+  display: none !important;
+  content: none !important;
+}
+
+.status-semaforo-texto {
+  display: none !important;
+}
+
+/* Padroniza cabeçalhos de admin/corridas: botão do meio sempre roxo */
+.pagina-corridas .admin-card-acao-perfil,
+.pagina-admin .admin-card-acao-perfil,
+.card-staff-cadastro .admin-card-acao-perfil {
+  background: linear-gradient(135deg, #5b3df5, #8b2ff5) !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  box-shadow: 0 14px 28px rgba(91, 61, 245, .22) !important;
+}
+
+.pagina-corridas .admin-card-acao-corridas,
+.pagina-admin .admin-card-acao-corridas,
+.card-staff-cadastro .admin-card-acao-corridas {
+  background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  box-shadow: 0 14px 28px rgba(20, 184, 166, .20) !important;
+}
+
+/* Corrige resumo fechado dos dias no formulário de edição */
+.dia-corrida-card-editavel .dia-resumo-toggle,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle,
+.dia-corrida-card .dia-resumo-toggle {
+  background: linear-gradient(135deg, #eef6ff, #f8fbff) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(148, 163, 184, .22) !important;
+  box-shadow: none !important;
+}
+
+.dia-corrida-card-editavel .dia-resumo-toggle strong,
+.dia-corrida-card-editavel .dia-resumo-toggle span,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle strong,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle span {
+  color: #0f172a !important;
+}
+
+.dia-corrida-card-editavel .dia-toggle-ico,
+.gerenciar-dias .dia-corrida-card-editavel .dia-toggle-ico {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  border: 1px solid rgba(37, 99, 235, .16) !important;
+}
