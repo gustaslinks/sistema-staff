@@ -578,7 +578,13 @@ function obterClasseProgressoVagas(percentual) {
 
 function corridaPossuiPatrocinioTenis(corrida) {
   if (!corrida) return false;
-  return corrida.possui_patrocinio_tenis === true || corridaPossuiPatrocinioTenis(corrida);
+
+  return (
+    corrida.possui_patrocinio_tenis === true ||
+    corrida.possui_patrocinio_tenis === "true" ||
+    corrida.possui_patrocinador_tenis === true ||
+    corrida.possui_patrocinador_tenis === "true"
+  );
 }
 
 
