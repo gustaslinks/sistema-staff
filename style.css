@@ -5870,7 +5870,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 .gerenciar-dias .dia-editavel-resumo * { border-color: transparent !important; }
 
 
-/* v168 - refinamento real dos botões rápidos e dias editáveis */
+/* v169 - refinamento real dos botões rápidos e dias editáveis */
 .linha-inscrito-acoes-rapidas {
   width: 100% !important;
   display: grid !important;
@@ -6001,7 +6001,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 }
 
 
-/* v168 - refinamento do card de inscritos: espaçamento e seta */
+/* v169 - refinamento do card de inscritos: espaçamento e seta */
 .linha-inscrito-principal {
   column-gap: 9px !important;
   row-gap: 6px !important;
@@ -6085,7 +6085,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 }
 
 
-/* v168 - ajuste real do card de inscritos: nome/dias próximos e seta refinada */
+/* v169 - ajuste real do card de inscritos: nome/dias próximos e seta refinada */
 .linha-inscrito-principal {
   display: grid !important;
   grid-template-columns: auto auto minmax(0, 1fr) auto !important;
@@ -6175,4 +6175,24 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
   .linha-inscrito-nome strong { font-size: 15px !important; line-height: 1.06 !important; }
   .linha-inscrito-nome small { font-size: 12px !important; line-height: 1.08 !important; }
   .botao-expandir-inscrito { width: 28px !important; height: 28px !important; min-width: 28px !important; }
+}
+
+
+/* v169 - mantém a seta SVG estilizada após abrir/fechar card */
+.linha-inscrito-admin.is-collapsed .icone-expandir-inscrito {
+  transform: rotate(0deg) !important;
+}
+
+.linha-inscrito-admin.is-expanded .icone-expandir-inscrito,
+.linha-inscrito-admin:not(.is-collapsed) .icone-expandir-inscrito {
+  transform: rotate(90deg) !important;
+}
+
+.botao-expandir-inscrito {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+.botao-expandir-inscrito svg {
+  display: block !important;
 }

@@ -1471,7 +1471,7 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
 
   return `
     <article
-      class="linha-inscrito-admin"
+      class="linha-inscrito-admin is-collapsed"
       data-inscricao-id="${inscricao.id}"
       data-corrida-id="${corridaId}"
       data-status="${status}"
@@ -1640,8 +1640,13 @@ function ativarControlesInscritosAdmin(areaInscritos, corridaId, totalVagasCorri
     botao.addEventListener("click", () => {
       const linha = botao.closest(".linha-inscrito-admin");
       const detalhes = linha.querySelector(".linha-inscrito-detalhes");
-      detalhes.classList.toggle("hidden");
-      botao.textContent = detalhes.classList.contains("hidden") ? "▸" : "▾";
+      if (!linha || !detalhes) return;
+
+      const fechado = detalhes.classList.toggle("hidden");
+      linha.classList.toggle("is-collapsed", fechado);
+      linha.classList.toggle("is-expanded", !fechado);
+      botao.setAttribute("aria-expanded", String(!fechado));
+      botao.setAttribute("aria-label", fechado ? "Ver detalhes" : "Ocultar detalhes");
     });
   });
 
