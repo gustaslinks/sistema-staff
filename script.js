@@ -448,45 +448,142 @@ function confirmarNumeroCalcado(cadastroSalvo, numeroEsperado){
   return normalizarNumeroCalcadoValor(cadastroSalvo.numero_calcado) === normalizarNumeroCalcadoValor(numeroEsperado);
 }
 
-async function atualizarCadastroExistente(dadosCadastro){
-  const idsParaTentar = [];
+function coletarCandidatosBuscaCadastro(dadosCadastro){
+  const candidatos = [];
+  const adicionar = (origem, campo, valor) => {
+    if (valor !== null && valor !== undefined && String(valor).trim() !== '') {
+      candidatos.push({ origem, campo, valor: String(valor).trim() });
+    }
+  };
 
-  if (staffIdInput && staffIdInput.value) idsParaTentar.push(staffIdInput.value);
-  if (staffAtualEdicao && staffAtualEdicao.id) idsParaTentar.push(staffAtualEdicao.id);
-  if (staffIdEdicao) idsParaTentar.push(staffIdEdicao);
-  if (staffLogadoEdicao && staffLogadoEdicao.id) idsParaTentar.push(staffLogadoEdicao.id);
+  adicionar('campo oculto', 'id', staffIdInput && staffIdInput.value);
+  adicionar('cadastro carregado', 'id', staffAtualEdicao && staffAtualEdicao.id);
+  adicionar('url/localStorage', 'id', staffIdEdicao);
+  adicionar('sessão', 'id', staffLogadoEdicao && staffLogadoEdicao.id);
+  adicionar('url', 'id', staffIdUrlEdicao);
 
-  const idsUnicos = [...new Set(idsParaTentar.filter(Boolean).map(String))];
+  adicionar('cpf original', 'cpf_nascimento', JSON.stringify({
+    cpf: staffCpfOriginalInput && staffCpfOriginalInput.value,
+    nascimento: staffNascimentoOriginalInput && staffNascimentoOriginalInput.value
+  }));
 
-  for (const id of idsUnicos) {
-    const resultado = await supabaseClient
+  adicionar('cadastro carregado', 'cpf_nascimento', JSON.stringify({
+    cpf: staffAtualEdicao && staffAtualEdicao.cpf,
+    nascimento: staffAtualEdicao && staffAtualEdicao.data_nascimento
+  }));
+
+  adicionar('sessão', 'cpf_nascimento', JSON.stringify({
+    cpf: staffLogadoEdicao && staffLogadoEdicao.cpf,
+    nascimento: staffLogadoEdicao && staffLogadoEdicao.data_nascimento
+  }));
+
+  adicionar('formulário', 'cpf_nascimento', JSON.stringify({
+    cpf: dadosCadastro && dadosCadastro.cpf,
+    nascimento: dadosCadastro && dadosCadastro.data_nascimento
+  }));
+
+  return candidatos;
+}
+
+async function localizarCadastroParaAtualizacao(dadosCadastro){
+  const candidatos = coletarCandidatosBuscaCadastro(dadosCadastro);
+  const idsTentados = new Set();
+  const combosTentados = new Set();
+
+  for (const candidato of candidatos) {
+    if (candidato.campo !== 'id') continue;
+    const id = String(candidato.valor || '').trim();
+    if (!id || idsTentados.has(id)) continue;
+    idsTentados.add(id);
+
+    const busca = await supabaseClient
       .from('staffs')
-      .update(dadosCadastro)
+      .select('*')
       .eq('id', id)
-      .select('*')
       .maybeSingle();
 
-    if (resultado.error) throw resultado.error;
-    if (resultado.data) return resultado.data;
+    if (busca.error) throw busca.error;
+    if (busca.data) return busca.data;
   }
 
-  const cpfOriginal = staffCpfOriginalInput && staffCpfOriginalInput.value ? staffCpfOriginalInput.value : (staffAtualEdicao && staffAtualEdicao.cpf ? staffAtualEdicao.cpf : cpf.value);
-  const nascimentoOriginal = staffNascimentoOriginalInput && staffNascimentoOriginalInput.value ? staffNascimentoOriginalInput.value : (staffAtualEdicao && staffAtualEdicao.data_nascimento ? staffAtualEdicao.data_nascimento : dateToDatabase(nascimento.value));
+  for (const candidato of candidatos) {
+    if (candidato.campo !== 'cpf_nascimento') continue;
 
-  if (cpfOriginal && nascimentoOriginal) {
-    const resultadoFallback = await supabaseClient
+    let payload = null;
+    try { payload = JSON.parse(candidato.valor); } catch (error) { payload = null; }
+    if (!payload || !payload.cpf || !payload.nascimento) continue;
+
+    const cpfBusca = String(payload.cpf).trim();
+    const nascimentoBusca = String(payload.nascimento).trim();
+    const chave = `${cpfBusca}|${nascimentoBusca}`;
+    if (combosTentados.has(chave)) continue;
+    combosTentados.add(chave);
+
+    const busca = await supabaseClient
       .from('staffs')
-      .update(dadosCadastro)
-      .eq('cpf', cpfOriginal)
-      .eq('data_nascimento', nascimentoOriginal)
       .select('*')
+      .eq('cpf', cpfBusca)
+      .eq('data_nascimento', nascimentoBusca)
       .maybeSingle();
 
-    if (resultadoFallback.error) throw resultadoFallback.error;
-    if (resultadoFallback.data) return resultadoFallback.data;
+    if (busca.error) throw busca.error;
+    if (busca.data) return busca.data;
   }
 
-  throw new Error('Não foi possível localizar o cadastro para atualização. Faça login novamente e tente outra vez.');
+  if (dadosCadastro && dadosCadastro.email) {
+    const buscaEmail = await supabaseClient
+      .from('staffs')
+      .select('*')
+      .eq('email', dadosCadastro.email)
+      .maybeSingle();
+
+    if (buscaEmail.error) throw buscaEmail.error;
+    if (buscaEmail.data) return buscaEmail.data;
+  }
+
+  return null;
+}
+
+async function atualizarCadastroExistente(dadosCadastro){
+  const cadastroEncontrado = await localizarCadastroParaAtualizacao(dadosCadastro);
+
+  if (!cadastroEncontrado || !cadastroEncontrado.id) {
+    console.warn('Cadastro não localizado para atualização.', {
+      staffIdInput: staffIdInput && staffIdInput.value,
+      staffAtualEdicao,
+      staffIdEdicao,
+      staffLogadoEdicao,
+      cpfFormulario: dadosCadastro && dadosCadastro.cpf,
+      nascimentoFormulario: dadosCadastro && dadosCadastro.data_nascimento
+    });
+    throw new Error('Não foi possível localizar o cadastro para atualização. Faça login novamente e tente outra vez.');
+  }
+
+  const atualizacao = await supabaseClient
+    .from('staffs')
+    .update(dadosCadastro)
+    .eq('id', cadastroEncontrado.id)
+    .select('*')
+    .maybeSingle();
+
+  if (atualizacao.error) throw atualizacao.error;
+
+  if (atualizacao.data) {
+    return atualizacao.data;
+  }
+
+  const releitura = await supabaseClient
+    .from('staffs')
+    .select('*')
+    .eq('id', cadastroEncontrado.id)
+    .maybeSingle();
+
+  if (releitura.error) throw releitura.error;
+  if (!releitura.data) {
+    throw new Error('Cadastro atualizado, mas não foi possível reler os dados salvos. Recarregue a página e tente novamente.');
+  }
+
+  return releitura.data;
 }
 
 form.addEventListener('submit',async function(event){
