@@ -753,7 +753,7 @@ async function carregarInscritosDaCorrida(
 
   const { data: corridaAtual } = await supabaseClient
     .from("corridas")
-    .select("id, nome, vagas_total")
+    .select("id, nome, data_corrida, data_inicio, data_fim, local, prazo_inscricao, observacoes, vagas_total")
     .eq("id", corridaIdNumerico)
     .single();
 
@@ -837,7 +837,10 @@ async function carregarInscritosDaCorrida(
         id,
         nome,
         data_dia,
-        tipo
+        tipo,
+        horario_inicio,
+        horario_fim,
+        valor_ajuda_custo
       )
     `)
     .in("inscricao_id", inscricaoIds);
@@ -997,7 +1000,8 @@ async function carregarInscritosDaCorrida(
         ${inscricoesComPrioridade.map(inscricao => gerarLinhaInscritoAdmin(
           inscricao,
           corridaIdNumerico,
-          totalDiasCorrida
+          totalDiasCorrida,
+          corridaAtual
         )).join("")}
       </div>
     </div>
@@ -1006,7 +1010,7 @@ async function carregarInscritosDaCorrida(
   ativarControlesInscritosAdmin(areaInscritos, corridaIdNumerico, totalVagasCorrida);
 }
 
-function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
+function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corridaAtual) {
   const staff = inscricao.staffs || {};
   const diasDisponiveis = inscricao.diasDisponiveis || [];
   const status = inscricao.statusNormalizado;
@@ -1026,6 +1030,15 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
           ? "kit-e-corrida"
           : "sem-tipo";
   const fotoUrl = staff.foto_url || "";
+  const mensagemWhatsappConfirmacao = gerarMensagemConfirmacaoWhatsapp({
+    staff,
+    corrida: corridaAtual || {},
+    dias: diasDisponiveis
+  });
+  const linkWhatsappConfirmacao = criarLinkWhatsapp(staff.telefone, mensagemWhatsappConfirmacao);
+  const botaoWhatsappConfirmacao = linkWhatsappConfirmacao
+    ? `<a class="botao-whatsapp-inscrito" href="${escapeHtml(linkWhatsappConfirmacao)}" target="_blank" rel="noopener">WhatsApp confirmação</a>`
+    : `<button type="button" class="botao-whatsapp-inscrito" disabled>Sem WhatsApp</button>`;
 
   return `
     <article
@@ -1119,6 +1132,8 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
             >
               Cancelar
             </button>
+
+            ${status === "confirmado" ? botaoWhatsappConfirmacao : ""}
           </div>
         </div>
 
@@ -2209,19 +2224,129 @@ function montarPagamentosPix(dadosExportacao) {
         txid
       });
 
+      const tipoPix = identificarTipoPix(staff);
+      const mensagemPagamentoWhatsapp = gerarMensagemPagamentoWhatsapp({
+        staff,
+        corrida: dadosExportacao.corrida || {},
+        dias,
+        valorTotal,
+        tipoPix,
+        chavePix: chavePixQRCode || staff.chave_pix || ""
+      });
+      const linkWhatsappPagamento = criarLinkWhatsapp(staff.telefone, mensagemPagamentoWhatsapp);
+
       return {
         inscricao_id: inscrito.inscricao_id,
         staff,
         dias,
-        tipoPix: identificarTipoPix(staff),
+        tipoPix,
         chavePixQRCode,
         valorTotal,
-        payloadPix
+        payloadPix,
+        linkWhatsappPagamento
       };
     })
     .sort((a, b) => (a.staff.nome_completo || "").localeCompare(b.staff.nome_completo || "", "pt-BR"));
 
   return confirmados;
+}
+
+
+function normalizarTelefoneWhatsapp(telefone) {
+  let numero = String(telefone || "").replace(/\D/g, "");
+
+  if (!numero) return "";
+
+  if (numero.length === 10 || numero.length === 11) {
+    numero = `55${numero}`;
+  }
+
+  if (!numero.startsWith("55") && numero.length >= 10) {
+    numero = `55${numero}`;
+  }
+
+  return numero;
+}
+
+function criarLinkWhatsapp(telefone, mensagem) {
+  const numero = normalizarTelefoneWhatsapp(telefone);
+  if (!numero || !mensagem) return "";
+  return `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+}
+
+function formatarPixParaMensagem(staff) {
+  const tipoPix = identificarTipoPix(staff);
+  const chavePix = staff && staff.chave_pix ? staff.chave_pix : "não informada";
+  return `${tipoPix}: ${chavePix}`;
+}
+
+function formatarDiaParaMensagem(dia) {
+  const nome = dia.nome || dia.tipo || "Dia";
+  const data = dia.data_dia ? formatarData(dia.data_dia) : "data não informada";
+  const horario = formatarHorarioPeriodo(dia.horario_inicio, dia.horario_fim);
+  const ajuda = dia.valor_ajuda_custo !== null && dia.valor_ajuda_custo !== undefined
+    ? formatarMoeda(dia.valor_ajuda_custo)
+    : "não informada";
+
+  return `• ${nome} — ${data} — ${horario}\n  Ajuda de custo: ${ajuda}`;
+}
+
+function gerarMensagemConfirmacaoWhatsapp({ staff, corrida, dias }) {
+  const nome = staff && staff.nome_completo ? staff.nome_completo.split(" ")[0] : "tudo bem";
+  const diasUnicos = removerDiasDuplicados(dias || []);
+  const diasTexto = diasUnicos.length
+    ? diasUnicos.map(formatarDiaParaMensagem).join("\n")
+    : "• Dias/horários: conferir com a organização.";
+  const valorTotal = diasUnicos.reduce((total, dia) => total + Number(dia.valor_ajuda_custo || 0), 0);
+  const valorTexto = valorTotal > 0 ? formatarMoeda(valorTotal) : "conforme dias confirmados";
+  const observacoes = corrida && corrida.observacoes
+    ? String(corrida.observacoes).trim()
+    : OBSERVACOES_PADRAO;
+  const local = corrida && corrida.local ? corrida.local : "local a confirmar";
+
+  return [
+    `Olá, ${nome}! Tudo bem?`,
+    "",
+    `Sua participação foi CONFIRMADA para: ${corrida.nome || "a corrida"}.`,
+    "",
+    `📍 Local:\n${local}`,
+    "",
+    "📅 Dias/horários confirmados:",
+    diasTexto,
+    "",
+    `💰 Ajuda de custo prevista: ${valorTexto}`,
+    "",
+    `📌 Observações importantes:\n${observacoes}`,
+    "",
+    `💳 Pagamento: será feito via Pix na chave escolhida no seu cadastro (${formatarPixParaMensagem(staff)}).`,
+    "Se essa chave Pix estiver antiga, incorreta ou for de uma conta sem acesso, revise seu cadastro antes do evento ou avise a organização.",
+    "",
+    "O pagamento normalmente é realizado no dia posterior à corrida.",
+    "",
+    "Qualquer dúvida, me chama por aqui."
+  ].join("\n");
+}
+
+function gerarMensagemPagamentoWhatsapp({ staff, corrida, dias, valorTotal, tipoPix, chavePix }) {
+  const nome = staff && staff.nome_completo ? staff.nome_completo.split(" ")[0] : "tudo bem";
+  const diasUnicos = removerDiasDuplicados(dias || []);
+  const diasTexto = diasUnicos.length
+    ? diasUnicos.map(formatarDiaParaMensagem).join("\n")
+    : "• Dias trabalhados conforme confirmação da organização.";
+
+  return [
+    `Olá, ${nome}! Tudo bem?`,
+    "",
+    `O pagamento referente à ${corrida.nome || "corrida"} foi realizado via Pix.`,
+    "",
+    `💰 Valor pago: ${formatarMoeda(valorTotal)}`,
+    `💳 Chave Pix utilizada: ${tipoPix || "Pix"}: ${chavePix || "não informada"}`,
+    "",
+    "📅 Referente aos dias:",
+    diasTexto,
+    "",
+    "Obrigado pela participação."
+  ].join("\n");
 }
 
 function garantirBibliotecaQRCode() {
@@ -2280,7 +2405,7 @@ async function exportarRelatorioPagamentoPix(corridaId) {
     for (let index = 0; index < pagamentos.length; index++) {
       const pagamento = pagamentos[index];
       const staff = pagamento.staff || {};
-      const alturaBloco = 66;
+      const alturaBloco = 74;
 
       if (y + alturaBloco > pageHeight - 12) {
         doc.addPage();
@@ -2316,6 +2441,18 @@ async function exportarRelatorioPagamentoPix(corridaId) {
       doc.setFontSize(8);
       doc.setFont(undefined, "normal");
       doc.text("Pago: (   ) Sim    (   ) Não", x + 5, y + 59);
+
+      if (pagamento.linkWhatsappPagamento) {
+        doc.setFillColor(220, 252, 231);
+        doc.setDrawColor(34, 197, 94);
+        doc.roundedRect(x + 5, y + 63, 45, 7, 2, 2, "FD");
+        doc.setTextColor(22, 101, 52);
+        doc.setFont(undefined, "bold");
+        doc.text("Enviar WhatsApp", x + 27.5, y + 67.8, { align: "center" });
+        doc.link(x + 5, y + 63, 45, 7, { url: pagamento.linkWhatsappPagamento });
+        doc.setTextColor(0, 0, 0);
+        doc.setFont(undefined, "normal");
+      }
 
       if (qrDataUrl) {
         doc.addImage(qrDataUrl, "PNG", x + largura - 50, y + 8, 42, 42);

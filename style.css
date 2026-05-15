@@ -3354,3 +3354,30 @@ button.floating-calendar-day {
     grid-template-columns: 1fr;
   }
 }
+
+/* v133 - WhatsApp operacional */
+.botao-whatsapp-inscrito {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 9px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.botao-whatsapp-inscrito:hover {
+  background: #bbf7d0;
+}
+
+.botao-whatsapp-inscrito:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
