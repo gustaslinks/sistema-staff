@@ -691,7 +691,8 @@ async function carregarCorridasAdmin() {
               title="${corrida.status === "aberta" ? "Encerrar inscrições" : "Abrir inscrições"}"
               aria-label="${corrida.status === "aberta" ? "Encerrar inscrições" : "Abrir inscrições"}"
             >
-              ${corrida.status === "aberta" ? "🔒" : "🔓"}
+              <span class="status-semaforo-indicador ${corrida.status === "aberta" ? "status-aberto" : "status-fechado"}" aria-hidden="true"></span>
+              <span class="status-semaforo-texto">${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições fechadas"}</span>
             </button>
           </div>
 
@@ -1131,7 +1132,7 @@ function ativarBotoesStatusCorrida() {
       if (!confirmar) return;
 
       botao.disabled = true;
-      botao.textContent = "↻";
+      botao.innerHTML = `<span class="status-semaforo-carregando" aria-hidden="true">↻</span><span class="status-semaforo-texto">Atualizando</span>`;
 
       const { error } = await supabaseClient
         .from("corridas")
@@ -1149,7 +1150,7 @@ function ativarBotoesStatusCorrida() {
         );
 
         botao.disabled = false;
-        botao.textContent = statusAtual === "aberta" ? "🔒" : "🔓";
+        botao.innerHTML = `<span class="status-semaforo-indicador ${statusAtual === "aberta" ? "status-aberto" : "status-fechado"}" aria-hidden="true"></span><span class="status-semaforo-texto">${statusAtual === "aberta" ? "Inscrições abertas" : "Inscrições fechadas"}</span>`;
 
         return;
       }
