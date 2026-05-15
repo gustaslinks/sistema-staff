@@ -116,7 +116,7 @@ if (novoDiaAteUltimo) {
 }
 
 if (corridaBannerInput) {
-  corridaBannerInput.addEventListener("change", function () {
+  corridaBannerInput.addEventListener("change", async function () {
     const arquivo = corridaBannerInput.files && corridaBannerInput.files[0] ? corridaBannerInput.files[0] : null;
 
     if (!arquivo) return;
@@ -127,16 +127,19 @@ if (corridaBannerInput) {
       return;
     }
 
-    if (arquivo.size > 1024 * 1024) {
-      alert("O banner deve ter até 1 MB. Exporte a imagem mais leve antes de enviar.");
+    try {
+      atualizarPreviewBannerCorrida(null);
+      corridaBannerArquivo = await otimizarBannerCorrida(arquivo);
+      corridaBannerRemovido = false;
+      const urlPreview = URL.createObjectURL(corridaBannerArquivo);
+      const tamanhoMb = (corridaBannerArquivo.size / (1024 * 1024)).toFixed(2).replace(".", ",");
+      atualizarPreviewBannerCorrida(urlPreview, `Novo banner otimizado • ${tamanhoMb} MB`);
+    } catch (erro) {
+      console.error("Erro ao otimizar banner:", erro);
+      alert("Não foi possível otimizar o banner. Tente outra imagem em JPG, PNG ou WebP.");
       corridaBannerInput.value = "";
-      return;
+      corridaBannerArquivo = null;
     }
-
-    corridaBannerArquivo = arquivo;
-    corridaBannerRemovido = false;
-    const urlPreview = URL.createObjectURL(arquivo);
-    atualizarPreviewBannerCorrida(urlPreview, "Novo banner selecionado");
   });
 }
 
@@ -149,6 +152,72 @@ if (removerBannerCorridaBtn) {
   });
 }
 
+
+
+function canvasParaBlob(canvas, mimeType, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (blob) resolve(blob);
+      else reject(new Error("Falha ao gerar imagem otimizada."));
+    }, mimeType, quality);
+  });
+}
+
+async function carregarImagemParaBanner(arquivo) {
+  const url = URL.createObjectURL(arquivo);
+  try {
+    const img = new Image();
+    img.decoding = "async";
+    img.src = url;
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+    return img;
+  } finally {
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+}
+
+async function otimizarBannerCorrida(arquivo) {
+  const larguraFinal = 1200;
+  const alturaFinal = 675;
+  const limiteBytes = 1024 * 1024;
+  const img = await carregarImagemParaBanner(arquivo);
+  const canvas = document.createElement("canvas");
+  canvas.width = larguraFinal;
+  canvas.height = alturaFinal;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas indisponível no navegador.");
+
+  const escala = Math.max(larguraFinal / img.naturalWidth, alturaFinal / img.naturalHeight);
+  const drawWidth = img.naturalWidth * escala;
+  const drawHeight = img.naturalHeight * escala;
+  const dx = (larguraFinal - drawWidth) / 2;
+  const dy = (alturaFinal - drawHeight) / 2;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, larguraFinal, alturaFinal);
+  ctx.drawImage(img, dx, dy, drawWidth, drawHeight);
+
+  const qualidades = [0.86, 0.8, 0.74, 0.68, 0.62, 0.56];
+  let blobFinal = null;
+  for (const qualidade of qualidades) {
+    const blob = await canvasParaBlob(canvas, "image/webp", qualidade);
+    blobFinal = blob;
+    if (blob.size <= limiteBytes) break;
+  }
+
+  if (!blobFinal) throw new Error("Falha ao otimizar banner.");
+  if (blobFinal.size > limiteBytes) {
+    const blobJpg = await canvasParaBlob(canvas, "image/jpeg", 0.72);
+    if (blobJpg.size < blobFinal.size) blobFinal = blobJpg;
+  }
+
+  const extensao = blobFinal.type === "image/jpeg" ? "jpg" : "webp";
+  return new File([blobFinal], `banner-corrida-1200x675.${extensao}`, { type: blobFinal.type || "image/webp" });
+}
 
 function atualizarPreviewBannerCorrida(url, legenda = "Banner atual") {
   if (!corridaBannerPreview) return;
@@ -171,8 +240,8 @@ function atualizarPreviewBannerCorrida(url, legenda = "Banner atual") {
 
 function obterExtensaoArquivoBanner(arquivo) {
   const tipo = String(arquivo && arquivo.type ? arquivo.type : "").toLowerCase();
-  if (tipo.includes("png")) return "png";
   if (tipo.includes("webp")) return "webp";
+  if (tipo.includes("png")) return "png";
   return "jpg";
 }
 
@@ -3063,7 +3132,7 @@ function montarLinhasExportacao(inscritos, incluirPrioridade = false) {
       RG: staff.rg || "",
       "Celular/Whatsapp": staff.telefone || "",
       "Chave PIX": staff.chave_pix || "",
-      "Calçado": staff.calcado || "",
+      "Calçado": staff.numero_calcado || "",
       "Dias disponíveis": dias
     };
 
@@ -3224,7 +3293,7 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
         staff.rg || "",
         staff.telefone || "",
         staff.chave_pix || "",
-        staff.calcado || ""
+        staff.numero_calcado || ""
       ];
 
       if (incluirPrioridade) {
@@ -3286,7 +3355,7 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
 function agruparTenisPorNumeracao(inscritos) {
   const mapa = {};
   (inscritos || []).forEach(inscrito => {
-    const numero = String((inscrito.staff && inscrito.staff.calcado) || "Não informado");
+    const numero = String((inscrito.staff && inscrito.staff.numero_calcado) || "Não informado");
     mapa[numero] = (mapa[numero] || 0) + 1;
   });
   return Object.entries(mapa)
@@ -3578,7 +3647,7 @@ async function buscarDadosExportacao(corridaId) {
 }
 
 function obterNumeracaoStaff(staff) {
-  return staff && staff.calcado ? String(staff.calcado) : "";
+  return staff && staff.numero_calcado ? String(staff.numero_calcado) : "";
 }
 
 function montarLinhasExportacao(inscritos, incluirPrioridade = false) {

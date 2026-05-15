@@ -478,7 +478,7 @@ form.addEventListener('submit',async function(event){
     if(pixTipo==='telefone') chavePixFinal=telefone.value;
     if(pixTipo==='outro') chavePixFinal=pixOutro.value;
 
-    const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,calcado: calcado ? calcado.value : null,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value || null,foto_url:fotoUrlFinal};
+    const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,numero_calcado: calcado ? (calcado.value ? Number(calcado.value) : null) : null,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value || null,foto_url:fotoUrlFinal};
     let cadastroSalvo = null;
 
     if (modoEdicao) {
@@ -650,6 +650,7 @@ async function iniciarModoEdicao(){
   telefone.value = data.telefone || '';
   email.value = data.email || '';
   cidade.value = data.cidade || '';
+  if (calcado) calcado.value = data.numero_calcado || '';
   indicado.value = data.indicado_por || '';
   observacoes.value = data.observacoes || '';
   fotoAtualUrl = data.foto_url || '';
