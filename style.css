@@ -2411,7 +2411,7 @@ body {
 .admin-card-footer .delete-btn,
 .admin-card-footer .botao-ver-inscritos {
   width: 100% !important;
-  min-height: 44px !important;
+  min-height: 38px !important;
   padding: 10px 12px !important;
   margin: 0 !important;
   border-radius: 13px !important;
@@ -2425,7 +2425,7 @@ body {
 
 .gerenciar-dias .botao-toggle-dias {
   width: 100% !important;
-  min-height: 44px !important;
+  min-height: 38px !important;
   padding: 10px 12px !important;
   border-radius: 13px !important;
 }
@@ -2805,7 +2805,7 @@ button.floating-calendar-day {
 .admin-inscritos-resumo-v127 .resumo-card {
   min-height: 70px !important;
   padding: 10px 8px !important;
-  border-radius: 15px !important;
+  border-radius: 11px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -2844,7 +2844,7 @@ button.floating-calendar-day {
   flex-direction: column !important;
   gap: 10px !important;
   padding: 12px !important;
-  border-radius: 16px !important;
+  border-radius: 12px !important;
   background: #f8fafc !important;
   border: 1px solid #e5e7eb !important;
 }
@@ -2918,7 +2918,7 @@ button.floating-calendar-day {
   gap: 10px !important;
   align-items: center !important;
   padding: 12px !important;
-  border-radius: 16px !important;
+  border-radius: 12px !important;
   background: #ffffff !important;
   border: 1px solid #e5e7eb !important;
 }
@@ -3574,7 +3574,7 @@ button.floating-calendar-day {
   margin: 0 !important;
   padding: 15px 22px !important;
   border: none !important;
-  border-radius: 16px !important;
+  border-radius: 12px !important;
   background: linear-gradient(135deg, #7c3aed, #2563eb) !important;
   color: #ffffff !important;
   box-shadow: 0 14px 32px rgba(37, 99, 235, 0.28);
@@ -4385,7 +4385,7 @@ body{background:linear-gradient(180deg,#f7f8fc 0%,#eef2f8 42%,#f8fafc 100%);}
 }
 
 .relatorios-painel {
-  margin-top: 12px !important;
+  margin-top: 6px !important;
   padding: 16px !important;
   border-radius: 22px !important;
   border: 1px solid rgba(99, 102, 241, .18) !important;
@@ -4418,7 +4418,7 @@ body{background:linear-gradient(180deg,#f7f8fc 0%,#eef2f8 42%,#f8fafc 100%);}
   min-height: 52px !important;
   padding: 12px 10px !important;
   border: 1px solid #dbe4f0 !important;
-  border-radius: 16px !important;
+  border-radius: 12px !important;
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
   color: #172033 !important;
   font-size: 14px !important;
@@ -4438,7 +4438,7 @@ body{background:linear-gradient(180deg,#f7f8fc 0%,#eef2f8 42%,#f8fafc 100%);}
 .relatorio-acao:hover,
 .relatorio-formato-opcao:hover {
   transform: translateY(-1px) !important;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, .10) !important;
+  box-shadow: none !important;
 }
 
 .relatorio-feedback.ativo {
@@ -4682,7 +4682,7 @@ body{background:linear-gradient(180deg,#f7f8fc 0%,#eef2f8 42%,#f8fafc 100%);}
 .relatorio-formato-opcao,
 .relatorio-acao {
   border: 1px solid rgba(148, 163, 184, .45) !important;
-  border-radius: 16px !important;
+  border-radius: 12px !important;
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
   box-shadow: 0 10px 22px rgba(15, 23, 42, .08) !important;
   color: #172033 !important;
@@ -4972,7 +4972,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 
 .floating-whatsapp-icon {
   width: 44px !important;
-  height: 44px !important;
+  height: 38px !important;
   background: rgba(255, 255, 255, 0.2) !important;
   font-size: 25px !important;
 }
@@ -5701,7 +5701,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
   min-height: 48px !important;
   padding-top: 10px !important;
   padding-bottom: 10px !important;
-  border-radius: 16px !important;
+  border-radius: 12px !important;
 }
 
 .card-corrida-admin .botao-ver-inscritos,
@@ -5756,19 +5756,19 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
   justify-content: stretch !important;
   align-items: stretch !important;
   padding: 0 !important;
-  margin-top: 12px !important;
+  margin-top: 6px !important;
 }
 
 .botao-acao-inscrito,
 .linha-inscrito-acoes .botao-acao-inscrito,
 .botao-whatsapp-inscrito.botao-acao-inscrito {
   width: 100% !important;
-  height: 44px !important;
+  height: 38px !important;
   min-width: 0 !important;
-  min-height: 44px !important;
-  border-radius: 16px !important;
-  border: 1px solid rgba(255,255,255,.45) !important;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, .10) !important;
+  min-height: 38px !important;
+  border-radius: 12px !important;
+  border: 2px solid currentColor !important;
+  box-shadow: none !important;
   transition: transform .16s ease, box-shadow .16s ease, filter .16s ease !important;
 }
 
@@ -5795,23 +5795,23 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 }
 
 .botao-confirmar-inscrito.botao-acao-inscrito {
-  background: linear-gradient(135deg, #bbf7d0, #22c55e) !important;
-  color: #065f46 !important;
+  background: transparent !important;
+  color: #16a34a !important;
 }
 
 .botao-lista-espera-inscrito.botao-acao-inscrito {
-  background: linear-gradient(135deg, #dbeafe, #60a5fa) !important;
-  color: #1e3a8a !important;
+  background: transparent !important;
+  color: #2563eb !important;
 }
 
 .botao-cancelar-inscrito.botao-acao-inscrito {
-  background: linear-gradient(135deg, #fee2e2, #ef4444) !important;
-  color: #991b1b !important;
+  background: transparent !important;
+  color: #dc2626 !important;
 }
 
 .botao-whatsapp-confirmado.botao-acao-inscrito {
-  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
-  color: #ffffff !important;
+  background: transparent !important;
+  color: #16a34a !important;
 }
 
 .botao-whatsapp-bloqueado.botao-acao-inscrito,
@@ -5859,8 +5859,12 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
   .linha-inscrito-acoes .botao-acao-inscrito,
   .botao-whatsapp-inscrito.botao-acao-inscrito {
     width: 100% !important;
-    height: 40px !important;
-    min-height: 40px !important;
-    border-radius: 15px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    border-radius: 11px !important;
   }
 }
+
+
+/* v165 */
+.gerenciar-dias .dia-editavel-resumo * { border-color: transparent !important; }

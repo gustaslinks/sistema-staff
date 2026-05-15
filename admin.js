@@ -2733,7 +2733,6 @@ function formatarDiaParaMensagem(dia) {
   const horario = formatarHorarioPeriodo(dia.horario_inicio, dia.horario_fim);
 
   return [
-    `• ${tipo}`,
     `${data} — ${diaSemana}`,
     `Horário: ${horario}`
   ].join("\n");
