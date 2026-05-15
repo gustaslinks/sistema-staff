@@ -5611,3 +5611,137 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
   backdrop-filter: blur(8px);
   pointer-events: none;
 }
+
+/* v163 - ações rápidas de inscritos, WhatsApp compacto e ajustes de admin */
+.linha-inscrito-principal {
+  grid-template-columns: auto auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+}
+
+.linha-inscrito-acoes-rapidas {
+  grid-column: 1 / -1;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 10px !important;
+  flex-wrap: nowrap !important;
+}
+
+.botao-acao-inscrito,
+.linha-inscrito-acoes .botao-acao-inscrito,
+.botao-whatsapp-inscrito.botao-acao-inscrito {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, .10) !important;
+}
+
+.botao-confirmar-inscrito.botao-acao-inscrito {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+}
+
+.botao-lista-espera-inscrito.botao-acao-inscrito {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+}
+
+.botao-cancelar-inscrito.botao-acao-inscrito {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+.botao-whatsapp-confirmado {
+  background: #16a34a !important;
+  color: #ffffff !important;
+}
+
+.botao-whatsapp-bloqueado,
+.botao-whatsapp-bloqueado:disabled {
+  background: #e5e7eb !important;
+  color: #9ca3af !important;
+  opacity: .75 !important;
+  cursor: not-allowed !important;
+}
+
+.linha-inscrito-acoes-rapidas .botao-acao-inscrito:disabled {
+  opacity: .42 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+.detalhes-inscrito-header {
+  grid-template-columns: auto minmax(180px, 1fr) !important;
+}
+
+.admin-card-footer,
+.admin-card-footer-v128 {
+  gap: 8px !important;
+}
+
+.admin-card-footer > .relatorios-admin,
+.admin-card-footer-v128 > .relatorios-admin {
+  margin: 0 !important;
+}
+
+.admin-card-footer > .relatorios-admin > .botao-relatorios-toggle,
+.admin-card-footer-v128 > .relatorios-admin > .botao-relatorios-toggle {
+  min-height: 48px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  border-radius: 16px !important;
+}
+
+.card-corrida-admin .botao-ver-inscritos,
+.card-corrida-admin .botao-editar-corrida,
+.card-corrida-admin .delete-btn,
+.card-corrida-admin .botao-toggle-dias {
+  min-height: 48px !important;
+}
+
+.preview-dias-corrida,
+.dia-corrida-card-editavel,
+.dia-corrida-card-editavel.is-open,
+.dia-corrida-card-editavel.is-open .dia-editavel-resumo,
+.dia-corrida-card-editavel .dia-editavel-resumo,
+.gerenciar-dias .dia-corrida-card-editavel,
+.gerenciar-dias .dia-corrida-card-editavel.is-open .dia-editavel-resumo {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+.dia-corrida-card-editavel .dia-resumo-toggle,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle,
+.dia-corrida-card .dia-resumo-toggle {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+@media (max-width: 520px) {
+  .linha-inscrito-acoes-rapidas {
+    justify-content: flex-start !important;
+    padding-left: 58px !important;
+  }
+
+  .botao-acao-inscrito,
+  .linha-inscrito-acoes .botao-acao-inscrito,
+  .botao-whatsapp-inscrito.botao-acao-inscrito {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    font-size: 16px !important;
+  }
+}

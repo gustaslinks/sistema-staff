@@ -1465,9 +1465,9 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
     dias: diasDisponiveis
   });
   const linkWhatsappConfirmacao = criarLinkWhatsapp(staff.telefone, mensagemWhatsappConfirmacao);
-  const botaoWhatsappConfirmacao = linkWhatsappConfirmacao
-    ? `<a class="botao-whatsapp-inscrito" href="${escapeHtml(linkWhatsappConfirmacao)}" target="_blank" rel="noopener">WhatsApp confirmação</a>`
-    : `<button type="button" class="botao-whatsapp-inscrito" disabled>Sem WhatsApp</button>`;
+  const botaoWhatsappConfirmacao = status === "confirmado" && linkWhatsappConfirmacao
+    ? `<a class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-confirmado" href="${escapeHtml(linkWhatsappConfirmacao)}" target="_blank" rel="noopener" title="Enviar WhatsApp de confirmação" aria-label="Enviar WhatsApp de confirmação">💬</a>`
+    : `<button type="button" class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-bloqueado" disabled title="WhatsApp liberado após confirmar" aria-label="WhatsApp liberado após confirmar">💬</button>`;
 
   return `
     <article
@@ -1513,6 +1513,40 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
         <span class="admin-status-inscricao ${status}">
           ${formatarStatusInscricao(status)}
         </span>
+
+        <div class="linha-inscrito-acoes linha-inscrito-acoes-rapidas" aria-label="Ações rápidas da inscrição">
+          <button
+            type="button"
+            class="botao-acao-inscrito botao-confirmar-inscrito"
+            data-inscricao-id="${inscricao.id}"
+            data-corrida-id="${corridaId}"
+            ${status === "confirmado" ? "disabled" : ""}
+            title="Confirmar inscrição"
+            aria-label="Confirmar inscrição"
+          >✓</button>
+
+          <button
+            type="button"
+            class="botao-acao-inscrito botao-lista-espera-inscrito"
+            data-inscricao-id="${inscricao.id}"
+            data-corrida-id="${corridaId}"
+            ${status === "lista_espera" ? "disabled" : ""}
+            title="Colocar em lista de espera"
+            aria-label="Colocar em lista de espera"
+          >⏱</button>
+
+          <button
+            type="button"
+            class="botao-acao-inscrito botao-cancelar-inscrito"
+            data-inscricao-id="${inscricao.id}"
+            data-corrida-id="${corridaId}"
+            ${status === "cancelado" ? "disabled" : ""}
+            title="Cancelar inscrição"
+            aria-label="Cancelar inscrição"
+          >×</button>
+
+          ${botaoWhatsappConfirmacao}
+        </div>
       </div>
 
       <div class="linha-inscrito-detalhes hidden">
@@ -1531,39 +1565,6 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
             </span>
           </div>
 
-          <div class="linha-inscrito-acoes">
-            <button
-              type="button"
-              class="botao-confirmar-inscrito"
-              data-inscricao-id="${inscricao.id}"
-              data-corrida-id="${corridaId}"
-              ${status === "confirmado" ? "disabled" : ""}
-            >
-              Confirmar
-            </button>
-
-            <button
-              type="button"
-              class="botao-lista-espera-inscrito"
-              data-inscricao-id="${inscricao.id}"
-              data-corrida-id="${corridaId}"
-              ${status === "lista_espera" ? "disabled" : ""}
-            >
-              Lista de espera
-            </button>
-
-            <button
-              type="button"
-              class="botao-cancelar-inscrito"
-              data-inscricao-id="${inscricao.id}"
-              data-corrida-id="${corridaId}"
-              ${status === "cancelado" ? "disabled" : ""}
-            >
-              Cancelar
-            </button>
-
-            ${status === "confirmado" ? botaoWhatsappConfirmacao : ""}
-          </div>
         </div>
 
         <div class="detalhes-inscrito-grid">
@@ -1941,9 +1942,10 @@ async function atualizarStatusInscricao(
   );
 
   const textoOriginal = botao.textContent;
+  const ehBotaoIcone = botao.classList && botao.classList.contains("botao-acao-inscrito");
 
   botao.disabled = true;
-  botao.textContent = "Salvando...";
+  botao.textContent = ehBotaoIcone ? "…" : "Salvando...";
 
   const { error } = await supabaseClient
     .from("inscricoes")
@@ -2705,22 +2707,35 @@ function formatarPixParaMensagem(staff) {
   return `${tipoPix}: ${chavePix}`;
 }
 
-function formatarDiaParaMensagem(dia) {
-  const nome = dia.nome || dia.tipo || "Dia";
-  const data = dia.data_dia ? formatarData(dia.data_dia) : "data não informada";
-  const horario = formatarHorarioPeriodo(dia.horario_inicio, dia.horario_fim);
-  const ajuda = dia.valor_ajuda_custo !== null && dia.valor_ajuda_custo !== undefined
-    ? formatarMoeda(dia.valor_ajuda_custo)
-    : "não informada";
+function formatarDataCurtaParaMensagem(valor) {
+  if (!valor) return "data não informada";
+  const texto = String(valor).trim();
+  const iso = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return `${iso[3]}/${iso[2]}`;
+  const br = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (br) return `${br[1]}/${br[2]}`;
+  return formatarData(valor);
+}
 
-  return `• ${nome} — ${data} — ${horario}\n  Ajuda de custo: ${ajuda}`;
+function formatarDiaParaMensagem(dia) {
+  const tipoBase = dia.tipo || dia.nome || "Dia";
+  const tipo = ehTipoEntregaKit(tipoBase) ? "Entrega de kit" : ehTipoDiaCorrida(tipoBase) ? "Corrida" : tipoBase;
+  const data = formatarDataCurtaParaMensagem(dia.data_dia);
+  const diaSemana = dia.data_dia ? obterDiaSemana(dia.data_dia) : "dia a confirmar";
+  const horario = formatarHorarioPeriodo(dia.horario_inicio, dia.horario_fim);
+
+  return [
+    `• ${tipo}`,
+    `${data} — ${diaSemana}`,
+    `Horário: ${horario}`
+  ].join("\n");
 }
 
 function gerarMensagemConfirmacaoWhatsapp({ staff, corrida, dias }) {
   const nome = staff && staff.nome_completo ? staff.nome_completo.split(" ")[0] : "tudo bem";
   const diasUnicos = removerDiasDuplicados(dias || []);
   const diasTexto = diasUnicos.length
-    ? diasUnicos.map(formatarDiaParaMensagem).join("\n")
+    ? diasUnicos.map(formatarDiaParaMensagem).join("\n────────────────────\n")
     : "• Dias/horários: conferir com a organização.";
   const valorTotal = diasUnicos.reduce((total, dia) => total + Number(dia.valor_ajuda_custo || 0), 0);
   const valorTexto = valorTotal > 0 ? formatarMoeda(valorTotal) : "conforme dias confirmados";
@@ -2744,6 +2759,7 @@ function gerarMensagemConfirmacaoWhatsapp({ staff, corrida, dias }) {
     `📌 Observações importantes:\n${observacoes}`,
     "",
     `💳 Pagamento: será feito via Pix na chave escolhida no seu cadastro (${formatarPixParaMensagem(staff)}).`,
+    "",
     "Se essa chave Pix estiver antiga, incorreta ou for de uma conta sem acesso, revise seu cadastro antes do evento ou avise a organização.",
     "",
     "O pagamento normalmente é realizado no dia posterior à corrida.",
