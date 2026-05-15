@@ -1494,7 +1494,7 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
         </label>
 
         <button type="button" class="botao-expandir-inscrito" aria-label="Ver detalhes">
-          <svg class="icone-expandir-inscrito" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+          <svg class="icone-expandir-inscrito" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
 
         <div class="linha-inscrito-nome">

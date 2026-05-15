@@ -6196,3 +6196,35 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 .botao-expandir-inscrito svg {
   display: block !important;
 }
+
+
+/* v170 - seta outline consistente no card de inscritos */
+.botao-expandir-inscrito {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+.botao-expandir-inscrito .icone-expandir-inscrito {
+  width: 15px !important;
+  height: 15px !important;
+  display: block !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.6 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  transform-origin: 50% 50% !important;
+  transition: transform .16s ease !important;
+}
+.botao-expandir-inscrito .icone-expandir-inscrito path {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.6 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+.linha-inscrito-admin.is-collapsed .botao-expandir-inscrito .icone-expandir-inscrito {
+  transform: rotate(0deg) !important;
+}
+.linha-inscrito-admin.is-expanded .botao-expandir-inscrito .icone-expandir-inscrito {
+  transform: rotate(90deg) !important;
+}
