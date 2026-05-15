@@ -4178,3 +4178,187 @@ body{background:linear-gradient(180deg,#f7f8fc 0%,#eef2f8 42%,#f8fafc 100%);}
     line-height: 1.25 !important;
   }
 }
+
+/* v142 - painel de relatórios e correção definitiva dos checkboxes mobile */
+.relatorios-admin {
+  width: 100%;
+  display: block;
+}
+
+.botao-relatorios-toggle {
+  width: 100%;
+}
+
+.relatorios-painel {
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid #dbe4ef;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, .08);
+}
+
+.relatorios-painel.hidden {
+  display: none !important;
+}
+
+.relatorios-secao + .relatorios-secao {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.relatorios-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.relatorios-formato-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.relatorio-formato-opcao,
+.relatorio-acao {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #172033;
+  border-radius: 14px;
+  padding: 11px 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.relatorio-formato-opcao:hover,
+.relatorio-acao:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .10);
+}
+
+.relatorio-formato-opcao.ativo {
+  border-color: #4f46e5;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  color: #312e81;
+  box-shadow: inset 0 0 0 1px rgba(79, 70, 229, .25);
+}
+
+.relatorios-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.relatorio-acao:disabled {
+  opacity: .65;
+  cursor: wait;
+  transform: none;
+}
+
+.relatorio-feedback {
+  display: none;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.relatorio-feedback.ativo {
+  display: block;
+}
+
+.relatorio-feedback.info {
+  color: #334155;
+  background: #f1f5f9;
+}
+
+.relatorio-feedback.sucesso {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.relatorio-feedback.erro {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.field-checkbox-admin,
+.field-ate-ultimo,
+.field-ate-ultimo-inline {
+  display: block !important;
+  align-self: stretch !important;
+}
+
+.field-checkbox-admin > label.checkbox-admin-card,
+.field-checkbox-admin > label.checkbox-admin-inline,
+.checkbox-admin-card.checkbox-admin-card-compacto,
+.checkbox-admin-card.checkbox-admin-inline {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 58px !important;
+  box-sizing: border-box !important;
+}
+
+.field-checkbox-admin > label.checkbox-admin-card input[type="checkbox"],
+.field-checkbox-admin > label.checkbox-admin-inline input[type="checkbox"],
+.checkbox-admin-card.checkbox-admin-inline input[type="checkbox"],
+#novo-dia-ate-ultimo,
+#corrida-patrocinador-tenis {
+  position: static !important;
+  display: inline-block !important;
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  flex: 0 0 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+}
+
+.field-checkbox-admin > label.checkbox-admin-card span,
+.field-checkbox-admin > label.checkbox-admin-inline span,
+.checkbox-admin-card.checkbox-admin-inline span {
+  display: block !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+@media (max-width: 720px) {
+  .relatorios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .relatorio-formato-opcao,
+  .relatorio-acao {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+
+  .field-checkbox-admin > label.checkbox-admin-card,
+  .field-checkbox-admin > label.checkbox-admin-inline,
+  .checkbox-admin-card.checkbox-admin-card-compacto,
+  .checkbox-admin-card.checkbox-admin-inline {
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 14px 16px !important;
+  }
+}
