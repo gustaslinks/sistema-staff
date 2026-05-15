@@ -1724,6 +1724,33 @@ function removerDiaCadastro(index) {
   renderizarPreviewDiasCadastro();
 }
 
+function atualizarCampoDiaCadastro(index, campo, valor) {
+  const dia = diasCadastroCorrida[index];
+  if (!dia) return;
+
+  if (campo === "valor_ajuda_custo") {
+    dia[campo] = valor === "" ? null : Number(valor);
+  } else {
+    dia[campo] = valor || null;
+  }
+
+  if (campo === "tipo" || campo === "data_dia") {
+    const tipo = dia.tipo || "Dia";
+    dia.nome = `${tipo} - ${obterDiaSemana(dia.data_dia)}`;
+  }
+}
+
+function atualizarAteUltimoDiaCadastro(index, marcado) {
+  const dia = diasCadastroCorrida[index];
+  if (!dia) return;
+
+  if (marcado) {
+    dia.horario_fim = null;
+  }
+
+  renderizarPreviewDiasCadastro();
+}
+
 function renderizarPreviewDiasCadastro() {
   if (!previewDiasCorrida) return;
 
@@ -1732,39 +1759,60 @@ function renderizarPreviewDiasCadastro() {
     return;
   }
 
-previewDiasCorrida.innerHTML = diasCadastroCorrida.map((dia, index) => `
-  <div class="dia-corrida-card">
-    <p><strong>${dia.nome}</strong></p>
+  previewDiasCorrida.innerHTML = diasCadastroCorrida.map((dia, index) => {
+    const ateUltimo = !dia.horario_fim;
+    return `
+      <div class="dia-corrida-card dia-corrida-card-editavel">
+        <div class="dia-editavel-topo">
+          <strong>${escapeHtml(dia.nome || "Dia da corrida")}</strong>
+          ${dia.id ? `<span class="badge-dia-existente">Dia cadastrado</span>` : `<span class="badge-dia-novo">Novo dia</span>`}
+        </div>
 
-    <p>
-      <strong>Data:</strong>
-      ${formatarData(dia.data_dia)}
-    </p>
+        <div class="grid grid-dia-editavel">
+          <div class="field">
+            <label>Tipo do período</label>
+            <select onchange="atualizarCampoDiaCadastro(${index}, 'tipo', this.value); renderizarPreviewDiasCadastro();">
+              <option value="Entrega de kit" ${dia.tipo === "Entrega de kit" ? "selected" : ""}>Entrega de kit</option>
+              <option value="Corrida" ${dia.tipo === "Corrida" ? "selected" : ""}>Dia da corrida</option>
+            </select>
+          </div>
 
-    <p>
-      <strong>Horário:</strong>
-      ${formatarHorarioPeriodo(dia.horario_inicio, dia.horario_fim)}
-    </p>
+          <div class="field">
+            <label>Data</label>
+            <input type="date" value="${dia.data_dia || ""}" onchange="atualizarCampoDiaCadastro(${index}, 'data_dia', this.value); renderizarPreviewDiasCadastro();">
+          </div>
 
-    <p>
-      <strong>Tipo:</strong>
-      ${dia.tipo || "-"}
-    </p>
+          <div class="field">
+            <label>Horário início</label>
+            <input type="time" value="${(dia.horario_inicio || "").slice(0, 5)}" onchange="atualizarCampoDiaCadastro(${index}, 'horario_inicio', this.value);">
+          </div>
 
-    <p>
-      <strong>Ajuda de custo:</strong>
-      ${formatarMoeda(dia.valor_ajuda_custo)}
-    </p>
+          <div class="field">
+            <label>Horário fim</label>
+            <input type="time" value="${(dia.horario_fim || "").slice(0, 5)}" ${ateUltimo ? "disabled" : ""} onchange="atualizarCampoDiaCadastro(${index}, 'horario_fim', this.value);">
+          </div>
 
-    <button
-      type="button"
-      class="delete-btn"
-      onclick="removerDiaCadastro(${index})"
-    >
-      Remover
-    </button>
-  </div>
-`).join("");
+          <div class="field">
+            <label>Ajuda de custo</label>
+            <input type="number" min="0" step="0.01" value="${dia.valor_ajuda_custo ?? ""}" onchange="atualizarCampoDiaCadastro(${index}, 'valor_ajuda_custo', this.value);">
+          </div>
+
+          <div class="field field-checkbox-admin field-ate-ultimo field-ate-ultimo-inline">
+            <label class="checkbox-admin-card checkbox-admin-card-compacto checkbox-admin-inline">
+              <input type="checkbox" ${ateUltimo ? "checked" : ""} onchange="atualizarAteUltimoDiaCadastro(${index}, this.checked);">
+              <span><strong>Até o último atleta chegar</strong></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="dia-corrida-acoes dia-corrida-acoes-editavel">
+          <button type="button" class="delete-btn" onclick="removerDiaCadastro(${index})">
+            Remover dia
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 // CARREGAR DIAS
@@ -1829,23 +1877,6 @@ async function carregarDiasCorrida(corridaId) {
         ${formatarMoeda(dia.valor_ajuda_custo)}
       </p>
 
-      <div class="dia-corrida-acoes">
-        <button
-          type="button"
-          class="botao-editar-dia"
-          onclick="editarDiaCorrida(${dia.id}, ${corridaId})"
-        >
-          Editar dia
-        </button>
-
-        <button
-          type="button"
-          class="delete-btn"
-          onclick="excluirDiaCorrida(${dia.id}, ${corridaId})"
-        >
-          Excluir dia
-        </button>
-      </div>
 
     </div>
   `).join("");
@@ -2695,17 +2726,29 @@ function ativarBotoesExportarPlanilha() {
 }
 
 async function abrirFluxoExportacao(corridaId, formato = "pdf") {
+  const { data: corrida } = await supabaseClient
+    .from("corridas")
+    .select("possui_patrocinador_tenis")
+    .eq("id", corridaId)
+    .single();
+
+  const corridaTemTenis = corrida && corrida.possui_patrocinador_tenis === true;
+  const textoOpcaoTenis = corridaTemTenis
+    ? "\n4 - Resumo de tênis por numeração"
+    : "";
+
   const filtro = prompt(
-    "Escolha o filtro de exportação:\n\n1 - Todos em ordem alfabética\n2 - Por tipo\n3 - Por dia\n4 - Resumo de tênis por numeração",
+    `Escolha o filtro de exportação:\n\n1 - Todos em ordem alfabética\n2 - Por tipo\n3 - Por dia${textoOpcaoTenis}`,
     "1"
   );
 
   if (filtro === null) return;
 
   const filtroNormalizado = String(filtro).trim();
+  const filtrosPermitidos = corridaTemTenis ? ["1", "2", "3", "4"] : ["1", "2", "3"];
 
-  if (!["1", "2", "3", "4"].includes(filtroNormalizado)) {
-    alert("Filtro inválido.");
+  if (!filtrosPermitidos.includes(filtroNormalizado)) {
+    alert(corridaTemTenis ? "Filtro inválido." : "Filtro inválido. O resumo de tênis só aparece para corridas marcadas com patrocinador de tênis.");
     return;
   }
 
@@ -2839,8 +2882,8 @@ async function exportarInscritosCorrida(corridaId, opcoes) {
     const dadosExportacao = await buscarDadosExportacao(corridaId);
     if (opcoes.filtro === "4") {
       if (!dadosExportacao.corrida.possui_patrocinador_tenis) {
-        const continuar = confirm("Esta corrida não está marcada como patrocinada por tênis. Gerar o relatório mesmo assim?");
-        if (!continuar) return;
+        alert("Esta corrida não está marcada como patrocinada por tênis.");
+        return;
       }
       if (opcoes.formato === "pdf") {
         exportarPDFResumoTenis(dadosExportacao.corrida, dadosExportacao.inscritos);
