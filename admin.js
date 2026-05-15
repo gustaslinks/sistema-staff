@@ -225,6 +225,26 @@ function contarInscritosValidos(inscricoes, corridaId) {
   }).length;
 }
 
+function contarInscritosPorStatus(inscricoes, corridaId, statusDesejado) {
+  if (!inscricoes) return 0;
+
+  return inscricoes.filter(inscricao => {
+    return inscricao.corrida_id === corridaId && normalizarStatusInscricao(inscricao.status) === statusDesejado;
+  }).length;
+}
+
+function calcularPercentualPreenchimento(confirmados, vagasTotal) {
+  if (!vagasTotal || vagasTotal <= 0) return 0;
+  return Math.min(100, Math.round((confirmados / vagasTotal) * 100));
+}
+
+function obterClasseProgressoVagas(percentual) {
+  if (percentual >= 100) return "completo";
+  if (percentual >= 80) return "alto";
+  if (percentual >= 50) return "medio";
+  return "baixo";
+}
+
 async function encerrarCorridasLotadas(corridas, inscricoes) {
   const corridasLotadas = (corridas || []).filter(corrida => {
     const vagasTotal = Number(corrida.vagas_total || 0);
@@ -295,9 +315,12 @@ async function carregarCorridasAdmin() {
 
   listaCorridasAdmin.innerHTML = corridas.map(corrida => {
     const totalInscritos = contarInscritosValidos(inscricoes || [], corrida.id);
+    const confirmadosCorrida = contarInscritosPorStatus(inscricoes || [], corrida.id, "confirmado");
     const vagasTotal = Number(corrida.vagas_total || 0);
+    const percentualVagas = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
+    const classeProgresso = obterClasseProgressoVagas(percentualVagas);
     const textoVagas = vagasTotal > 0
-      ? `${totalInscritos} de ${vagasTotal} vagas preenchidas`
+      ? `${confirmadosCorrida} de ${vagasTotal} vagas preenchidas`
       : `${totalInscritos} inscrito(s)`;
 
     return `
@@ -308,6 +331,17 @@ async function carregarCorridasAdmin() {
         <div class="corrida-status-card ${corrida.status}">
           <strong>${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
           <span>${textoVagas}</span>
+          ${vagasTotal > 0 ? `
+            <div class="corrida-progresso-vagas" aria-label="Preenchimento das vagas">
+              <div class="corrida-progresso-topo">
+                <span>Preenchimento</span>
+                <strong>${percentualVagas}%</strong>
+              </div>
+              <div class="corrida-progresso-trilho">
+                <div class="corrida-progresso-barra ${classeProgresso}" style="width: ${percentualVagas}%;"></div>
+              </div>
+            </div>
+          ` : ""}
         </div>
 
         <p><strong>Período:</strong>
@@ -868,78 +902,88 @@ async function carregarInscritosDaCorrida(
 
   const resumo = gerarResumoInscricoes(inscricoesComPrioridade, totalVagasCorrida);
 
+  const vagasLivres = totalVagasCorrida > 0
+    ? Math.max(totalVagasCorrida - resumo.confirmados, 0)
+    : 0;
+
   areaInscritos.innerHTML = `
     <div class="admin-inscritos-painel" data-corrida-id="${corridaIdNumerico}">
 
-      <div class="admin-inscritos-resumo admin-inscritos-resumo-compacto" data-layout="compacto-v111">
-        <div class="resumo-card resumo-card-total">
-          <strong>${resumo.total}</strong>
-          <span>inscritos</span>
+      <div class="admin-inscritos-resumo admin-inscritos-resumo-compacto admin-inscritos-resumo-v127" data-layout="compacto-v127">
+        <div class="resumo-dupla">
+          <div class="resumo-card resumo-card-total">
+            <strong>${resumo.total}</strong>
+            <span>inscritos</span>
+          </div>
+          <div class="resumo-card resumo-card-vagas">
+            <strong>${totalVagasCorrida ? vagasLivres : "—"}</strong>
+            <span>vagas livres</span>
+          </div>
         </div>
 
         <div class="resumo-dupla">
-          <div class="resumo-card">
-            <strong>${totalVagasCorrida || 0}</strong>
-            <span>vagas</span>
-          </div>
-          <div class="resumo-card">
+          <div class="resumo-card resumo-card-confirmados">
             <strong>${resumo.confirmados}</strong>
             <span>confirmados</span>
           </div>
-        </div>
-
-        <div class="resumo-dupla">
-          <div class="resumo-card">
+          <div class="resumo-card resumo-card-pendentes">
             <strong>${resumo.pendentes}</strong>
             <span>pendentes</span>
           </div>
-          <div class="resumo-card">
+        </div>
+
+        <div class="resumo-dupla">
+          <div class="resumo-card resumo-card-espera">
             <strong>${resumo.listaEspera}</strong>
             <span>lista de espera</span>
+          </div>
+          <div class="resumo-card resumo-card-cancelados">
+            <strong>${resumo.cancelados}</strong>
+            <span>cancelados</span>
           </div>
         </div>
       </div>
 
-      <div class="admin-inscritos-acoes-massa">
-        <button type="button" class="botao-admin-batch botao-selecionar-prioridade-alta">
-          Selecionar prioridade alta
-        </button>
-        <button type="button" class="botao-admin-batch botao-selecionar-filtrados">
-          Selecionar filtrados
-        </button>
-        <button type="button" class="botao-admin-batch botao-desselecionar-todos">
-          Desselecionar todos
-        </button>
-        <button type="button" class="botao-admin-batch botao-confirmar-selecionados">
-          Confirmar selecionados
-        </button>
-        <button type="button" class="botao-admin-batch botao-confirmar-reservar">
-          Confirmar selecionados e colocar restantes em lista de espera
-        </button>
-      </div>
-
-      <div class="admin-inscritos-filtros">
+      <div class="admin-inscritos-filtros admin-inscritos-filtros-v127">
         <input
           type="search"
           class="admin-busca-inscrito"
           placeholder="Buscar por nome..."
         >
-        <div class="admin-filtros-status">
-          <button type="button" class="admin-filtro-inscrito ativo" data-filtro="todos">Todos</button>
-          <button type="button" class="admin-filtro-inscrito" data-filtro="pendente">Pendentes</button>
-          <button type="button" class="admin-filtro-inscrito" data-filtro="confirmado">Confirmados</button>
-          <button type="button" class="admin-filtro-inscrito" data-filtro="lista_espera">Lista de espera</button>
-          <button type="button" class="admin-filtro-inscrito" data-filtro="prioridade-alta">Prioridade alta</button>
-          <button type="button" class="admin-filtro-inscrito" data-filtro="prioridade-media">Prioridade média</button>
-          <button type="button" class="admin-filtro-inscrito" data-filtro="prioridade-baixa">Prioridade baixa</button>
-          <button type="button" class="admin-filtro-inscrito" data-filtro="somente-kit">Somente entrega de kit</button>
-          <button type="button" class="admin-filtro-inscrito" data-filtro="somente-corrida">Somente dia da corrida</button>
+
+        <div class="admin-filtros-linha">
+          <div class="admin-toggles-tipo" aria-label="Filtrar por tipo de dia">
+            <button type="button" class="admin-toggle-tipo ativo" data-tipo="kit">📦 Entrega Kit</button>
+            <button type="button" class="admin-toggle-tipo ativo" data-tipo="corrida">🏁 Dia da Corrida</button>
+          </div>
+
+          <label class="admin-status-select-wrap">
+            <span>Status</span>
+            <select class="admin-status-select">
+              <option value="todos">Todos</option>
+              <option value="pendente" selected>Pendentes</option>
+              <option value="confirmado">Confirmados</option>
+              <option value="lista_espera">Lista de espera</option>
+              <option value="cancelado">Cancelados</option>
+            </select>
+          </label>
         </div>
       </div>
 
-      <div class="admin-contador-selecao">
-        <span class="admin-selecao-texto">${vagasPreSelecionadas} selecionado(s)</span>
-        ${totalVagasCorrida ? `<span>Limite: ${totalVagasCorrida} vaga(s)</span>` : ""}
+      <div class="admin-inscritos-acoes-massa admin-inscritos-acoes-v127">
+        <label class="admin-selecionar-exibidos">
+          <input type="checkbox" class="checkbox-selecionar-exibidos">
+          <span>Selecionar todos os exibidos</span>
+        </label>
+
+        <div class="admin-contador-selecao">
+          <span class="admin-selecao-texto">0 selecionado(s)</span>
+          ${totalVagasCorrida ? `<span>Vagas livres: ${vagasLivres}</span>` : ""}
+        </div>
+
+        <button type="button" class="botao-admin-batch botao-confirmar-selecionados">
+          Confirmar selecionados
+        </button>
       </div>
 
       <div class="admin-lista-compacta-inscritos">
@@ -984,6 +1028,8 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
       data-status="${status}"
       data-prioridade="${inscricao.prioridade.classe}"
       data-tipo-disponibilidade="${tipoDisponibilidadeFiltro}"
+      data-tem-kit="${possuiEntregaKit ? "1" : "0"}"
+      data-tem-corrida="${possuiDiaCorrida ? "1" : "0"}"
       data-nome="${escapeHtml(nomeBusca)}"
     >
       <div class="linha-inscrito-principal">
@@ -1092,35 +1138,48 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida) {
 
 function ativarControlesInscritosAdmin(areaInscritos, corridaId, totalVagasCorrida) {
   ativarBotoesStatusInscricao(areaInscritos);
+  filtrarInscritosAdmin(areaInscritos);
   atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
 
   const busca = areaInscritos.querySelector(".admin-busca-inscrito");
-  const filtros = areaInscritos.querySelectorAll(".admin-filtro-inscrito");
+  const statusSelect = areaInscritos.querySelector(".admin-status-select");
+  const togglesTipo = areaInscritos.querySelectorAll(".admin-toggle-tipo");
   const checkboxes = areaInscritos.querySelectorAll(".checkbox-inscrito-batch");
   const botoesExpandir = areaInscritos.querySelectorAll(".botao-expandir-inscrito");
+  const checkboxSelecionarExibidos = areaInscritos.querySelector(".checkbox-selecionar-exibidos");
 
   if (busca) {
     busca.addEventListener("input", () => filtrarInscritosAdmin(areaInscritos));
   }
 
-  filtros.forEach(botao => {
-    botao.addEventListener("click", () => {
-      filtros.forEach(item => item.classList.remove("ativo"));
-      botao.classList.add("ativo");
+  if (statusSelect) {
+    statusSelect.addEventListener("change", () => {
+      limparSelecaoInscritos(areaInscritos);
       filtrarInscritosAdmin(areaInscritos);
+      atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
+    });
+  }
+
+  togglesTipo.forEach(botao => {
+    botao.addEventListener("click", () => {
+      botao.classList.toggle("ativo");
+      limparSelecaoInscritos(areaInscritos);
+      filtrarInscritosAdmin(areaInscritos);
+      atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
     });
   });
 
   checkboxes.forEach(checkbox => {
     checkbox.addEventListener("change", () => {
       if (checkbox.checked && totalVagasCorrida > 0) {
+        const limite = obterLimiteSelecao(areaInscritos, totalVagasCorrida);
         const selecionados = areaInscritos.querySelectorAll(
           ".checkbox-inscrito-batch:checked"
         ).length;
 
-        if (selecionados > totalVagasCorrida) {
+        if (selecionados > limite) {
           checkbox.checked = false;
-          alert(`Limite de ${totalVagasCorrida} vaga(s) atingido.`);
+          alert(`Limite de ${limite} vaga(s) livre(s) atingido.`);
         }
       }
 
@@ -1137,58 +1196,28 @@ function ativarControlesInscritosAdmin(areaInscritos, corridaId, totalVagasCorri
     });
   });
 
-  const botaoSelecionarPrioridadeAlta = areaInscritos.querySelector(".botao-selecionar-prioridade-alta");
-  if (botaoSelecionarPrioridadeAlta) {
-    botaoSelecionarPrioridadeAlta.addEventListener("click", () => {
-      let selecionados = areaInscritos.querySelectorAll(
-        ".checkbox-inscrito-batch:checked"
-      ).length;
+  if (checkboxSelecionarExibidos) {
+    checkboxSelecionarExibidos.addEventListener("change", () => {
+      if (!checkboxSelecionarExibidos.checked) {
+        limparSelecaoInscritos(areaInscritos);
+        atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
+        return;
+      }
 
-      areaInscritos.querySelectorAll(".linha-inscrito-admin").forEach(linha => {
-        const checkbox = linha.querySelector(".checkbox-inscrito-batch");
-        if (!checkbox || checkbox.disabled || checkbox.checked) return;
-        if (linha.dataset.prioridade !== "prioridade-alta") return;
-        if (linha.dataset.status === "cancelado" || linha.dataset.status === "lista_espera") return;
-        if (totalVagasCorrida > 0 && selecionados >= totalVagasCorrida) return;
-
-        checkbox.checked = true;
-        selecionados += 1;
-      });
-
-      atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
-    });
-  }
-
-  const botaoSelecionarFiltrados = areaInscritos.querySelector(".botao-selecionar-filtrados");
-  if (botaoSelecionarFiltrados) {
-    botaoSelecionarFiltrados.addEventListener("click", () => {
-      let selecionados = areaInscritos.querySelectorAll(
-        ".checkbox-inscrito-batch:checked"
-      ).length;
+      let selecionados = 0;
+      const limite = obterLimiteSelecao(areaInscritos, totalVagasCorrida);
 
       areaInscritos.querySelectorAll(".linha-inscrito-admin:not(.hidden)").forEach(linha => {
         const checkbox = linha.querySelector(".checkbox-inscrito-batch");
-        if (!checkbox || checkbox.disabled || checkbox.checked) return;
-
         const status = linha.dataset.status;
-        if (status === "cancelado") return;
-
-        if (totalVagasCorrida > 0 && selecionados >= totalVagasCorrida) return;
+        if (!checkbox || checkbox.disabled) return;
+        if (status === "confirmado" || status === "cancelado") return;
+        if (totalVagasCorrida > 0 && selecionados >= limite) return;
 
         checkbox.checked = true;
         selecionados += 1;
       });
 
-      atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
-    });
-  }
-
-  const botaoDesselecionarTodos = areaInscritos.querySelector(".botao-desselecionar-todos");
-  if (botaoDesselecionarTodos) {
-    botaoDesselecionarTodos.addEventListener("click", () => {
-      areaInscritos.querySelectorAll(".checkbox-inscrito-batch").forEach(checkbox => {
-        if (!checkbox.disabled) checkbox.checked = false;
-      });
       atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
     });
   }
@@ -1199,36 +1228,51 @@ function ativarControlesInscritosAdmin(areaInscritos, corridaId, totalVagasCorri
       await confirmarSelecionadosEmLote(areaInscritos, corridaId, false);
     });
   }
+}
 
-  const botaoConfirmarReservar = areaInscritos.querySelector(".botao-confirmar-reservar");
-  if (botaoConfirmarReservar) {
-    botaoConfirmarReservar.addEventListener("click", async () => {
-      await confirmarSelecionadosEmLote(areaInscritos, corridaId, true);
-    });
-  }
+function limparSelecaoInscritos(areaInscritos) {
+  areaInscritos.querySelectorAll(".checkbox-inscrito-batch").forEach(checkbox => {
+    if (!checkbox.disabled) checkbox.checked = false;
+  });
+
+  const checkboxSelecionarExibidos = areaInscritos.querySelector(".checkbox-selecionar-exibidos");
+  if (checkboxSelecionarExibidos) checkboxSelecionarExibidos.checked = false;
+}
+
+function obterLimiteSelecao(areaInscritos, totalVagasCorrida) {
+  if (!totalVagasCorrida || totalVagasCorrida <= 0) return Infinity;
+
+  const confirmados = areaInscritos.querySelectorAll(
+    '.linha-inscrito-admin[data-status="confirmado"]'
+  ).length;
+
+  return Math.max(totalVagasCorrida - confirmados, 0);
 }
 
 function filtrarInscritosAdmin(areaInscritos) {
   const busca = areaInscritos.querySelector(".admin-busca-inscrito");
-  const filtroAtivo = areaInscritos.querySelector(".admin-filtro-inscrito.ativo");
+  const statusSelect = areaInscritos.querySelector(".admin-status-select");
   const termo = busca ? busca.value.trim().toLowerCase() : "";
-  const filtro = filtroAtivo ? filtroAtivo.dataset.filtro : "todos";
+  const filtroStatus = statusSelect ? statusSelect.value : "pendente";
+  const tipoKitAtivo = !!areaInscritos.querySelector('.admin-toggle-tipo[data-tipo="kit"].ativo');
+  const tipoCorridaAtivo = !!areaInscritos.querySelector('.admin-toggle-tipo[data-tipo="corrida"].ativo');
 
   areaInscritos.querySelectorAll(".linha-inscrito-admin").forEach(linha => {
     const nome = linha.dataset.nome || "";
     const status = linha.dataset.status || "";
-    const prioridade = linha.dataset.prioridade || "";
-    const tipoDisponibilidade = linha.dataset.tipoDisponibilidade || "";
+    const temKit = linha.dataset.temKit === "1";
+    const temCorrida = linha.dataset.temCorrida === "1";
 
     const passaBusca = !termo || nome.includes(termo);
-    const passaFiltro =
-      filtro === "todos" ||
-      filtro === status ||
-      filtro === prioridade ||
-      filtro === tipoDisponibilidade ||
-      (filtro === "pendente" && (status === "inscrito" || status === "pendente"));
+    const passaStatus =
+      filtroStatus === "todos" ||
+      filtroStatus === status ||
+      (filtroStatus === "pendente" && (status === "inscrito" || status === "pendente"));
+    const passaTipo =
+      (tipoKitAtivo && temKit) ||
+      (tipoCorridaAtivo && temCorrida);
 
-    linha.classList.toggle("hidden", !(passaBusca && passaFiltro));
+    linha.classList.toggle("hidden", !(passaBusca && passaStatus && passaTipo));
   });
 }
 

@@ -2704,3 +2704,295 @@ button.floating-calendar-day {
     font-size: 13px;
   }
 }
+
+/* =========================================================
+   AJUSTES V127 - ADMIN INSCRITOS MAIS COMPACTO E OPERACIONAL
+========================================================= */
+
+.pagina-admin .card-staff {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 16px 18px !important;
+}
+
+.pagina-admin .foto-staff {
+  width: 72px !important;
+  height: 72px !important;
+}
+
+.pagina-admin .dados-staff h2 {
+  margin: 2px 0 4px !important;
+  font-size: 20px !important;
+  line-height: 1.15 !important;
+}
+
+.pagina-admin .dados-staff p {
+  margin: 2px 0 !important;
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+}
+
+.pagina-admin .label-card {
+  margin-bottom: 2px !important;
+  font-size: 11px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pagina-admin .logout-btn {
+  align-self: center;
+  min-width: 92px;
+  margin: 0 !important;
+}
+
+.corrida-progresso-vagas {
+  margin-top: 12px;
+}
+
+.corrida-progresso-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+}
+
+.corrida-progresso-topo strong {
+  font-size: 12px !important;
+}
+
+.corrida-progresso-trilho {
+  width: 100%;
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(15,23,42,0.08);
+}
+
+.corrida-progresso-barra {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.25s ease;
+}
+
+.corrida-progresso-barra.baixo { background: #fca5a5; }
+.corrida-progresso-barra.medio { background: #facc15; }
+.corrida-progresso-barra.alto { background: #60a5fa; }
+.corrida-progresso-barra.completo { background: #22c55e; }
+
+.admin-inscritos-resumo.admin-inscritos-resumo-v127 {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-dupla {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card {
+  min-height: 70px !important;
+  padding: 10px 8px !important;
+  border-radius: 15px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-total,
+.admin-inscritos-resumo-v127 .resumo-card-vagas {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-confirmados {
+  background: #ecfdf5 !important;
+  border-color: #bbf7d0 !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-pendentes {
+  background: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-espera {
+  background: #eef2ff !important;
+  border-color: #c7d2fe !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-cancelados {
+  background: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+
+.admin-inscritos-filtros-v127 {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  padding: 12px !important;
+  border-radius: 16px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.admin-inscritos-filtros-v127 .admin-busca-inscrito {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 12px;
+}
+
+.admin-filtros-linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 10px;
+  align-items: end;
+}
+
+.admin-toggles-tipo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-toggle-tipo {
+  min-height: 42px;
+  padding: 9px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-toggle-tipo.ativo {
+  background: #111827;
+  border-color: #111827;
+  color: #ffffff;
+}
+
+.admin-status-select-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-status-select-wrap span {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.admin-status-select {
+  min-height: 42px;
+  width: 100%;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-inscritos-acoes-v127 {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px !important;
+  align-items: center !important;
+  padding: 12px !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.admin-selecionar-exibidos {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-selecionar-exibidos input {
+  width: 18px;
+  height: 18px;
+}
+
+.admin-inscritos-acoes-v127 .admin-contador-selecao {
+  justify-content: flex-end;
+  font-size: 12px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.admin-inscritos-acoes-v127 .botao-confirmar-selecionados {
+  min-height: 42px;
+  background: #16a34a;
+  white-space: nowrap;
+}
+
+.admin-inscritos-acoes-v127 .botao-confirmar-selecionados:hover {
+  background: #15803d;
+}
+
+@media (max-width: 700px) {
+  .pagina-admin .card-staff {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 14px !important;
+  }
+
+  .pagina-admin .foto-staff {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .pagina-admin .dados-staff h2 {
+    font-size: 17px !important;
+  }
+
+  .pagina-admin .logout-btn {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .admin-filtros-linha,
+  .admin-inscritos-acoes-v127 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-toggles-tipo {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-toggle-tipo {
+    min-height: 40px;
+    padding: 8px 7px;
+    font-size: 12px;
+  }
+
+  .admin-inscritos-acoes-v127 .admin-contador-selecao {
+    justify-content: flex-start;
+  }
+}
