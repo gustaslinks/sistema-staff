@@ -1466,8 +1466,16 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
   });
   const linkWhatsappConfirmacao = criarLinkWhatsapp(staff.telefone, mensagemWhatsappConfirmacao);
   const botaoWhatsappConfirmacao = status === "confirmado" && linkWhatsappConfirmacao
-    ? `<a class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-confirmado" href="${escapeHtml(linkWhatsappConfirmacao)}" target="_blank" rel="noopener" title="Enviar WhatsApp de confirmação" aria-label="Enviar WhatsApp de confirmação">💬</a>`
-    : `<button type="button" class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-bloqueado" disabled title="WhatsApp liberado após confirmar" aria-label="WhatsApp liberado após confirmar">💬</button>`;
+    ? `<a class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-confirmado" href="${escapeHtml(linkWhatsappConfirmacao)}" target="_blank" rel="noopener" title="Enviar WhatsApp de confirmação" aria-label="Enviar WhatsApp de confirmação"><svg class="icone-whatsapp-oficial" viewBox="0 0 32 32" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M16.02 3.35C9.07 3.35 3.43 8.88 3.43 15.68c0 2.18.59 4.3 1.7 6.16L3.38 28.65l7.05-1.78a12.9 12.9 0 0 0 5.59 1.27c6.95 0 12.6-5.53 12.6-12.34S22.97 3.35 16.02 3.35Z" fill="white"/>
+  <path d="M16.02 5.24c5.88 0 10.66 4.7 10.66 10.47 0 5.78-4.78 10.48-10.66 10.48-1.78 0-3.53-.44-5.08-1.27l-.36-.2-4.15 1.05 1.02-3.95-.24-.39a10.25 10.25 0 0 1-1.84-5.72c0-5.77 4.78-10.47 10.65-10.47Z" fill="#20C263"/>
+  <path d="M12.5 10.15c-.25-.55-.51-.57-.75-.58h-.64c-.22 0-.58.08-.88.4-.3.33-1.16 1.1-1.16 2.7 0 1.58 1.19 3.12 1.35 3.34.16.22 2.3 3.58 5.7 4.88 2.82 1.08 3.4.86 4.02.8.61-.05 1.98-.78 2.26-1.54.28-.76.28-1.4.2-1.54-.08-.14-.3-.22-.64-.38-.33-.16-1.98-.95-2.29-1.06-.3-.1-.52-.16-.75.16-.22.33-.86 1.06-1.05 1.28-.2.22-.39.24-.72.08-.33-.16-1.4-.5-2.67-1.61-.99-.86-1.65-1.93-1.84-2.26-.2-.32-.02-.5.15-.66.15-.14.33-.38.5-.57.16-.19.22-.32.33-.54.11-.22.06-.41-.03-.57-.08-.16-.73-1.73-1.09-2.33Z" fill="white"/>
+</svg></a>`
+    : `<button type="button" class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-bloqueado" disabled title="WhatsApp liberado após confirmar" aria-label="WhatsApp liberado após confirmar"><svg class="icone-whatsapp-oficial" viewBox="0 0 32 32" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M16.02 3.35C9.07 3.35 3.43 8.88 3.43 15.68c0 2.18.59 4.3 1.7 6.16L3.38 28.65l7.05-1.78a12.9 12.9 0 0 0 5.59 1.27c6.95 0 12.6-5.53 12.6-12.34S22.97 3.35 16.02 3.35Z" fill="white"/>
+  <path d="M16.02 5.24c5.88 0 10.66 4.7 10.66 10.47 0 5.78-4.78 10.48-10.66 10.48-1.78 0-3.53-.44-5.08-1.27l-.36-.2-4.15 1.05 1.02-3.95-.24-.39a10.25 10.25 0 0 1-1.84-5.72c0-5.77 4.78-10.47 10.65-10.47Z" fill="#20C263"/>
+  <path d="M12.5 10.15c-.25-.55-.51-.57-.75-.58h-.64c-.22 0-.58.08-.88.4-.3.33-1.16 1.1-1.16 2.7 0 1.58 1.19 3.12 1.35 3.34.16.22 2.3 3.58 5.7 4.88 2.82 1.08 3.4.86 4.02.8.61-.05 1.98-.78 2.26-1.54.28-.76.28-1.4.2-1.54-.08-.14-.3-.22-.64-.38-.33-.16-1.98-.95-2.29-1.06-.3-.1-.52-.16-.75.16-.22.33-.86 1.06-1.05 1.28-.2.22-.39.24-.72.08-.33-.16-1.4-.5-2.67-1.61-.99-.86-1.65-1.93-1.84-2.26-.2-.32-.02-.5.15-.66.15-.14.33-.38.5-.57.16-.19.22-.32.33-.54.11-.22.06-.41-.03-.57-.08-.16-.73-1.73-1.09-2.33Z" fill="white"/>
+</svg></button>`;
 
   return `
     <article
@@ -1523,7 +1531,7 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
             ${status === "confirmado" ? "disabled" : ""}
             title="Confirmar inscrição"
             aria-label="Confirmar inscrição"
-          >✓</button>
+          ><svg class="icone-acao-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
 
           <button
             type="button"
@@ -1533,7 +1541,7 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
             ${status === "lista_espera" ? "disabled" : ""}
             title="Colocar em lista de espera"
             aria-label="Colocar em lista de espera"
-          >⏱</button>
+          ><svg class="icone-acao-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg></button>
 
           <button
             type="button"
@@ -1543,7 +1551,7 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
             ${status === "cancelado" ? "disabled" : ""}
             title="Cancelar inscrição"
             aria-label="Cancelar inscrição"
-          >×</button>
+          ><svg class="icone-acao-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
 
           ${botaoWhatsappConfirmacao}
         </div>

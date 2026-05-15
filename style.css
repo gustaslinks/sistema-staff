@@ -5612,7 +5612,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
   pointer-events: none;
 }
 
-/* v163 - ações rápidas de inscritos, WhatsApp compacto e ajustes de admin */
+/* v164 - ações rápidas refinadas, WhatsApp oficial e dias sem borda */
 .linha-inscrito-principal {
   grid-template-columns: auto auto minmax(0, 1fr) auto !important;
   align-items: center !important;
@@ -5743,5 +5743,124 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
     min-width: 30px !important;
     min-height: 30px !important;
     font-size: 16px !important;
+  }
+}
+
+
+/* v164 - refinamento dos botões rápidos dos inscritos */
+.linha-inscrito-acoes-rapidas {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  padding: 0 !important;
+  margin-top: 12px !important;
+}
+
+.botao-acao-inscrito,
+.linha-inscrito-acoes .botao-acao-inscrito,
+.botao-whatsapp-inscrito.botao-acao-inscrito {
+  width: 100% !important;
+  height: 44px !important;
+  min-width: 0 !important;
+  min-height: 44px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,.45) !important;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, .10) !important;
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease !important;
+}
+
+.botao-acao-inscrito:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 16px 28px rgba(15, 23, 42, .14) !important;
+  filter: saturate(1.05) !important;
+}
+
+.icone-acao-svg {
+  width: 21px !important;
+  height: 21px !important;
+  stroke: currentColor !important;
+  stroke-width: 3 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: none !important;
+}
+
+.icone-whatsapp-oficial {
+  width: 25px !important;
+  height: 25px !important;
+  display: block !important;
+}
+
+.botao-confirmar-inscrito.botao-acao-inscrito {
+  background: linear-gradient(135deg, #bbf7d0, #22c55e) !important;
+  color: #065f46 !important;
+}
+
+.botao-lista-espera-inscrito.botao-acao-inscrito {
+  background: linear-gradient(135deg, #dbeafe, #60a5fa) !important;
+  color: #1e3a8a !important;
+}
+
+.botao-cancelar-inscrito.botao-acao-inscrito {
+  background: linear-gradient(135deg, #fee2e2, #ef4444) !important;
+  color: #991b1b !important;
+}
+
+.botao-whatsapp-confirmado.botao-acao-inscrito {
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  color: #ffffff !important;
+}
+
+.botao-whatsapp-bloqueado.botao-acao-inscrito,
+.botao-whatsapp-bloqueado.botao-acao-inscrito:disabled {
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb) !important;
+  color: #9ca3af !important;
+  opacity: .82 !important;
+  box-shadow: none !important;
+}
+
+.linha-inscrito-acoes-rapidas .botao-acao-inscrito:disabled:not(.botao-whatsapp-bloqueado) {
+  opacity: .50 !important;
+  filter: grayscale(.15) !important;
+}
+
+/* v164 - remove fundo e bordas internas dos dias cadastrados na edição */
+.gerenciar-dias .dia-corrida-card-editavel,
+.gerenciar-dias .dia-corrida-card-editavel.is-open,
+.gerenciar-dias .dia-corrida-card-editavel .dia-editavel-resumo,
+.gerenciar-dias .dia-corrida-card-editavel.is-open .dia-editavel-resumo,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle:hover,
+.dia-corrida-card-editavel .dia-resumo-toggle,
+.dia-corrida-card .dia-resumo-toggle {
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+@media (max-width: 520px) {
+  .linha-inscrito-acoes-rapidas {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    padding-left: 0 !important;
+  }
+
+  .botao-acao-inscrito,
+  .linha-inscrito-acoes .botao-acao-inscrito,
+  .botao-whatsapp-inscrito.botao-acao-inscrito {
+    width: 100% !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    border-radius: 15px !important;
   }
 }
