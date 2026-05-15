@@ -441,12 +441,13 @@ salvarCorridaBtn.addEventListener("click", async function () {
     }
 
     for (const dia of diasCadastroCorrida) {
+      const ateUltimoAtleta = dia.ate_ultimo_atleta === true;
       const dadosDia = {
         corrida_id: corridaId,
         nome: dia.nome,
         data_dia: dia.data_dia,
         horario_inicio: dia.horario_inicio || null,
-        horario_fim: dia.horario_fim || null,
+        horario_fim: ateUltimoAtleta ? null : (dia.horario_fim || null),
         tipo: dia.tipo || null,
         valor_ajuda_custo: dia.valor_ajuda_custo,
         vagas: 0
@@ -965,6 +966,7 @@ async function carregarCorridaParaEdicao(corridaId) {
     horario_fim: dia.horario_fim,
     tipo: dia.tipo,
     valor_ajuda_custo: dia.valor_ajuda_custo,
+    ate_ultimo_atleta: !dia.horario_fim,
     aberto: false
   }));
 
@@ -2111,8 +2113,12 @@ function atualizarAteUltimoDiaCadastro(index, marcado) {
   const dia = diasCadastroCorrida[index];
   if (!dia) return;
 
-  if (marcado) {
+  dia.ate_ultimo_atleta = marcado === true;
+
+  if (dia.ate_ultimo_atleta) {
     dia.horario_fim = null;
+  } else if (!dia.horario_fim) {
+    dia.horario_fim = "";
   }
 
   renderizarPreviewDiasCadastro();
@@ -2137,7 +2143,7 @@ function renderizarPreviewDiasCadastro() {
   }
 
   previewDiasCorrida.innerHTML = diasCadastroCorrida.map((dia, index) => {
-    const ateUltimo = !dia.horario_fim;
+    const ateUltimo = dia.ate_ultimo_atleta === true;
     const aberto = dia.aberto === true;
     const resumoData = dia.data_dia ? formatarDataBR(dia.data_dia) : "Data não definida";
     const resumoHorario = ateUltimo

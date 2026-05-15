@@ -5378,3 +5378,105 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
     padding-right: 64px !important;
   }
 }
+
+/* v155 - ajustes críticos: semáforo transparente e dias editáveis */
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  right: 20px !important;
+  top: 20px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.status-semaforo-indicador {
+  width: 20px !important;
+  height: 20px !important;
+  border: 3px solid rgba(255,255,255,.88) !important;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.22) !important;
+}
+
+.status-semaforo-indicador.status-aberto::after {
+  width: 20px !important;
+  height: 20px !important;
+  left: -3px !important;
+  top: -3px !important;
+}
+
+.card-corrida-admin .corrida-status-card,
+.corrida-status-card {
+  padding-right: 58px !important;
+}
+
+.dia-corrida-card-editavel .dia-resumo-toggle,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle,
+.dia-corrida-card .dia-resumo-toggle {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+}
+
+.dia-corrida-card-editavel .dia-resumo-toggle:hover,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle:hover,
+.dia-corrida-card .dia-resumo-toggle:hover {
+  background: transparent !important;
+  color: #111827 !important;
+}
+
+.dia-corrida-card-editavel .dia-toggle-ico,
+.gerenciar-dias .dia-corrida-card-editavel .dia-toggle-ico {
+  background: linear-gradient(135deg, #e0f2fe, #ede9fe) !important;
+  color: #2563eb !important;
+}
+
+.dia-corrida-card-editavel .delete-btn-dia-resumo,
+.gerenciar-dias .dia-corrida-card-editavel .delete-btn-dia-resumo,
+.dia-corrida-card .delete-btn-dia-resumo {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  border: 1px solid rgba(239, 68, 68, .22) !important;
+  box-shadow: none !important;
+}
+
+.dia-corrida-card-editavel .delete-btn-dia-resumo:hover,
+.gerenciar-dias .dia-corrida-card-editavel .delete-btn-dia-resumo:hover,
+.dia-corrida-card .delete-btn-dia-resumo:hover {
+  background: #fecaca !important;
+}
+
+@media (max-width: 520px) {
+  .botao-alterar-status-corrida.botao-status-compacto,
+  .botao-status-compacto {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    right: 18px !important;
+    top: 18px !important;
+  }
+
+  .status-semaforo-indicador {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .status-semaforo-indicador.status-aberto::after {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .card-corrida-admin .corrida-status-card,
+  .corrida-status-card {
+    padding-right: 52px !important;
+  }
+}

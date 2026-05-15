@@ -490,21 +490,47 @@ form.addEventListener('submit',async function(event){
         throw new Error('Sessão expirada. Faça login novamente.');
       }
 
-      // Tenta atualizar pelo ID carregado. Usamos select() para confirmar a linha atualizada.
-      let atualizarCadastro = await supabaseClient
-        .from('staffs')
-        .update(dadosCadastro)
-        .eq('id', idParaAtualizar)
-        .select('*')
-        .maybeSingle();
+      async function buscarCadastroAtualizado() {
+        if (idParaAtualizar) {
+          const resposta = await supabaseClient
+            .from('staffs')
+            .select('*')
+            .eq('id', idParaAtualizar)
+            .maybeSingle();
+          if (resposta.error) throw resposta.error;
+          if (resposta.data) return resposta.data;
+        }
 
-      if (atualizarCadastro.error) throw atualizarCadastro.error;
-      cadastroSalvo = atualizarCadastro.data;
+        if (cpfOriginalEdicao) {
+          const resposta = await supabaseClient
+            .from('staffs')
+            .select('*')
+            .eq('cpf', cpfOriginalEdicao)
+            .eq('data_nascimento', nascimentoOriginalEdicao)
+            .maybeSingle();
+          if (resposta.error) throw resposta.error;
+          if (resposta.data) return resposta.data;
+        }
 
-      // Fallback: se o ID salvo no navegador estiver inconsistente, atualiza pelo CPF + nascimento
-      // do cadastro carregado na própria tela. Isso evita falso positivo de cadastro salvo.
+        return null;
+      }
+
+      let respostaUpdate = null;
+
+      if (idParaAtualizar) {
+        respostaUpdate = await supabaseClient
+          .from('staffs')
+          .update(dadosCadastro)
+          .eq('id', idParaAtualizar)
+          .select('*')
+          .maybeSingle();
+
+        if (respostaUpdate.error) throw respostaUpdate.error;
+        cadastroSalvo = respostaUpdate.data;
+      }
+
       if (!cadastroSalvo && cpfOriginalEdicao) {
-        atualizarCadastro = await supabaseClient
+        respostaUpdate = await supabaseClient
           .from('staffs')
           .update(dadosCadastro)
           .eq('cpf', cpfOriginalEdicao)
@@ -512,32 +538,24 @@ form.addEventListener('submit',async function(event){
           .select('*')
           .maybeSingle();
 
-        if (atualizarCadastro.error) throw atualizarCadastro.error;
-        cadastroSalvo = atualizarCadastro.data;
+        if (respostaUpdate.error) throw respostaUpdate.error;
+        cadastroSalvo = respostaUpdate.data;
       }
 
-      // Última conferência: se o update não retornou linha, tenta buscar o registro atualizado.
-      if (!cadastroSalvo && idParaAtualizar) {
-        const buscarAtualizado = await supabaseClient
-          .from('staffs')
-          .select('*')
-          .eq('id', idParaAtualizar)
-          .maybeSingle();
+      const cadastroConferido = await buscarCadastroAtualizado();
+      if (cadastroConferido) cadastroSalvo = cadastroConferido;
 
-        if (buscarAtualizado.error) throw buscarAtualizado.error;
+      const calcadoEsperado = dadosCadastro.numero_calcado == null ? null : Number(dadosCadastro.numero_calcado);
+      const calcadoSalvo = cadastroSalvo && cadastroSalvo.numero_calcado == null ? null : Number(cadastroSalvo && cadastroSalvo.numero_calcado);
+      const cadastroConfere = cadastroSalvo &&
+        (cadastroSalvo.nome_completo || '') === dadosCadastro.nome_completo &&
+        (cadastroSalvo.email || '') === dadosCadastro.email &&
+        (cadastroSalvo.telefone || '') === dadosCadastro.telefone &&
+        (cadastroSalvo.cidade || '') === dadosCadastro.cidade &&
+        calcadoSalvo === calcadoEsperado;
 
-        const dataBuscada = buscarAtualizado.data;
-        const pareceAtualizado = dataBuscada && (
-          dataBuscada.email === dadosCadastro.email ||
-          dataBuscada.telefone === dadosCadastro.telefone ||
-          dataBuscada.cidade === dadosCadastro.cidade ||
-          dataBuscada.foto_url === dadosCadastro.foto_url
-        );
-
-        if (pareceAtualizado) cadastroSalvo = dataBuscada;
-      }
-
-      if (!cadastroSalvo) {
+      if (!cadastroConfere) {
+        console.warn('Cadastro após tentativa de update não bate com os dados enviados.', { dadosCadastro, cadastroSalvo });
         throw new Error('Não foi possível confirmar a atualização do cadastro. Recarregue a página e tente novamente.');
       }
     } else {
@@ -580,10 +598,18 @@ form.addEventListener('submit',async function(event){
       throw new Error('Cadastro salvo, mas não foi possível carregar os dados de acesso. Tente fazer login.');
     }
 
-    localStorage.setItem('staffLogado', JSON.stringify({
-      ...cadastroSalvo,
-      is_admin: cadastroSalvo.is_admin === true || cadastroSalvo.is_admin === 'true'
-    }));
+    const staffLogadoAtual = (() => {
+      try { return JSON.parse(localStorage.getItem('staffLogado') || 'null'); } catch (e) { return null; }
+    })();
+
+    const deveAtualizarSessao = !modoEdicao || !staffLogadoAtual || String(staffLogadoAtual.id || '') === String(cadastroSalvo.id || '');
+
+    if (deveAtualizarSessao) {
+      localStorage.setItem('staffLogado', JSON.stringify({
+        ...cadastroSalvo,
+        is_admin: cadastroSalvo.is_admin === true || cadastroSalvo.is_admin === 'true'
+      }));
+    }
 
     successMessage.textContent = modoEdicao ? 'Cadastro atualizado com sucesso.' : 'Cadastro enviado com sucesso. Redirecionando para as corridas...';
     successMessage.style.display='block';
