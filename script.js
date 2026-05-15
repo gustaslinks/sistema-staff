@@ -43,12 +43,16 @@ const staffIdUrlEdicao = paramsCadastro.get('id');
 // Segurança do fluxo de edição:
 // - staff comum SEMPRE edita apenas o próprio cadastro salvo no localStorage;
 // - id pela URL só é aceito quando o usuário logado é admin.
-const isAdminEdicao = staffLogadoEdicao && staffLogadoEdicao.is_admin === true;
+const isAdminEdicao = !!(staffLogadoEdicao && (staffLogadoEdicao.is_admin === true || staffLogadoEdicao.is_admin === 'true' || staffLogadoEdicao.is_admin === 1 || staffLogadoEdicao.is_admin === '1'));
 const staffIdEdicao = modoEdicao
   ? (isAdminEdicao && staffIdUrlEdicao ? staffIdUrlEdicao : (staffLogadoEdicao && staffLogadoEdicao.id ? staffLogadoEdicao.id : null))
   : null;
 let fotoAtualUrl = '';
 let staffAtualEdicao = null;
+let modoEdicaoAdminCpfAtivo = false;
+function isModoAtualizacao(){
+  return modoEdicao || modoEdicaoAdminCpfAtivo;
+}
 
 const cardStaffCadastro = document.getElementById('card-staff-cadastro');
 const fotoStaffCadastro = document.getElementById('foto-staff-cadastro');
@@ -95,6 +99,7 @@ function renderizarCardLogadoCadastro(){
 }
 
 renderizarCardLogadoCadastro();
+configurarBuscaAdminCadastro();
 
 if(botaoAdminCadastro){
   botaoAdminCadastro.addEventListener('click', () => {
@@ -513,9 +518,7 @@ async function buscarCadastroPorCpf(cpfValor){
 }
 
 function travarCamposLoginStaffComum(){
-  if (!modoEdicao) return;
-
-  const deveTravar = !isAdminEdicao;
+  const deveTravar = (modoEdicao || modoEdicaoAdminCpfAtivo) && !isAdminEdicao;
   [cpf, nascimento].forEach((campo) => {
     if (!campo) return;
     campo.disabled = deveTravar;
@@ -565,18 +568,20 @@ function preencherFormularioComStaff(data){
 }
 
 function configurarBuscaAdminCadastro(){
-  if (!modoEdicao || !isAdminEdicao || !adminEditarStaffPanel) return;
+  if (!isAdminEdicao || !adminEditarStaffPanel) return;
 
   adminEditarStaffPanel.classList.remove('hidden');
 
-  if (adminBuscaCpfStaff) {
+  if (adminBuscaCpfStaff && !adminBuscaCpfStaff.dataset.listenerConfigurado) {
+    adminBuscaCpfStaff.dataset.listenerConfigurado = '1';
     adminBuscaCpfStaff.addEventListener('input', () => {
       adminBuscaCpfStaff.value = maskCPF(adminBuscaCpfStaff.value);
       if (adminBuscaStaffStatus) adminBuscaStaffStatus.textContent = '';
     });
   }
 
-  if (adminBtnBuscarStaff) {
+  if (adminBtnBuscarStaff && !adminBtnBuscarStaff.dataset.listenerConfigurado) {
+    adminBtnBuscarStaff.dataset.listenerConfigurado = '1';
     adminBtnBuscarStaff.addEventListener('click', async () => {
       const cpfBusca = adminBuscaCpfStaff ? adminBuscaCpfStaff.value : '';
 
@@ -597,7 +602,9 @@ function configurarBuscaAdminCadastro(){
           return;
         }
 
+        modoEdicaoAdminCpfAtivo = true;
         preencherFormularioComStaff(staffEncontrado);
+        if (submitBtn) submitBtn.textContent = 'Salvar alterações';
         if (adminBuscaStaffStatus) {
           adminBuscaStaffStatus.textContent = `Cadastro carregado: ${staffEncontrado.nome_completo || 'staff sem nome'}.`;
         }
@@ -761,7 +768,7 @@ form.addEventListener('submit',async function(event){
   if(!isFormValid(true)){alert('Revise os campos destacados antes de finalizar o cadastro.');return;}
 
   submitBtn.disabled=true;
-  submitBtn.textContent = modoEdicao ? 'Salvando alterações...' : 'Enviando cadastro...';
+  submitBtn.textContent = isModoAtualizacao() ? 'Salvando alterações...' : 'Enviando cadastro...';
 
   try{
     if(SUPABASE_URL==='COLE_AQUI_PROJECT_URL' || SUPABASE_ANON_KEY==='COLE_AQUI_PUBLISHABLE_KEY'){
@@ -794,7 +801,7 @@ form.addEventListener('submit',async function(event){
     const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,numero_calcado: calcado ? (calcado.value ? Number(calcado.value) : null) : null,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value || null,foto_url:fotoUrlFinal};
     let cadastroSalvo = null;
 
-    if (modoEdicao) {
+    if (isModoAtualizacao()) {
       cadastroSalvo = await atualizarCadastroExistente(dadosCadastro);
 
 
@@ -855,19 +862,19 @@ form.addEventListener('submit',async function(event){
       }));
     }
 
-    successMessage.textContent = modoEdicao ? 'Cadastro atualizado com sucesso.' : 'Cadastro enviado com sucesso. Redirecionando para as corridas...';
+    successMessage.textContent = isModoAtualizacao() ? 'Cadastro atualizado com sucesso.' : 'Cadastro enviado com sucesso. Redirecionando para as corridas...';
     successMessage.style.display='block';
     successMessage.scrollIntoView({behavior:'smooth',block:'center'});
 
     setTimeout(() => {
       window.location.href = 'corridas.html';
-    }, modoEdicao ? 500 : 600);
+    }, isModoAtualizacao() ? 500 : 600);
     return;
   }catch(error){
     alert('Erro ao enviar cadastro: '+error.message);
     console.error(error);
   }finally{
-    submitBtn.textContent = modoEdicao ? 'Salvar alterações' : 'Finalizar cadastro';
+    submitBtn.textContent = isModoAtualizacao() ? 'Salvar alterações' : 'Finalizar cadastro';
     refreshSubmitState();
   }
 });
@@ -945,4 +952,4 @@ updatePixPreviews();
 refreshSubmitState();
 
 
-// v171 - edição admin por CPF na própria página de cadastro; CPF/nascimento travados para staff comum.
+// v172 - correção: detecção robusta de admin e busca por CPF também disponível para admin logado.
