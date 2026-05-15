@@ -300,9 +300,14 @@ function contarInscritosPorStatus(inscricoes, corridaId, statusDesejado) {
   }).length;
 }
 
-function calcularPercentualPreenchimento(confirmados, vagasTotal) {
+function calcularPercentualPreenchimento(valor, vagasTotal) {
   if (!vagasTotal || vagasTotal <= 0) return 0;
-  return Math.min(100, Math.round((confirmados / vagasTotal) * 100));
+  return Math.min(100, Math.round((valor / vagasTotal) * 100));
+}
+
+function formatarResumoVagas(valor, vagasTotal, rotulo) {
+  if (vagasTotal > 0) return `${valor} de ${vagasTotal} ${rotulo}`;
+  return `${valor} ${rotulo}`;
 }
 
 function obterClasseProgressoVagas(percentual) {
@@ -384,11 +389,12 @@ async function carregarCorridasAdmin() {
     const totalInscritos = contarInscritosValidos(inscricoes || [], corrida.id);
     const confirmadosCorrida = contarInscritosPorStatus(inscricoes || [], corrida.id, "confirmado");
     const vagasTotal = Number(corrida.vagas_total || 0);
-    const percentualVagas = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
-    const classeProgresso = obterClasseProgressoVagas(percentualVagas);
-    const textoVagas = vagasTotal > 0
-      ? `${confirmadosCorrida} de ${vagasTotal} vagas preenchidas`
-      : `${totalInscritos} inscrito(s)`;
+    const percentualInscritos = calcularPercentualPreenchimento(totalInscritos, vagasTotal);
+    const percentualConfirmados = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
+    const classeProgressoInscritos = obterClasseProgressoVagas(percentualInscritos);
+    const classeProgressoConfirmados = obterClasseProgressoVagas(percentualConfirmados);
+    const textoInscritos = formatarResumoVagas(totalInscritos, vagasTotal, "inscrito(s)");
+    const textoConfirmados = formatarResumoVagas(confirmadosCorrida, vagasTotal, "confirmado(s)");
 
     return `
       <article class="card-corrida-admin" data-corrida-id="${corrida.id}">
@@ -399,7 +405,8 @@ async function carregarCorridasAdmin() {
           <div class="corrida-status-topo-linha">
             <div>
               <strong class="corrida-status-label">${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
-              <span class="corrida-vagas-texto">${textoVagas}</span>
+              <span class="corrida-vagas-texto corrida-inscritos-texto">Inscritos: ${textoInscritos}</span>
+              <span class="corrida-vagas-texto corrida-confirmados-texto">Confirmados: ${textoConfirmados}</span>
             </div>
 
             <button
@@ -415,13 +422,23 @@ async function carregarCorridasAdmin() {
           </div>
 
           ${vagasTotal > 0 ? `
-            <div class="corrida-progresso-vagas" aria-label="Preenchimento das vagas">
+            <div class="corrida-progresso-vagas corrida-progresso-inscritos" aria-label="Inscritos em relação às vagas">
               <div class="corrida-progresso-topo">
-                <span>Preenchimento</span>
-                <strong class="corrida-progresso-percentual">${percentualVagas}%</strong>
+                <span>Inscritos</span>
+                <strong class="corrida-progresso-percentual corrida-progresso-inscritos-percentual">${percentualInscritos}%</strong>
               </div>
               <div class="corrida-progresso-trilho">
-                <div class="corrida-progresso-barra ${classeProgresso}" style="width: ${percentualVagas}%;"></div>
+                <div class="corrida-progresso-barra corrida-progresso-inscritos-barra ${classeProgressoInscritos}" style="width: ${percentualInscritos}%;"></div>
+              </div>
+            </div>
+
+            <div class="corrida-progresso-vagas corrida-progresso-confirmados" aria-label="Confirmados em relação às vagas">
+              <div class="corrida-progresso-topo">
+                <span>Confirmados</span>
+                <strong class="corrida-progresso-percentual corrida-progresso-confirmados-percentual">${percentualConfirmados}%</strong>
+              </div>
+              <div class="corrida-progresso-trilho">
+                <div class="corrida-progresso-barra corrida-progresso-confirmados-barra ${classeProgressoConfirmados}" style="width: ${percentualConfirmados}%;"></div>
               </div>
             </div>
           ` : ""}
@@ -781,7 +798,7 @@ function ativarBotoesStatusCorrida() {
       if (!confirmar) return;
 
       botao.disabled = true;
-      botao.textContent = "Atualizando...";
+      botao.textContent = "↻";
 
       const { error } = await supabaseClient
         .from("corridas")
@@ -799,11 +816,12 @@ function ativarBotoesStatusCorrida() {
         );
 
         botao.disabled = false;
+        botao.textContent = statusAtual === "aberta" ? "🔒" : "🔓";
 
         return;
       }
 
-      carregarCorridasAdmin();
+      await carregarCorridasAdmin();
     });
   });
 }
@@ -1038,8 +1056,8 @@ async function carregarInscritosDaCorrida(
           <label class="admin-status-select-wrap">
             <span>Status</span>
             <select class="admin-status-select">
-              <option value="todos">Todos</option>
-              <option value="pendente" selected>Pendentes</option>
+              <option value="todos" selected>Todos</option>
+              <option value="pendente">Pendentes</option>
               <option value="confirmado">Confirmados</option>
               <option value="lista_espera">Lista de espera</option>
               <option value="cancelado">Cancelados</option>
@@ -1404,26 +1422,43 @@ async function atualizarResumoCorridaCard(corridaId) {
     return;
   }
 
-  const totalInscritos = contarInscritosValidos(inscricoes || [], Number(corridaId));
-  const confirmadosCorrida = contarInscritosPorStatus(inscricoes || [], Number(corridaId), "confirmado");
+  const totalInscritos = (inscricoes || []).filter(inscricao => {
+    const status = normalizarStatusInscricao(inscricao.status);
+    return status !== "cancelado" && status !== "lista_espera";
+  }).length;
+  const confirmadosCorrida = (inscricoes || []).filter(inscricao => {
+    return normalizarStatusInscricao(inscricao.status) === "confirmado";
+  }).length;
   const vagasTotal = Number(corrida.vagas_total || 0);
-  const percentualVagas = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
-  const classeProgresso = obterClasseProgressoVagas(percentualVagas);
-  const textoVagas = vagasTotal > 0
-    ? `${confirmadosCorrida} de ${vagasTotal} vagas preenchidas`
-    : `${totalInscritos} inscrito(s)`;
+  const percentualInscritos = calcularPercentualPreenchimento(totalInscritos, vagasTotal);
+  const percentualConfirmados = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
+  const classeProgressoInscritos = obterClasseProgressoVagas(percentualInscritos);
+  const classeProgressoConfirmados = obterClasseProgressoVagas(percentualConfirmados);
 
-  const textoVagasEl = card.querySelector(".corrida-vagas-texto");
-  if (textoVagasEl) textoVagasEl.textContent = textoVagas;
+  const textoInscritosEl = card.querySelector(".corrida-inscritos-texto");
+  if (textoInscritosEl) textoInscritosEl.textContent = `Inscritos: ${formatarResumoVagas(totalInscritos, vagasTotal, "inscrito(s)")}`;
 
-  const percentualEl = card.querySelector(".corrida-progresso-percentual");
-  if (percentualEl) percentualEl.textContent = `${percentualVagas}%`;
+  const textoConfirmadosEl = card.querySelector(".corrida-confirmados-texto");
+  if (textoConfirmadosEl) textoConfirmadosEl.textContent = `Confirmados: ${formatarResumoVagas(confirmadosCorrida, vagasTotal, "confirmado(s)")}`;
 
-  const barraEl = card.querySelector(".corrida-progresso-barra");
-  if (barraEl) {
-    barraEl.style.width = `${percentualVagas}%`;
-    barraEl.classList.remove("baixo", "medio", "alto", "completo");
-    barraEl.classList.add(classeProgresso);
+  const percentualInscritosEl = card.querySelector(".corrida-progresso-inscritos-percentual");
+  if (percentualInscritosEl) percentualInscritosEl.textContent = `${percentualInscritos}%`;
+
+  const barraInscritosEl = card.querySelector(".corrida-progresso-inscritos-barra");
+  if (barraInscritosEl) {
+    barraInscritosEl.style.width = `${percentualInscritos}%`;
+    barraInscritosEl.classList.remove("baixo", "medio", "alto", "completo");
+    barraInscritosEl.classList.add(classeProgressoInscritos);
+  }
+
+  const percentualConfirmadosEl = card.querySelector(".corrida-progresso-confirmados-percentual");
+  if (percentualConfirmadosEl) percentualConfirmadosEl.textContent = `${percentualConfirmados}%`;
+
+  const barraConfirmadosEl = card.querySelector(".corrida-progresso-confirmados-barra");
+  if (barraConfirmadosEl) {
+    barraConfirmadosEl.style.width = `${percentualConfirmados}%`;
+    barraConfirmadosEl.classList.remove("baixo", "medio", "alto", "completo");
+    barraConfirmadosEl.classList.add(classeProgressoConfirmados);
   }
 }
 
@@ -1482,8 +1517,10 @@ async function confirmarSelecionadosEmLote(areaInscritos, corridaId, reservarRes
     }
   }
 
+  const posicaoScroll = window.scrollY;
   await carregarInscritosDaCorrida(corridaId, areaInscritos);
   await atualizarResumoCorridaCard(corridaId);
+  requestAnimationFrame(() => window.scrollTo({ top: posicaoScroll, left: 0 }));
 }
 
 // BOTÕES CONFIRMAR / CANCELAR / RESERVA
@@ -1575,11 +1612,15 @@ async function atualizarStatusInscricao(
     return;
   }
 
+  const posicaoScroll = window.scrollY;
+
   await carregarInscritosDaCorrida(
     corridaId,
     areaInscritos
   );
   await atualizarResumoCorridaCard(corridaId);
+
+  requestAnimationFrame(() => window.scrollTo({ top: posicaoScroll, left: 0 }));
 }
 
 function gerarResumoInscricoes(inscricoes, totalVagasCorrida) {
@@ -1784,13 +1825,23 @@ async function carregarDiasCorrida(corridaId) {
         ${formatarMoeda(dia.valor_ajuda_custo)}
       </p>
 
-      <button
-        type="button"
-        class="delete-btn"
-        onclick="excluirDiaCorrida(${dia.id}, ${corridaId})"
-      >
-        Excluir dia
-      </button>
+      <div class="dia-corrida-acoes">
+        <button
+          type="button"
+          class="botao-editar-dia"
+          onclick="editarDiaCorrida(${dia.id}, ${corridaId})"
+        >
+          Editar dia
+        </button>
+
+        <button
+          type="button"
+          class="delete-btn"
+          onclick="excluirDiaCorrida(${dia.id}, ${corridaId})"
+        >
+          Excluir dia
+        </button>
+      </div>
 
     </div>
   `).join("");
@@ -1878,6 +1929,80 @@ if (areaInscritos && !areaInscritos.classList.contains("hidden")) {
   await carregarInscritosDaCorrida(corridaId, areaInscritos);
   await atualizarResumoCorridaCard(corridaId);
 }
+}
+
+// EDITAR DIA
+async function editarDiaCorrida(diaId, corridaId) {
+  const { data: dia, error: erroBuscar } = await supabaseClient
+    .from("corrida_dias")
+    .select("*")
+    .eq("id", diaId)
+    .single();
+
+  if (erroBuscar || !dia) {
+    console.error("Erro ao buscar dia da corrida:", erroBuscar);
+    alert("Não foi possível carregar este dia para edição.");
+    return;
+  }
+
+  const tipo = prompt("Tipo do dia:", dia.tipo || "Entrega de kit");
+  if (tipo === null) return;
+
+  const dataDia = prompt("Data do dia (AAAA-MM-DD):", dia.data_dia || "");
+  if (dataDia === null) return;
+
+  const horarioInicio = prompt("Horário inicial (HH:MM):", (dia.horario_inicio || "").slice(0, 5));
+  if (horarioInicio === null) return;
+
+  const horarioFim = prompt("Horário final (HH:MM). Deixe vazio para 'até último atleta':", (dia.horario_fim || "").slice(0, 5));
+  if (horarioFim === null) return;
+
+  const ajudaTexto = prompt("Ajuda de custo (somente número):", dia.valor_ajuda_custo ?? "");
+  if (ajudaTexto === null) return;
+
+  if (!dataDia.trim()) {
+    alert("A data do dia é obrigatória.");
+    return;
+  }
+
+  const valorAjuda = ajudaTexto.trim() === ""
+    ? null
+    : Number(ajudaTexto.replace(",", "."));
+
+  if (valorAjuda !== null && Number.isNaN(valorAjuda)) {
+    alert("Informe um valor de ajuda de custo válido.");
+    return;
+  }
+
+  const nome = `${tipo.trim() || "Dia"} - ${obterDiaSemana(dataDia.trim())}`;
+
+  const { error: erroAtualizar } = await supabaseClient
+    .from("corrida_dias")
+    .update({
+      nome,
+      data_dia: dataDia.trim(),
+      horario_inicio: horarioInicio.trim() || null,
+      horario_fim: horarioFim.trim() || null,
+      tipo: tipo.trim() || null,
+      valor_ajuda_custo: valorAjuda
+    })
+    .eq("id", diaId);
+
+  if (erroAtualizar) {
+    console.error("Erro ao atualizar dia da corrida:", erroAtualizar);
+    alert("Não foi possível atualizar o dia da corrida.");
+    return;
+  }
+
+  await carregarDiasCorrida(corridaId);
+
+  const areaInscritos = document.getElementById(`inscritos-corrida-${corridaId}`);
+  if (areaInscritos && !areaInscritos.classList.contains("hidden")) {
+    const posicaoScroll = window.scrollY;
+    await carregarInscritosDaCorrida(corridaId, areaInscritos);
+    await atualizarResumoCorridaCard(corridaId);
+    requestAnimationFrame(() => window.scrollTo({ top: posicaoScroll, left: 0 }));
+  }
 }
 
 // EXCLUIR DIA

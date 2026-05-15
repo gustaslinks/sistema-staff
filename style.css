@@ -3381,3 +3381,95 @@ button.floating-calendar-day {
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+/* =========================================================
+   AJUSTES V135 - ADMIN: INSCRITOS, STATUS E EDIÇÃO DE DIAS
+========================================================= */
+
+.card-corrida-admin .corrida-status-card.aberta {
+  background: #ecfdf5 !important;
+  border: 1px solid #22c55e !important;
+  color: #14532d !important;
+}
+
+.card-corrida-admin .corrida-status-card.encerrada {
+  background: #fef2f2 !important;
+  border: 1px solid #ef4444 !important;
+  color: #7f1d1d !important;
+}
+
+.corrida-status-topo-linha > div {
+  min-width: 0;
+}
+
+.corrida-vagas-texto {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.25;
+}
+
+.corrida-inscritos-texto {
+  font-weight: 700;
+}
+
+.corrida-confirmados-texto {
+  opacity: 0.88;
+}
+
+.corrida-progresso-vagas + .corrida-progresso-vagas {
+  margin-top: 9px;
+}
+
+.corrida-progresso-inscritos .corrida-progresso-barra.baixo {
+  background: #38bdf8;
+}
+
+.corrida-progresso-inscritos .corrida-progresso-barra.medio {
+  background: #0ea5e9;
+}
+
+.corrida-progresso-inscritos .corrida-progresso-barra.alto,
+.corrida-progresso-inscritos .corrida-progresso-barra.completo {
+  background: #0284c7;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto:disabled {
+  font-size: 18px !important;
+  opacity: 0.75;
+}
+
+.dia-corrida-acoes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dia-corrida-acoes button {
+  margin-top: 0 !important;
+  min-height: 38px;
+}
+
+.dia-corrida-acoes .botao-editar-dia {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+.dia-corrida-acoes .botao-editar-dia:hover {
+  background: #1d4ed8 !important;
+}
+
+.dia-corrida-acoes .delete-btn {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 700px) {
+  .corrida-status-topo-linha {
+    grid-template-columns: minmax(0, 1fr) 34px;
+  }
+
+  .corrida-vagas-texto {
+    font-size: 12px;
+  }
+}
