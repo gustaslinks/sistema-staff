@@ -3084,3 +3084,84 @@ button.floating-calendar-day {
     font-size: 12.5px !important;
   }
 }
+
+/* =========================================================
+   AJUSTES V130 - ADMIN: QR LOCAL, STATUS MAIS CLARO E AÇÕES
+========================================================= */
+
+.admin-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-acoes .btn-ver-painel-staff {
+  width: auto !important;
+  min-height: 42px;
+  padding: 10px 14px !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+}
+
+.admin-acoes .btn-ver-painel-staff:hover {
+  background: #e2e8f0 !important;
+}
+
+.corrida-status-card.aberta,
+.card-corrida-admin .corrida-status-card.aberta {
+  background: #ecfdf5 !important;
+  border-color: #bbf7d0 !important;
+  color: #14532d !important;
+}
+
+.corrida-status-card.encerrada,
+.card-corrida-admin .corrida-status-card.encerrada {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.16) !important;
+  color: #0f172a !important;
+  font-size: 17px !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto.acao-encerrar {
+  background: #fff7ed !important;
+  border-color: #fed7aa !important;
+  color: #7c2d12 !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto.acao-abrir {
+  background: #ecfdf5 !important;
+  border-color: #86efac !important;
+  color: #14532d !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.98);
+}
+
+.corrida-vagas-texto,
+.corrida-progresso-percentual {
+  transition: color 0.2s ease;
+}
+
+@media (max-width: 700px) {
+  .admin-acoes {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-acoes .btn-ver-painel-staff,
+  .admin-acoes .btn-admin {
+    width: 100% !important;
+  }
+}

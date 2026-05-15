@@ -324,15 +324,15 @@ async function carregarCorridasAdmin() {
       : `${totalInscritos} inscrito(s)`;
 
     return `
-      <article class="card-corrida-admin">
+      <article class="card-corrida-admin" data-corrida-id="${corrida.id}">
 
         <h3>${corrida.nome}</h3>
 
         <div class="corrida-status-card ${corrida.status}">
           <div class="corrida-status-topo-linha">
             <div>
-              <strong>${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
-              <span>${textoVagas}</span>
+              <strong class="corrida-status-label">${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
+              <span class="corrida-vagas-texto">${textoVagas}</span>
             </div>
 
             <button
@@ -351,7 +351,7 @@ async function carregarCorridasAdmin() {
             <div class="corrida-progresso-vagas" aria-label="Preenchimento das vagas">
               <div class="corrida-progresso-topo">
                 <span>Preenchimento</span>
-                <strong>${percentualVagas}%</strong>
+                <strong class="corrida-progresso-percentual">${percentualVagas}%</strong>
               </div>
               <div class="corrida-progresso-trilho">
                 <div class="corrida-progresso-barra ${classeProgresso}" style="width: ${percentualVagas}%;"></div>
@@ -1294,6 +1294,54 @@ function atualizarContadorSelecao(areaInscritos, totalVagasCorrida) {
   }
 }
 
+async function atualizarResumoCorridaCard(corridaId) {
+  const card = document.querySelector(`.card-corrida-admin[data-corrida-id="${corridaId}"]`);
+  if (!card) return;
+
+  const { data: corrida, error: erroCorrida } = await supabaseClient
+    .from("corridas")
+    .select("id, status, vagas")
+    .eq("id", Number(corridaId))
+    .maybeSingle();
+
+  if (erroCorrida || !corrida) {
+    console.warn("Não foi possível atualizar resumo da corrida:", erroCorrida);
+    return;
+  }
+
+  const { data: inscricoes, error: erroInscricoes } = await supabaseClient
+    .from("inscricoes")
+    .select("id, status")
+    .eq("corrida_id", Number(corridaId));
+
+  if (erroInscricoes) {
+    console.warn("Não foi possível atualizar contadores da corrida:", erroInscricoes);
+    return;
+  }
+
+  const totalInscritos = contarInscritosValidos(inscricoes || [], Number(corridaId));
+  const confirmadosCorrida = contarInscritosPorStatus(inscricoes || [], Number(corridaId), "confirmado");
+  const vagasTotal = Number(corrida.vagas || 0);
+  const percentualVagas = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
+  const classeProgresso = obterClasseProgressoVagas(percentualVagas);
+  const textoVagas = vagasTotal > 0
+    ? `${confirmadosCorrida} de ${vagasTotal} vagas preenchidas`
+    : `${totalInscritos} inscrito(s)`;
+
+  const textoVagasEl = card.querySelector(".corrida-vagas-texto");
+  if (textoVagasEl) textoVagasEl.textContent = textoVagas;
+
+  const percentualEl = card.querySelector(".corrida-progresso-percentual");
+  if (percentualEl) percentualEl.textContent = `${percentualVagas}%`;
+
+  const barraEl = card.querySelector(".corrida-progresso-barra");
+  if (barraEl) {
+    barraEl.style.width = `${percentualVagas}%`;
+    barraEl.classList.remove("baixo", "medio", "alto", "completo");
+    barraEl.classList.add(classeProgresso);
+  }
+}
+
 async function confirmarSelecionadosEmLote(areaInscritos, corridaId, reservarRestantes) {
   const linhas = Array.from(areaInscritos.querySelectorAll(".linha-inscrito-admin"));
   const idsSelecionados = linhas
@@ -1350,6 +1398,7 @@ async function confirmarSelecionadosEmLote(areaInscritos, corridaId, reservarRes
   }
 
   await carregarInscritosDaCorrida(corridaId, areaInscritos);
+  await atualizarResumoCorridaCard(corridaId);
 }
 
 // BOTÕES CONFIRMAR / CANCELAR / RESERVA
@@ -1445,6 +1494,7 @@ async function atualizarStatusInscricao(
     corridaId,
     areaInscritos
   );
+  await atualizarResumoCorridaCard(corridaId);
 }
 
 function gerarResumoInscricoes(inscricoes, totalVagasCorrida) {
@@ -1741,6 +1791,7 @@ const areaInscritos = document.getElementById(
 
 if (areaInscritos && !areaInscritos.classList.contains("hidden")) {
   await carregarInscritosDaCorrida(corridaId, areaInscritos);
+  await atualizarResumoCorridaCard(corridaId);
 }
 }
 
@@ -2173,61 +2224,9 @@ function montarPagamentosPix(dadosExportacao) {
   return confirmados;
 }
 
-function carregarScriptQRCode(url) {
-  return new Promise((resolve, reject) => {
-    const existente = Array.from(document.scripts).find((script) => script.src === url);
-
-    if (existente && window.QRCode && window.QRCode.toDataURL) {
-      resolve();
-      return;
-    }
-
-    const script = existente || document.createElement("script");
-    const timeout = setTimeout(() => {
-      reject(new Error("Tempo esgotado ao carregar QR Code."));
-    }, 8000);
-
-    script.onload = () => {
-      clearTimeout(timeout);
-      if (window.QRCode && window.QRCode.toDataURL) {
-        resolve();
-      } else {
-        reject(new Error("Biblioteca carregada, mas QRCode.toDataURL não foi encontrado."));
-      }
-    };
-
-    script.onerror = () => {
-      clearTimeout(timeout);
-      reject(new Error("Falha ao carregar QR Code."));
-    };
-
-    if (!existente) {
-      script.src = url;
-      script.async = true;
-      document.head.appendChild(script);
-    }
-  });
-}
-
-async function garantirBibliotecaQRCode() {
-  if (window.QRCode && window.QRCode.toDataURL) return;
-
-  const urls = [
-    "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js",
-    "https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.4/qrcode.min.js"
-  ];
-
-  for (const url of urls) {
-    try {
-      await carregarScriptQRCode(url);
-      if (window.QRCode && window.QRCode.toDataURL) return;
-    } catch (erro) {
-      console.warn("Falha ao carregar biblioteca QR Code:", url, erro);
-    }
-  }
-
-  throw new Error("Biblioteca de QR Code não carregada. Confira sua conexão e tente novamente.");
+function garantirBibliotecaQRCode() {
+  if (window.QRCode && window.QRCode.toDataURL) return Promise.resolve();
+  return Promise.reject(new Error("Biblioteca de QR Code não carregada. Confira se o arquivo qrcode.min.js está na raiz do projeto."));
 }
 
 async function gerarQRCodeDataURLPix(payload) {
@@ -2823,6 +2822,14 @@ function exportarPDFCorrida(corrida, secoes, filtro) {
 // INICIALIZAÇÃO
 inserirEstilosPrioridadeAdmin();
 carregarCorridasAdmin();
+
+const abrirCorridasBtn = document.getElementById("abrir-corridas-btn");
+
+if (abrirCorridasBtn) {
+  abrirCorridasBtn.addEventListener("click", function () {
+    window.location.href = "corridas.html";
+  });
+}
 
 const logoutBtn = document.getElementById("logoutBtn");
 
