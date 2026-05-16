@@ -3603,7 +3603,7 @@ function ativarBotoesRelatoriosAdmin() {
 }
 
 async function buscarInscricoesExportacaoComFallback(corridaId) {
-  const colunasStaff = "id, nome_completo, cpf, rg, telefone, cidade, email, foto_url, chave_pix";
+  const colunasStaff = "id, nome_completo, cpf, rg, telefone, cidade, email, foto_url, chave_pix, numero_calcado";
   const consultaComRelacao = await supabaseClient
     .from("inscricoes")
     .select(`
@@ -4216,8 +4216,9 @@ if (logoutBtn) {
   });
 }
 
-/* v176 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
-/* v176 - ajustes reais nos relatórios PDF solicitados */
+/* v177 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
+/* v177 - ajustes reais nos relatórios PDF solicitados */
+/* v177 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
 function obterDataDiaRelatorio(dia) {
   if (!dia || !dia.data_dia) return null;
   const partes = String(dia.data_dia).split("-");
