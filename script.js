@@ -1188,4 +1188,4 @@ updatePixPreviews();
 refreshSubmitState();
 
 
-// v2.2 - login por CPF, sessão persistente, controles de senha e segurança admin.
+// v2.3 - login por CPF, sessão persistente, controles de senha e segurança admin.

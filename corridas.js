@@ -271,23 +271,19 @@ async function carregarCorridas() {
           <h4>Disponibilidade para trabalho</h4>
 
           <div class="texto-disponibilidade-info">
-            <strong>
-              Staffs com disponibilidade para TODOS os dias do evento
-              terão prioridade na seleção.
-            </strong>
-
-            <span>
-              Informe abaixo os dias em que você possui disponibilidade para trabalhar.
-            </span>
+            <div class="aviso-icone" aria-hidden="true">★</div>
+            <div>
+              <strong>Prioridade na seleção</strong>
+              <span>Staffs com disponibilidade para <b>TODOS</b> os dias do evento terão prioridade. Informe abaixo os dias em que você pode trabalhar.</span>
+            </div>
           </div>
 
           <div class="texto-disponibilidade-alerta">
-            <strong>Importante:</strong>
-
-            O envio da inscrição NÃO garante convocação para a equipe.
-
-            A confirmação da escala será realizada posteriormente
-            pela organização via WhatsApp ou e-mail.
+            <div class="aviso-icone" aria-hidden="true">!</div>
+            <div>
+              <strong>Importante</strong>
+              <span>O envio da inscrição <b>NÃO garante convocação</b>. A confirmação da escala será realizada posteriormente pela organização via WhatsApp ou e-mail.</span>
+            </div>
           </div>
 
           <div class="lista-dias-disponibilidade">
@@ -363,8 +359,11 @@ async function carregarCorridas() {
             <h2>${corrida.nome}</h2>
           </div>
           <div class="corrida-status-card aberta">
-            <strong>Inscrições abertas</strong>
-            <span>${textoVagas} vagas preenchidas</span>
+            <span class="status-semaforo-indicador status-aberto" aria-hidden="true"></span>
+            <div>
+              <strong>Inscrições abertas</strong>
+              <span>${textoVagas} vagas preenchidas</span>
+            </div>
           </div>
         </div>
 
