@@ -69,6 +69,15 @@ function isEmailLogin(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
+function pareceEmail(value) {
+  return /[a-zA-Z@]/.test(String(value || ""));
+}
+
+function pareceCpf(value) {
+  const valor = String(value || "").trim();
+  return !!valor && !pareceEmail(valor);
+}
+
 function setStatus(message, type = "info") {
   if (!loginStatus) return;
   loginStatus.textContent = message || "";
@@ -180,8 +189,10 @@ function configurarToggleSenha() {
 
 if (loginCpf) {
   loginCpf.addEventListener("input", () => {
-    if (!loginCpf.value.includes("@")) {
-      loginCpf.value = maskCPF(loginCpf.value);
+    const valor = loginCpf.value;
+    // Permite e-mail normalmente. Só aplica máscara quando o campo tiver apenas números/pontuação de CPF.
+    if (valor && !/[a-zA-Z@]/.test(valor)) {
+      loginCpf.value = maskCPF(valor);
     }
     setStatus("");
   });
@@ -237,42 +248,46 @@ form.addEventListener("submit", async function (event) {
   }
 });
 
+async function solicitarRecuperacaoSenha() {
+  if (!forgotPasswordBtn || !loginCpf) return;
+
+  const loginInformado = String(loginCpf.value || "").trim();
+
+  if (!loginInformado) {
+    setStatus("Digite seu CPF ou e-mail para receber o link de redefinição de senha.", "error");
+    loginCpf.focus();
+    return;
+  }
+
+  forgotPasswordBtn.disabled = true;
+  const textoOriginal = forgotPasswordBtn.textContent;
+  forgotPasswordBtn.textContent = "Enviando link...";
+  setStatus("Verificando cadastro e solicitando o link de redefinição...", "info");
+
+  try {
+    const email = await resolverEmailLogin(loginInformado);
+    const basePath = window.location.pathname.replace(/index\.html?$/i, "");
+    const redirectTo = window.location.origin + basePath + "alterar-senha.html";
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw error;
+
+    setStatus("Pronto. Se existir um cadastro ativo com esse CPF ou e-mail, enviaremos um link para redefinir sua senha.", "success");
+  } catch (error) {
+    console.error("Erro ao solicitar recuperação de senha:", error);
+    setStatus(error.message || "Não foi possível solicitar a recuperação de senha. Confira CPF/e-mail e tente novamente.", "error");
+  } finally {
+    forgotPasswordBtn.disabled = false;
+    forgotPasswordBtn.textContent = textoOriginal || "Esqueci minha senha";
+  }
+}
+
 if (forgotPasswordBtn) {
-  forgotPasswordBtn.addEventListener("click", async () => {
-    forgotPasswordBtn.disabled = true;
-    setStatus("");
-
-    try {
-      const valorDigitado = String(loginCpf.value || "").trim();
-
-      if (!valorDigitado) {
-        throw new Error("Digite seu CPF ou e-mail para recuperar a senha.");
-      }
-
-      const email = await resolverEmailLogin(valorDigitado);
-
-      const redirectTo =
-        window.location.origin +
-        window.location.pathname.replace(/index\.html?$/i, "") +
-        "alterar-senha.html";
-
-      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo
-      });
-
-      if (error) throw error;
-
-      setStatus(
-        "Se existir um cadastro vinculado a este CPF ou e-mail, você receberá um link para redefinir sua senha.",
-        "success"
-      );
-    } catch (error) {
-      console.error("Erro recuperação senha:", error);
-      setStatus(error.message || "Não foi possível solicitar a recuperação de senha.", "error");
-    } finally {
-      forgotPasswordBtn.disabled = false;
-    }
-  });
+  forgotPasswordBtn.onclick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    solicitarRecuperacaoSenha();
+  };
 }
 
 configurarToggleSenha();

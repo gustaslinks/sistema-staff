@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Staff</title>
-  <link rel="stylesheet" href="style.css?v=33">
+  <link rel="stylesheet" href="style.css?v=35">
 </head>
 <body class="login-page">
-  <button class="version-badge" type="button" data-version-summary="v3.3: cola banner no topo dos cards, remove Dados de acesso no modo edição, separa Segurança e acesso e mantém e-mail travado para staff comum.">v3.3</button>
+  <button class="version-badge" type="button" data-version-summary="v3.5: corrige o clique do Esqueci minha senha, mensagens do campo vazio e CPF/e-mail no login.">v3.5</button>
   <div class="container">
     <div class="login-card">
       <h1>Área do Staff</h1>
-      <p class="subtitle">Entre com seu CPF e senha cadastrados.</p>
+      <p class="subtitle">Entre com seu CPF ou e-mail e senha cadastrados.</p>
 
       <form id="loginForm" novalidate>
         <div class="field">
@@ -29,11 +29,11 @@
 
         <label class="keep-connected-option"><input type="checkbox" id="keepConnected" checked> <span>Manter-me conectado</span></label>
 
-        <div id="loginStatus" class="login-status" aria-live="polite"></div>
+        <div id="loginStatus" class="login-status" aria-live="polite" role="alert"></div>
 
         <button type="submit" id="loginBtn">Entrar</button>
         <div class="login-secondary-actions">
-          <button type="button" id="forgotPasswordBtn" class="forgot-password-btn">Esqueci minha senha</button>
+          <button type="button" id="forgotPasswordBtn" class="forgot-password-btn" onclick="return false;">Esqueci minha senha</button>
           <a class="cadastro-link" href="cadastro.html">Ainda não tenho cadastro</a>
         </div>
       </form>
@@ -41,7 +41,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="login.js?v=33"></script>
+  <script src="login.js?v=35"></script>
 
 <script>
 (function(){
