@@ -9015,3 +9015,73 @@ body.pagina-editar-cadastro .header p {
   display: none !important;
   content: none !important;
 }
+
+
+/* v2.7 - segurança visível só para admin e botões de foto refinados */
+.foto-input-actions-compact .foto-input-btn {
+  min-height: 58px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  padding: 14px 16px !important;
+  white-space: nowrap !important;
+}
+
+.foto-input-actions-compact .foto-input-btn .foto-input-ico {
+  width: 22px !important;
+  height: 22px !important;
+  flex: 0 0 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  top: 0 !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+  border-radius: 0 !important;
+  background-color: currentColor !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  opacity: .95 !important;
+}
+
+.foto-input-actions-compact .foto-input-btn span:not(.foto-input-ico) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  position: relative !important;
+  top: 0 !important;
+  margin: 0 !important;
+}
+
+.foto-input-actions-compact .foto-icon-gallery,
+.foto-input-actions-compact .foto-icon-camera {
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+}
+
+.foto-input-actions-compact .foto-icon-gallery::after,
+.foto-input-actions-compact .foto-icon-camera::after {
+  content: none !important;
+}
+
+.foto-input-actions-compact .foto-icon-gallery {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm0 2v8.7l3.4-3.4a1 1 0 0 1 1.4 0l2.2 2.2 3.2-4.1a1 1 0 0 1 1.6 0L19 13.2V7H5Zm11-1.25a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm0 2v8.7l3.4-3.4a1 1 0 0 1 1.4 0l2.2 2.2 3.2-4.1a1 1 0 0 1 1.6 0L19 13.2V7H5Zm11-1.25a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+}
+
+.foto-input-actions-compact .foto-icon-camera {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M8.4 5.2 7 7H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2l-1.4-1.8A2 2 0 0 0 14 4.5h-4a2 2 0 0 0-1.6.7ZM12 9a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M8.4 5.2 7 7H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2l-1.4-1.8A2 2 0 0 0 14 4.5h-4a2 2 0 0 0-1.6.7ZM12 9a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+}
+
+@media (max-width: 420px) {
+  .foto-input-actions-compact .foto-input-btn {
+    font-size: 14px !important;
+    gap: 8px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}

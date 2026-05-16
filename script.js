@@ -181,13 +181,25 @@ function configurarToggleSenha(){
 
 function renderizarSegurancaCadastro(staff){
   if(!modoEdicao || !accountSecurityPanel) return;
-  accountSecurityPanel.classList.remove('hidden');
 
   const estaEditandoProprioCadastro = staffLogadoEdicao && staff && String(staffLogadoEdicao.id || '') === String(staff.id || '');
-  if(btnAlterarSenha) btnAlterarSenha.classList.toggle('hidden', !estaEditandoProprioCadastro);
-  if(btnEnviarResetSenha) btnEnviarResetSenha.classList.toggle('hidden', !(isAdminEdicao && staff && staff.email));
 
-  if(isAdminEdicao && adminMetaPanel){
+  // Usuário comum não deve ver o card administrativo de Segurança e acesso.
+  // A troca da própria senha permanece disponível pela página alterar-senha.html.
+  if(!isAdminEdicao){
+    accountSecurityPanel.classList.add('hidden');
+    if(adminMetaPanel) adminMetaPanel.classList.add('hidden');
+    if(btnAlterarSenha) btnAlterarSenha.classList.add('hidden');
+    if(btnEnviarResetSenha) btnEnviarResetSenha.classList.add('hidden');
+    if(btnExcluirStaff) btnExcluirStaff.classList.add('hidden');
+    return;
+  }
+
+  accountSecurityPanel.classList.remove('hidden');
+  if(btnAlterarSenha) btnAlterarSenha.classList.toggle('hidden', !estaEditandoProprioCadastro);
+  if(btnEnviarResetSenha) btnEnviarResetSenha.classList.toggle('hidden', !(staff && staff.email));
+
+  if(adminMetaPanel){
     adminMetaPanel.classList.remove('hidden');
     if(adminStaffIdInfo) adminStaffIdInfo.textContent = staff && staff.id ? staff.id : '-';
     if(adminAuthIdInfo) adminAuthIdInfo.textContent = staff && staff.auth_user_id ? staff.auth_user_id : 'Sem vínculo Auth';
