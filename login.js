@@ -72,8 +72,7 @@ form.addEventListener("submit", async function (event) {
       .maybeSingle();
 
     if (error || !data) {
-      alert("CPF não encontrado. Faça seu cadastro para continuar.");
-      window.location.href = "cadastro.html";
+      alert("CPF ou data de nascimento não encontrados. Confira os dados digitados. Se ainda não tiver cadastro, use o botão de cadastro na tela inicial.");
       return;
     }
 

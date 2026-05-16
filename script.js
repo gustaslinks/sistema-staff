@@ -21,6 +21,7 @@ const calcado = document.getElementById('calcado');
 const indicado = document.getElementById('indicado');
 const pixOutro = document.getElementById('pixOutro');
 const foto = document.getElementById('foto');
+const fotoCamera = document.getElementById('fotoCamera');
 const observacoes = document.getElementById('observacoes');
 const termos = document.getElementById('termos');
 const form = document.getElementById('staffForm');
@@ -48,6 +49,7 @@ const staffIdEdicao = modoEdicao
   ? (isAdminEdicao && staffIdUrlEdicao ? staffIdUrlEdicao : (staffLogadoEdicao && staffLogadoEdicao.id ? staffLogadoEdicao.id : null))
   : null;
 let fotoAtualUrl = '';
+document.body.classList.add(modoEdicao ? 'pagina-editar-cadastro' : 'pagina-cadastro-geral');
 let staffAtualEdicao = null;
 let modoEdicaoAdminCpfAtivo = false;
 function isModoAtualizacao(){
@@ -239,7 +241,7 @@ function getValidationState(showAll=false){
     fieldCalcado: calcado ? calcado.value !== "" : true,
     fieldIndicado:indicado.value.trim().length>=2,
     fieldObservacoes:true,
-    fieldFoto: modoEdicao ? (foto.files.length===0 || ['image/jpeg','image/png'].includes(foto.files[0].type)) : (foto.files.length>0 && ['image/jpeg','image/png'].includes(foto.files[0].type)),
+    fieldFoto: modoEdicao ? (!arquivoFotoSelecionado() || arquivoFotoValido()) : arquivoFotoValido(),
     fieldPixOutro:selectedPix!=='outro' || isValidPixOutro(pixOutro.value),
     fieldTermos:termos.checked
   };
@@ -248,6 +250,16 @@ function getValidationState(showAll=false){
     if(fieldId!=='fieldTermos') setFieldStatus(fieldId,valid,shouldShow);
   });
   return state;
+}
+
+function arquivoFotoSelecionado(){
+  return (foto && foto.files && foto.files.length > 0) || (fotoCamera && fotoCamera.files && fotoCamera.files.length > 0) || !!(window.StaffPhotoCropper && window.StaffPhotoCropper.getFile && window.StaffPhotoCropper.getFile());
+}
+
+function arquivoFotoValido(){
+  const arquivo = (window.StaffPhotoCropper && window.StaffPhotoCropper.getFile && window.StaffPhotoCropper.getFile()) || (foto && foto.files && foto.files[0]) || (fotoCamera && fotoCamera.files && fotoCamera.files[0]);
+  if(!arquivo) return false;
+  return ['image/jpeg','image/png'].includes(arquivo.type);
 }
 
 function isFormValid(showAll=false){return Object.values(getValidationState(showAll)).every(Boolean);}
@@ -370,36 +382,36 @@ nascimento.addEventListener('change',()=>{markTouched('fieldNascimento');refresh
 pixOutro.addEventListener('input',()=>{pixOutro.value=pixOutro.value.replace(/^\s+/,'');markTouched('fieldPixOutro');refreshSubmitState();});
 pixOutro.addEventListener('blur',()=>{pixOutro.value=removeExtraSpaces(pixOutro.value);markTouched('fieldPixOutro');refreshSubmitState();});
 
-foto.addEventListener('change', async ()=>{
+async function processarArquivoFoto(inputOrigem){
   markTouched('fieldFoto');
+  if(!inputOrigem) { refreshSubmitState(); return; }
   const preview=document.getElementById('fotoPreview');
   const previewImg=document.getElementById('fotoPreviewImg');
   const previewText=document.getElementById('fotoPreviewText');
 
-  if(window.StaffPhotoCropper) window.StaffPhotoCropper.clear();
-
-  if(foto.files.length>0 && ['image/jpeg','image/png'].includes(foto.files[0].type)){
-    const file=foto.files[0];
-
+  const arquivo = inputOrigem.files && inputOrigem.files[0];
+  if(arquivo && ['image/jpeg','image/png'].includes(arquivo.type)){
     if(window.StaffPhotoCropper && typeof window.StaffPhotoCropper.open === 'function'){
-      const recortada = await window.StaffPhotoCropper.open(file, foto);
-      if(!recortada){
-        preview.style.display='none';
+      const recortada = await window.StaffPhotoCropper.open(arquivo, inputOrigem);
+      if(recortada){
+        if(previewImg) previewImg.src=URL.createObjectURL(recortada);
+        if(previewText) previewText.textContent=`${recortada.name} • ${(recortada.size/1024/1024).toFixed(2)} MB`;
+        if(preview) preview.style.display='flex';
       }
-      refreshSubmitState();
-      return;
+    } else {
+      if(previewImg) previewImg.src=URL.createObjectURL(arquivo);
+      if(previewText) previewText.textContent=`${arquivo.name} • ${(arquivo.size/1024/1024).toFixed(2)} MB`;
+      if(preview) preview.style.display='flex';
     }
-
-    previewImg.src=URL.createObjectURL(file);
-    previewText.textContent=`${file.name} • ${(file.size/1024/1024).toFixed(2)} MB`;
-    preview.style.display='flex';
   }else{
-    preview.style.display='none';
+    if(preview) preview.style.display='none';
+    if(inputOrigem) inputOrigem.value='';
   }
   refreshSubmitState();
-});
+}
 
-termos.addEventListener('change',()=>{markTouched('fieldTermos');refreshSubmitState();});
+if(foto){ foto.addEventListener('change', () => processarArquivoFoto(foto)); }
+if(fotoCamera){ fotoCamera.addEventListener('change', () => processarArquivoFoto(fotoCamera)); }
 
 document.querySelectorAll('input[name="pixTipo"]').forEach(radio=>{
   radio.addEventListener('change',()=>{
@@ -778,8 +790,8 @@ form.addEventListener('submit',async function(event){
     const cpfLimpo=onlyNumbers(cpf.value);
     let fotoUrlFinal = fotoAtualUrl;
 
-    if (foto.files.length > 0) {
-      const arquivoFoto=(window.StaffPhotoCropper && window.StaffPhotoCropper.getFile && window.StaffPhotoCropper.getFile()) || foto.files[0];
+    if (arquivoFotoSelecionado()) {
+      const arquivoFoto=(window.StaffPhotoCropper && window.StaffPhotoCropper.getFile && window.StaffPhotoCropper.getFile()) || (foto && foto.files && foto.files[0]) || (fotoCamera && fotoCamera.files && fotoCamera.files[0]);
       const extensao=arquivoFoto.type === 'image/jpeg' ? 'jpg' : (arquivoFoto.name.split('.').pop().toLowerCase() || 'jpg');
       const nomeArquivo=`${cpfLimpo}-${Date.now()}.${extensao}`;
       const caminhoFoto=`staffs/${nomeArquivo}`;
@@ -919,6 +931,7 @@ async function iniciarModoEdicao(){
   liberarBotaoEdicao();
   travarCamposLoginStaffComum();
   foto.required = false;
+  if (fotoCamera) fotoCamera.required = false;
   const helperFoto = document.querySelector('#fieldFoto .error');
   if(helperFoto) helperFoto.textContent = 'Envie uma nova foto somente se quiser trocar a foto atual.';
 
@@ -952,4 +965,4 @@ updatePixPreviews();
 refreshSubmitState();
 
 
-// v183 - correção: detecção robusta de admin e busca por CPF também disponível para admin logado.
+// v184 - correção: detecção robusta de admin e busca por CPF também disponível para admin logado.

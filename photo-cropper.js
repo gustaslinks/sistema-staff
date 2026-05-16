@@ -22,7 +22,12 @@
     startY: 0,
     baseX: 0,
     baseY: 0,
-    resolve: null
+    resolve: null,
+    pointers: new Map(),
+    pinchStartDistance: 0,
+    pinchStartScale: 1,
+    pinchBaseX: 0,
+    pinchBaseY: 0
   };
 
   function $(id){ return document.getElementById(id); }
@@ -48,7 +53,7 @@
             <input id="photoCropperZoom" type="range" min="1" max="3" step="0.01" value="1" aria-label="Zoom da foto">
             <span>Mais</span>
           </div>
-          <p class="photo-cropper-help">Arraste a imagem para posicionar. O arquivo salvo será quadrado e comprimido para o cadastro.</p>
+          <p class="photo-cropper-help">Arraste a imagem para posicionar. No celular, use pinça para aproximar/afastar. O arquivo salvo será quadrado e comprimido para o cadastro.</p>
         </div>
         <div class="photo-cropper-actions">
           <button type="button" class="photo-cropper-btn secondary" id="photoCropperCancel">Cancelar</button>
@@ -70,14 +75,38 @@
     });
 
     state.stage.addEventListener('pointerdown', (ev) => {
-      state.dragging = true;
+      ev.preventDefault();
       state.stage.setPointerCapture(ev.pointerId);
-      state.startX = ev.clientX;
-      state.startY = ev.clientY;
-      state.baseX = state.x;
-      state.baseY = state.y;
+      state.pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+      if(state.pointers.size === 1){
+        state.dragging = true;
+        state.startX = ev.clientX;
+        state.startY = ev.clientY;
+        state.baseX = state.x;
+        state.baseY = state.y;
+      } else if(state.pointers.size === 2){
+        state.dragging = false;
+        state.pinchStartDistance = pointerDistance();
+        state.pinchStartScale = state.scale;
+        state.pinchBaseX = state.x;
+        state.pinchBaseY = state.y;
+      }
     });
     state.stage.addEventListener('pointermove', (ev) => {
+      if(!state.pointers.has(ev.pointerId)) return;
+      ev.preventDefault();
+      state.pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+      if(state.pointers.size >= 2){
+        const dist = pointerDistance();
+        if(state.pinchStartDistance > 0){
+          const nextScale = state.pinchStartScale * (dist / state.pinchStartDistance);
+          state.scale = Math.min(Number(state.zoomRange.max), Math.max(Number(state.zoomRange.min), nextScale));
+          state.zoomRange.value = String(state.scale);
+          clampPosition();
+          applyTransform();
+        }
+        return;
+      }
       if(!state.dragging) return;
       state.x = state.baseX + ev.clientX - state.startX;
       state.y = state.baseY + ev.clientY - state.startY;
@@ -86,11 +115,30 @@
     });
     state.stage.addEventListener('pointerup', endDrag);
     state.stage.addEventListener('pointercancel', endDrag);
+    state.stage.addEventListener('pointerleave', endDrag);
     backdrop.addEventListener('click', (ev) => { if(ev.target === backdrop) cancel(); });
   }
 
+  function pointerDistance(){
+    const pts = Array.from(state.pointers.values());
+    if(pts.length < 2) return 0;
+    const dx = pts[0].x - pts[1].x;
+    const dy = pts[0].y - pts[1].y;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
   function endDrag(ev){
-    state.dragging = false;
+    if(ev && state.pointers) state.pointers.delete(ev.pointerId);
+    if(state.pointers && state.pointers.size === 1){
+      const remaining = Array.from(state.pointers.values())[0];
+      state.dragging = true;
+      state.startX = remaining.x;
+      state.startY = remaining.y;
+      state.baseX = state.x;
+      state.baseY = state.y;
+    } else {
+      state.dragging = false;
+    }
     try{ state.stage.releasePointerCapture(ev.pointerId); }catch(e){}
   }
 
@@ -99,6 +147,7 @@
     state.input = input;
     state.file = file;
     state.cropFile = null;
+    state.pointers && state.pointers.clear();
 
     return new Promise((resolve) => {
       state.resolve = resolve;

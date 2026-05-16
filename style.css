@@ -6198,7 +6198,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 }
 
 
-/* v183 - seta outline consistente no card de inscritos */
+/* v184 - seta outline consistente no card de inscritos */
 .botao-expandir-inscrito {
   font-size: 0 !important;
   line-height: 0 !important;
@@ -6229,7 +6229,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
   transform: rotate(90deg) !important;
 }
 
-/* v183 - busca admin na edição de cadastro */
+/* v184 - busca admin na edição de cadastro */
 .admin-editar-staff-panel {
   background: #ffffff;
   border: 1px solid rgba(124, 58, 237, 0.18);
@@ -6320,5 +6320,167 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 
   .admin-editar-staff-busca button {
     width: 100%;
+  }
+}
+
+
+/* v184 - melhoria visual cadastro/edição, blocos e foto */
+body.pagina-cadastro-geral,
+body.pagina-editar-cadastro {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 14% 0%, rgba(124, 58, 237, 0.13), transparent 32%),
+    radial-gradient(circle at 86% 12%, rgba(14, 165, 233, 0.15), transparent 30%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 44%, #f8fafc 100%) !important;
+}
+
+body.pagina-editar-cadastro {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(16, 185, 129, 0.13), transparent 31%),
+    radial-gradient(circle at 84% 8%, rgba(124, 58, 237, 0.14), transparent 32%),
+    linear-gradient(180deg, #f7fdfb 0%, #eef7ff 48%, #f8fafc 100%) !important;
+}
+
+body.pagina-cadastro-geral .container,
+body.pagina-editar-cadastro .container {
+  position: relative;
+}
+
+body.pagina-cadastro-geral .header,
+body.pagina-editar-cadastro .header {
+  background: rgba(255,255,255,0.82);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 24px;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.09);
+  backdrop-filter: blur(10px);
+  padding: 24px 22px;
+  margin-bottom: 18px;
+}
+
+body.pagina-cadastro-geral #staffForm.form-area,
+body.pagina-editar-cadastro #staffForm.form-area {
+  background: rgba(255,255,255,0.94);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 26px;
+  box-shadow: 0 20px 54px rgba(15, 23, 42, 0.10);
+  overflow: hidden;
+}
+
+#staffForm .section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 12px 14px 12px 46px !important;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(124,58,237,.10), rgba(14,165,233,.08));
+  border: 1px solid rgba(124,58,237,.13);
+  color: #312e81 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: .01em;
+  position: relative;
+}
+
+#staffForm .section-title::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  box-shadow: 0 7px 14px rgba(124,58,237,.20);
+}
+
+body.pagina-editar-cadastro #staffForm .section-title {
+  background: linear-gradient(135deg, rgba(16,185,129,.11), rgba(124,58,237,.08));
+  border-color: rgba(16,185,129,.18);
+  color: #064e3b !important;
+}
+
+body.pagina-editar-cadastro #staffForm .section-title::before {
+  background: linear-gradient(135deg, #10b981, #7c3aed);
+}
+
+#staffForm .field {
+  background: rgba(248,250,252,0.62);
+  border: 1px solid rgba(226,232,240,.72);
+  border-radius: 16px;
+  padding: 12px !important;
+}
+
+#staffForm .grid .field {
+  height: calc(100% - 20px);
+}
+
+#staffForm .pix-card {
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 20px rgba(15,23,42,.04);
+}
+
+.foto-input-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.foto-input-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid rgba(124,58,237,.22);
+  color: #5b21b6;
+  background: rgba(124,58,237,.07);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.foto-input-btn-camera {
+  color: #047857;
+  border-color: rgba(16,185,129,.28);
+  background: rgba(16,185,129,.08);
+}
+
+.foto-input-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15,23,42,.08);
+}
+
+.foto-input-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.photo-cropper-stage {
+  touch-action: none;
+}
+
+@media (max-width: 720px) {
+  body.pagina-cadastro-geral .header,
+  body.pagina-editar-cadastro .header {
+    padding: 20px 18px;
+    border-radius: 22px;
+  }
+
+  #staffForm .section-title {
+    padding-left: 44px !important;
+  }
+
+  #staffForm .field {
+    padding: 11px !important;
+  }
+
+  .foto-input-actions {
+    grid-template-columns: 1fr;
   }
 }

@@ -4222,10 +4222,10 @@ if (logoutBtn) {
   });
 }
 
-/* v183 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
-/* v183 - ajustes reais nos relatórios PDF solicitados */
-/* v183 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
-/* v183 - tabela numeracao preenche coluna esquerda inteira antes da direita */
+/* v184 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
+/* v184 - ajustes reais nos relatórios PDF solicitados */
+/* v184 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
+/* v184 - tabela numeracao preenche coluna esquerda inteira antes da direita */
 function obterDataDiaRelatorio(dia) {
   if (!dia || !dia.data_dia) return null;
   const partes = String(dia.data_dia).split("-");
@@ -4793,6 +4793,6 @@ async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
   return nomeArquivo;
 }
 
-/* v183 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
+/* v184 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
 
-/* v183 - lista em branco com 18 linhas em uma única página. */
+/* v184 - lista em branco com 18 linhas em uma única página. */
