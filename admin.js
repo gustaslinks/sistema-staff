@@ -2507,6 +2507,7 @@ async function carregarDiasCorrida(corridaId) {
         ${formatarMoeda(dia.valor_ajuda_custo)}
       </p>
 
+      <div class="checkin-dia-acoes">
       <button
         type="button"
         class="botao-admin-secundario botao-checkin-dia"
@@ -2515,6 +2516,14 @@ async function carregarDiasCorrida(corridaId) {
       >
         <span class="btn-ico">▦</span><span>Gerar QR Check-in PDF</span>
       </button>
+
+      <a
+        class="botao-admin-secundario botao-dashboard-checkin"
+        href="checkin-dashboard.html?corrida=${corridaId}&dia=${dia.id}"
+      >
+        <span class="btn-ico">◉</span><span>Acompanhar Check-in</span>
+      </a>
+      </div>
 
     </div>
   `).join("");
