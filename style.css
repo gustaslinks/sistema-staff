@@ -9905,3 +9905,102 @@ body.body-corridas .card-corrida h2 {
     flex-basis: 28px !important;
   }
 }
+
+/* =========================================================
+   v3.2 - ajuste fino Corridas x Admin
+   - Remove gutter duplicado da página Corridas no mobile
+   - Mantém a distância lateral igual ao Admin: só o padding do body
+   - Adiciona status visual dentro de Minhas inscrições
+   - Refina texto de corrida encerrada
+========================================================= */
+body.body-corridas {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+body.body-corridas .pagina-corridas {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  gap: 16px !important;
+}
+
+body.body-corridas .card-staff,
+body.body-corridas .cabecalho-corridas,
+body.body-corridas .card-corrida,
+body.body-corridas .card-minha-inscricao,
+body.body-corridas .lista-corridas > p,
+body.body-corridas .lista-minhas-inscricoes > p,
+.card-corrida-admin {
+  border-radius: 24px !important;
+}
+
+body.body-corridas .card-corrida,
+body.body-corridas .card-minha-inscricao {
+  padding: 24px !important;
+}
+
+body.body-corridas .card-corrida-com-banner .corrida-banner-wrap,
+body.body-corridas .card-minha-inscricao .corrida-banner-wrap {
+  margin-left: -24px !important;
+  margin-right: -24px !important;
+  border-radius: 24px 24px 0 0 !important;
+}
+
+body.body-corridas .card-corrida-com-banner .corrida-card-banner,
+body.body-corridas .card-minha-inscricao .corrida-card-banner,
+body.body-corridas .card-minha-inscricao .minha-inscricao-banner {
+  border-radius: 24px 24px 0 0 !important;
+}
+
+body.body-corridas .card-corrida h2,
+body.body-corridas .card-minha-inscricao h3 {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  text-align: left !important;
+}
+
+.corrida-status-card.minha-inscricao-status {
+  margin: 14px 0 18px !important;
+}
+
+.corrida-status-card.minha-inscricao-status strong {
+  font-size: clamp(18px, 4vw, 24px) !important;
+}
+
+.corrida-status-card.minha-inscricao-status span:not(.status-semaforo-indicador) {
+  font-size: clamp(13px, 3vw, 16px) !important;
+}
+
+@media (max-width: 520px) {
+  body.body-corridas {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    padding-top: 20px !important;
+  }
+
+  body.body-corridas .pagina-corridas {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    gap: 16px !important;
+  }
+
+  body.body-corridas .card-corrida,
+  body.body-corridas .card-minha-inscricao {
+    padding: 20px !important;
+  }
+
+  body.body-corridas .card-corrida-com-banner .corrida-banner-wrap,
+  body.body-corridas .card-minha-inscricao .corrida-banner-wrap {
+    margin-left: -20px !important;
+    margin-right: -20px !important;
+    border-radius: 24px 24px 0 0 !important;
+  }
+
+  body.body-corridas .card-corrida-com-banner .corrida-card-banner,
+  body.body-corridas .card-minha-inscricao .corrida-card-banner,
+  body.body-corridas .card-minha-inscricao .minha-inscricao-banner {
+    border-radius: 24px 24px 0 0 !important;
+  }
+}

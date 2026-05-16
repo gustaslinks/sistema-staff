@@ -395,7 +395,7 @@ async function carregarCorridas() {
           <div class="corrida-status-card ${inscricaoAberta ? "aberta" : "encerrada"}">
             <div>
               <strong>${inscricaoAberta ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
-              <span>${inscricaoAberta ? `${textoVagas} vagas preenchidas` : "Cadastro bloqueado para novas inscrições"}</span>
+              <span>${inscricaoAberta ? `${textoVagas} vagas preenchidas` : "Inscrições finalizadas. Acompanhe as próximas corridas"}</span>
             </div>
             <span class="status-semaforo-indicador ${inscricaoAberta ? "status-aberto" : "status-fechado"}" aria-hidden="true"></span>
           </div>
@@ -683,6 +683,7 @@ async function carregarMinhasInscricoes() {
       }
 
       const bannerMinhaInscricao = obterBannerCorridaUrl(corrida);
+      const inscricaoAbertaMinha = corrida.status === "aberta";
 
       return `
         <article class="card-minha-inscricao ${bannerMinhaInscricao ? "card-minha-com-banner" : "card-minha-sem-banner"}">
@@ -692,6 +693,14 @@ async function carregarMinhasInscricoes() {
           <div class="conteudo-minha-inscricao">
 
             <h3>${corrida.nome}</h3>
+
+            <div class="corrida-status-card minha-inscricao-status ${inscricaoAbertaMinha ? "aberta" : "encerrada"}">
+              <div>
+                <strong>${inscricaoAbertaMinha ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
+                <span>${inscricaoAbertaMinha ? "A corrida ainda está recebendo inscrições" : "Obrigado por participar. Até a próxima corrida"}</span>
+              </div>
+              <span class="status-semaforo-indicador ${inscricaoAbertaMinha ? "status-aberto" : "status-fechado"}" aria-hidden="true"></span>
+            </div>
 
             <p>
               <strong>Data:</strong>

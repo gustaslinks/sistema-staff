@@ -758,7 +758,7 @@ async function carregarCorridasAdmin() {
           <div class="corrida-status-topo-linha">
             <div>
               <strong class="corrida-status-label corrida-status-label-destaque">${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
-              <span class="corrida-status-subtitulo">${corrida.status === "aberta" ? "Cadastro liberado para staffs" : "Cadastro bloqueado para novas inscrições"}</span>
+              <span class="corrida-status-subtitulo">${corrida.status === "aberta" ? "Cadastro liberado para staffs" : "Inscrições finalizadas. Acompanhe as próximas corridas"}</span>
             </div>
 
             <button
