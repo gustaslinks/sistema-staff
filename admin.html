@@ -6,13 +6,13 @@
 
   <title>Painel Admin | Sistema Staff</title>
 
-  <link rel="stylesheet" href="style.css?v=23">
+  <link rel="stylesheet" href="style.css?v=24">
   <link rel="stylesheet" href="photo-cropper.css?v=22">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <button class="version-badge" type="button" title="v2.3: badge de versão clicável; card de inscrições abertas com semáforo pulsante; ajustes visuais em disponibilidade, avisos e cards da página de corridas." aria-label="v2.3: badge de versão clicável; card de inscrições abertas com semáforo pulsante; ajustes visuais em disponibilidade, avisos e cards da página de corridas." onclick="alert(this.getAttribute('aria-label'))">v2.3</button>
+  <button class="version-badge" type="button" data-version-summary="v2.4: correção definitiva do logout no celular; badge de versão com painel tocável; card de inscrições abertas alinhado com texto à esquerda e semáforo centralizado à direita; login visualmente refinado; ícone de senha flat; avisos e disponibilidade ajustados.">v2.4</button>
 
   <main class="pagina-admin">
 
@@ -211,9 +211,37 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
-  <script src="qrcode.min.js?v=22"></script>
-  <script src="photo-cropper.js?v=22"></script>
-  <script src="admin.js?v=22"></script>
-  <script src="floating-tools.js?v=23"></script>
+  <script src="qrcode.min.js?v=24"></script>
+  <script src="photo-cropper.js?v=24"></script>
+  <script src="admin.js?v=24"></script>
+  <script src="floating-tools.js?v=24"></script>
+
+<script>
+(function(){
+  function openVersionInfo(){
+    var badge=document.querySelector('.version-badge');
+    if(!badge) return;
+    var text=badge.getAttribute('data-version-summary') || badge.getAttribute('title') || badge.textContent;
+    var old=document.querySelector('.version-popover');
+    if(old){ old.remove(); return; }
+    var box=document.createElement('div');
+    box.className='version-popover';
+    box.innerHTML='<button type="button" class="version-popover-close" aria-label="Fechar">×</button><strong>'+badge.textContent+'</strong><p>'+text+'</p>';
+    document.body.appendChild(box);
+    box.querySelector('.version-popover-close').addEventListener('click', function(e){ e.stopPropagation(); box.remove(); });
+    setTimeout(function(){
+      document.addEventListener('click', function close(ev){
+        if(!box.contains(ev.target) && ev.target!==badge){ box.remove(); document.removeEventListener('click', close); }
+      });
+    },0);
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var badge=document.querySelector('.version-badge');
+    if(!badge) return;
+    badge.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); openVersionInfo(); });
+    badge.addEventListener('touchend', function(e){ e.preventDefault(); e.stopPropagation(); openVersionInfo(); }, {passive:false});
+  });
+})();
+</script>
 </body>
 </html>

@@ -7706,7 +7706,7 @@ body.pagina-editar-cadastro .header p {
 }
 
 
-/* v2.3 - ajuste real do semáforo dentro do box de inscrições */
+/* v2.4 - ajuste real do semáforo dentro do box de inscrições */
 .corrida-status-topo-linha{
   display:flex !important;
   align-items:center !important;
@@ -7909,7 +7909,7 @@ body.pagina-editar-cadastro .header p {
   color: #1d4ed8;
 }
 
-/* v2.3 - segurança, senha e controles admin */
+/* v2.4 - segurança, senha e controles admin */
 .password-wrapper {
   position: relative;
   display: flex;
@@ -8018,7 +8018,7 @@ body.pagina-editar-cadastro .header p {
 
 
 /* =========================================================
-   v2.3 - correção logout + polimento página Corridas
+   v2.4 - correção logout + polimento página Corridas
 ========================================================= */
 .version-badge {
   cursor: help;
@@ -8368,7 +8368,7 @@ body.pagina-editar-cadastro .header p {
 }
 
 /* =========================================================
-   v2.3 - refinamentos Corridas + badge clicável
+   v2.4 - refinamentos Corridas + badge clicável
 ========================================================= */
 .version-badge {
   appearance: none !important;
@@ -8504,5 +8504,234 @@ body.pagina-editar-cadastro .header p {
     width: 38px !important;
     height: 38px !important;
     border-radius: 14px !important;
+  }
+}
+
+/* =========================================================
+   v2.4 - logout mobile, badge tocável, login e status de corrida
+========================================================= */
+.version-badge {
+  position: fixed !important;
+  top: max(14px, env(safe-area-inset-top)) !important;
+  right: 16px !important;
+  z-index: 2147483000 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+}
+.version-popover {
+  position: fixed;
+  top: calc(max(14px, env(safe-area-inset-top)) + 54px);
+  right: 16px;
+  width: min(330px, calc(100vw - 32px));
+  z-index: 2147483001;
+  padding: 16px 18px 16px;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, .96);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 24px 60px rgba(15,23,42,.35);
+  backdrop-filter: blur(12px);
+}
+.version-popover strong {
+  display: block;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.version-popover p {
+  margin: 0;
+  color: rgba(255,255,255,.82);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.version-popover-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,.82);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.login-page {
+  background:
+    radial-gradient(circle at 14% 10%, rgba(124,58,237,.14), transparent 32%),
+    radial-gradient(circle at 88% 16%, rgba(14,165,233,.14), transparent 34%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 52%, #f8fafc 100%) !important;
+}
+.login-page .login-card {
+  position: relative;
+  overflow: hidden;
+  padding: 38px 34px 32px !important;
+  border-radius: 32px !important;
+  background: rgba(255,255,255,.94) !important;
+  border: 1px solid rgba(124,58,237,.14) !important;
+  box-shadow: 0 26px 70px rgba(15,23,42,.14) !important;
+}
+.login-page .login-card::before {
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:6px;
+  background:linear-gradient(90deg,#22c55e,#06b6d4,#7c3aed);
+}
+.login-page .login-card h1 {
+  font-size: clamp(34px, 7vw, 46px) !important;
+  line-height: .96 !important;
+  margin-bottom: 12px !important;
+}
+.login-page .subtitle {
+  font-size: 16px !important;
+  color: #64748b !important;
+  margin-bottom: 28px !important;
+}
+.login-page .field label {
+  color:#334155 !important;
+  font-size: 13px !important;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.login-page .field input {
+  min-height: 54px;
+  border-radius: 18px !important;
+  font-weight: 650;
+  color: #0f172a;
+}
+.login-page #loginBtn,
+.login-page button[type="submit"] {
+  min-height: 56px;
+  border-radius: 18px !important;
+  background: linear-gradient(135deg, #10b981, #06b6d4, #7c3aed) !important;
+  box-shadow: 0 18px 34px rgba(14,165,233,.22) !important;
+}
+.login-page .forgot-password-btn,
+.login-page .cadastro-link {
+  border-radius: 18px !important;
+}
+
+.password-toggle {
+  right: 9px !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 13px !important;
+  background: #eef2ff !important;
+  color: #475569 !important;
+  border: 1px solid rgba(99,102,241,.18) !important;
+}
+.password-toggle:hover,
+.password-toggle.is-visible {
+  background: #e0e7ff !important;
+  color: #4338ca !important;
+}
+.password-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  background: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+.password-icon-eye {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 5C5 5 2 12 2 12s3 7 10 7 10-7 10-7-3-7-10-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 5C5 5 2 12 2 12s3 7 10 7 10-7 10-7-3-7-10-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z'/%3E%3C/svg%3E");
+}
+.password-icon-eye-off {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m3.3 2 18.7 18.7-1.3 1.3-3.1-3.1A11.2 11.2 0 0 1 12 20C5 20 2 12 2 12a18.4 18.4 0 0 1 5-6.6L2 3.3 3.3 2Zm7 7 4.7 4.7A3.5 3.5 0 0 0 10.3 9ZM12 4c7 0 10 8 10 8a18 18 0 0 1-2.8 4.3l-2.3-2.3a5 5 0 0 0-6.9-6.9L8.3 5.4A11.8 11.8 0 0 1 12 4Z'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m3.3 2 18.7 18.7-1.3 1.3-3.1-3.1A11.2 11.2 0 0 1 12 20C5 20 2 12 2 12a18.4 18.4 0 0 1 5-6.6L2 3.3 3.3 2Zm7 7 4.7 4.7A3.5 3.5 0 0 0 10.3 9ZM12 4c7 0 10 8 10 8a18 18 0 0 1-2.8 4.3l-2.3-2.3a5 5 0 0 0-6.9-6.9L8.3 5.4A11.8 11.8 0 0 1 12 4Z'/%3E%3C/svg%3E");
+}
+
+.corrida-status-card.aberta {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  min-height: 106px !important;
+  padding: 22px clamp(22px, 4vw, 34px) !important;
+  text-align: left !important;
+  border-radius: 28px !important;
+}
+.corrida-status-card.aberta > div {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+.corrida-status-card.aberta strong {
+  font-size: clamp(22px, 4.8vw, 34px) !important;
+  line-height: 1.05 !important;
+  margin: 0 0 8px !important;
+}
+.corrida-status-card.aberta span:not(.status-semaforo-indicador) {
+  margin-top: 0 !important;
+  font-size: clamp(16px, 3.2vw, 23px) !important;
+  line-height: 1.22 !important;
+  color: #166534 !important;
+}
+.corrida-status-card.aberta .status-semaforo-indicador {
+  order: 2 !important;
+  flex: 0 0 58px !important;
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  min-height: 58px !important;
+  margin: 0 !important;
+  align-self: center !important;
+  border: 8px solid rgba(255,255,255,.92) !important;
+  box-shadow: 0 16px 34px rgba(34,197,94,.30), 0 0 0 1px rgba(34,197,94,.18) !important;
+}
+
+.texto-disponibilidade-info,
+.texto-disponibilidade-alerta {
+  grid-template-columns: 1fr !important;
+  gap: 9px !important;
+  padding: 20px 20px !important;
+  border-radius: 24px !important;
+}
+.texto-disponibilidade-info .aviso-icone,
+.texto-disponibilidade-alerta .aviso-icone {
+  display: none !important;
+}
+.texto-disponibilidade-info {
+  background: linear-gradient(135deg, #f8fafc, #eef6ff) !important;
+  border-color: rgba(96,165,250,.36) !important;
+  color: #1e3a8a !important;
+}
+.texto-disponibilidade-alerta {
+  background: linear-gradient(135deg, #fffaf0, #fff7ed) !important;
+  border-color: rgba(251,146,60,.32) !important;
+  color: #7c2d12 !important;
+}
+.texto-disponibilidade-info strong,
+.texto-disponibilidade-alerta strong {
+  font-size: clamp(18px, 3.4vw, 24px) !important;
+}
+.texto-disponibilidade-info span,
+.texto-disponibilidade-alerta span {
+  font-size: clamp(15px, 2.8vw, 18px) !important;
+  font-weight: 600 !important;
+  line-height: 1.55 !important;
+}
+
+@media (max-width: 760px) {
+  .corrida-card-head {
+    align-items: stretch !important;
+  }
+  .corrida-status-card.aberta {
+    min-height: 110px !important;
+    width: 100% !important;
+    padding: 22px 24px !important;
+  }
+  .corrida-status-card.aberta .status-semaforo-indicador {
+    flex-basis: 54px !important;
+    width: 54px !important;
+    height: 54px !important;
+    min-width: 54px !important;
+    min-height: 54px !important;
   }
 }

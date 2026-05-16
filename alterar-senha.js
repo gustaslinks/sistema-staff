@@ -1,16 +1,28 @@
 const SUPABASE_URL = "https://klpxoffkajijjktxztmc.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_O_MlVkyfreG125LVia6nag_1GL5bUli";
 const MANUAL_LOGOUT_KEY = "sistemaStaffManualLogout";
-async function sairDoSistemaSeguro() {
+function limparSessaoLocalSupabase() {
   try {
-    sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
     localStorage.removeItem("staffLogado");
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("sb-") || key.includes("supabase.auth")) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch (error) {
+    console.warn("Não foi possível limpar sessão local:", error);
+  }
+}
+async function sairDoSistemaSeguro() {
+  sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+  limparSessaoLocalSupabase();
+  try {
     await supabaseClient.auth.signOut({ scope: "global" });
   } catch (error) {
     console.warn("Falha ao encerrar sessão:", error);
   } finally {
-    localStorage.removeItem("staffLogado");
-    window.location.replace("index.html?logout=1");
+    limparSessaoLocalSupabase();
+    window.location.replace("index.html?logout=1&t=" + Date.now());
   }
 }
 
@@ -37,7 +49,8 @@ function configurarToggleSenha(){
     btn.addEventListener('click', () => {
       const visivel = input.type === 'text';
       input.type = visivel ? 'password' : 'text';
-      btn.textContent = visivel ? '👁️' : '🙈';
+      btn.innerHTML = visivel ? '<span class="password-icon password-icon-eye" aria-hidden="true"></span>' : '<span class="password-icon password-icon-eye-off" aria-hidden="true"></span>';
+      btn.classList.toggle('is-visible', !visivel);
     });
   });
 }

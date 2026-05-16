@@ -9,16 +9,28 @@ const supabaseClient = supabase.createClient(
 
 
 const MANUAL_LOGOUT_KEY = "sistemaStaffManualLogout";
-async function sairDoSistemaSeguro() {
+function limparSessaoLocalSupabase() {
   try {
-    sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
     localStorage.removeItem("staffLogado");
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("sb-") || key.includes("supabase.auth")) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch (error) {
+    console.warn("Não foi possível limpar sessão local:", error);
+  }
+}
+async function sairDoSistemaSeguro() {
+  sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+  limparSessaoLocalSupabase();
+  try {
     await supabaseClient.auth.signOut({ scope: "global" });
   } catch (error) {
     console.warn("Falha ao encerrar sessão:", error);
   } finally {
-    localStorage.removeItem("staffLogado");
-    window.location.replace("index.html?logout=1");
+    limparSessaoLocalSupabase();
+    window.location.replace("index.html?logout=1&t=" + Date.now());
   }
 }
 async function validarSessaoSupabaseObrigatoria() {

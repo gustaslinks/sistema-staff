@@ -17,6 +17,36 @@ const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
 const loginStatus = document.getElementById("loginStatus");
 const MANUAL_LOGOUT_KEY = "sistemaStaffManualLogout";
 
+function limparSessaoLocalSupabase() {
+  try {
+    localStorage.removeItem("staffLogado");
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("sb-") || key.includes("supabase.auth")) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch (error) {
+    console.warn("Não foi possível limpar sessão local:", error);
+  }
+}
+
+async function processarLogoutManualNaTelaLogin() {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has("logout")) return false;
+  sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+  limparSessaoLocalSupabase();
+  try {
+    await supabaseClient.auth.signOut({ scope: "global" });
+  } catch (error) {
+    console.warn("Sessão remota já encerrada ou indisponível:", error);
+  }
+  limparSessaoLocalSupabase();
+  history.replaceState({}, document.title, window.location.pathname);
+  setStatus("Sessão encerrada. Entre novamente para acessar o sistema.", "success");
+  return true;
+}
+
+
 function onlyNumbers(value) {
   return String(value || "").replace(/\D/g, "");
 }
@@ -100,6 +130,7 @@ async function carregarStaffDaSessao(userId) {
 }
 
 async function verificarSessaoExistente() {
+  if (await processarLogoutManualNaTelaLogin()) return;
   if (sessionStorage.getItem(MANUAL_LOGOUT_KEY) === "1") return;
   const { data } = await supabaseClient.auth.getSession();
   const user = data && data.session && data.session.user;
@@ -122,7 +153,8 @@ function configurarToggleSenha() {
       const visivel = input.type === "text";
       input.type = visivel ? "password" : "text";
       btn.setAttribute("aria-label", visivel ? "Mostrar senha" : "Ocultar senha");
-      btn.textContent = visivel ? "👁️" : "🙈";
+      btn.innerHTML = visivel ? '<span class="password-icon password-icon-eye" aria-hidden="true"></span>' : '<span class="password-icon password-icon-eye-off" aria-hidden="true"></span>';
+      btn.classList.toggle('is-visible', !visivel);
     });
   });
 }
