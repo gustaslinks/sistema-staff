@@ -1,0 +1,7910 @@
+/* =========================================================
+   SISTEMA STAFF - ESTILOS GERAIS
+   Arquivo CSS principal unificado.
+   ========================================================= */
+
+/* =========================================================
+   RESET E CONFIGURAÇÕES GERAIS
+========================================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  padding: 30px 15px;
+  background: #f3f5f9;
+  color: #1d1d1d;
+  display: flex;
+  justify-content: center;
+}
+
+.hidden {
+  display: none;
+}
+
+
+/* =========================================================
+   CONTAINERS GERAIS
+========================================================= */
+
+.container,
+.pagina-corridas {
+  width: 100%;
+  max-width: 760px;
+}
+
+
+/* =========================================================
+   CABEÇALHO DO CADASTRO / LOGIN
+========================================================= */
+
+.header {
+  padding: 35px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #111827, #1f2937);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.header h1 {
+  margin-bottom: 10px;
+  font-size: 32px;
+}
+
+.header p {
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+
+/* =========================================================
+   ÁREA DE FORMULÁRIO
+========================================================= */
+
+.form-area {
+  padding: 35px;
+  background: #ffffff;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+  margin: 35px 0 25px;
+  padding-left: 12px;
+  border-left: 5px solid #2563eb;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.section-title:first-child {
+  margin-top: 0;
+}
+
+
+/* =========================================================
+   CAMPOS DE FORMULÁRIO
+========================================================= */
+
+.field {
+  margin-bottom: 22px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 8px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #f9fafb;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.field.valid input,
+.field.valid textarea {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.field.invalid input,
+.field.invalid textarea {
+  border-color: #dc2626;
+  background: #fff7f7;
+}
+
+
+/* =========================================================
+   MENSAGENS DE APOIO E ERRO
+========================================================= */
+
+.helper {
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.error {
+  display: none;
+  margin-top: 6px;
+  color: #dc2626;
+  font-size: 12px;
+}
+
+.field.invalid .error {
+  display: block;
+}
+
+.success-message {
+  display: none;
+  margin-top: 22px;
+  padding: 16px;
+  border: 1px solid #a7f3d0;
+  border-radius: 14px;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   GRIDS
+========================================================= */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+
+/* =========================================================
+   OPÇÕES DE PIX
+========================================================= */
+
+.pix-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.pix-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pix-card:hover,
+.pix-card:has(input:checked) {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.pix-card input {
+  margin-top: 3px;
+}
+
+.pix-card strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #111827;
+  font-size: 14px;
+}
+
+.pix-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   UPLOAD E PRÉ-VISUALIZAÇÃO DE FOTO
+========================================================= */
+
+.file-preview {
+  display: none;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.file-preview img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+  border-radius: 50%;
+}
+
+.file-preview div {
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   CHECKBOX
+========================================================= */
+
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.checkbox input {
+  margin-top: 4px;
+  transform: scale(1.2);
+}
+
+.checkbox label {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   BOTÕES GERAIS
+========================================================= */
+
+.submit-btn {
+  width: 100%;
+  margin-top: 30px;
+  padding: 18px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+
+.logout-btn {
+  padding: 18px 24px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+}
+
+.submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.login-shortcut {
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.login-shortcut:hover {
+  background: #374151;
+}
+
+.back-corridas-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.back-corridas-btn:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.btn-admin {
+  width: auto;
+  margin-top: 0;
+}
+
+/* =========================================================
+   TEXTO DE RODAPÉ
+========================================================= */
+
+.footer-text {
+  margin-top: 25px;
+  color: #6b7280;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   PÁGINA DE CORRIDAS
+========================================================= */
+
+.pagina-corridas {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+
+/* =========================================================
+   CARD DO STAFF LOGADO
+========================================================= */
+
+.card-staff {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 22px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.foto-staff-wrapper {
+  flex-shrink: 0;
+}
+
+.foto-staff {
+  display: block;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 3px solid #e5e7eb;
+  border-radius: 50%;
+  background: #e5e7eb;
+}
+
+.dados-staff {
+  flex: 1;
+}
+
+.label-card {
+  margin-bottom: 4px;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dados-staff h2 {
+  margin-bottom: 8px;
+  color: #111827;
+  font-size: 24px;
+}
+
+.dados-staff p {
+  margin: 3px 0;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.botao-sair {
+  flex-shrink: 0;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botao-sair:hover {
+  background: #374151;
+}
+
+.acoes-staff {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.botao-admin {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botao-admin:hover {
+  background: #1d4ed8;
+}
+
+/* =========================================================
+   CABEÇALHO DAS CORRIDAS
+========================================================= */
+
+.cabecalho-corridas {
+  padding: 28px 30px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #111827, #1f2937);
+  color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.cabecalho-corridas h1 {
+  margin-bottom: 8px;
+  font-size: 30px;
+}
+
+.cabecalho-corridas h2 {
+  margin-bottom: 8px;
+  font-size: 30px;
+}
+
+.cabecalho-corridas p {
+  font-size: 15px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+
+/* =========================================================
+   LISTA E CARDS DE CORRIDAS
+========================================================= */
+
+.lista-corridas {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.lista-corridas > p {
+  padding: 22px;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #4b5563;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.card-corrida {
+  padding: 26px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card-corrida h2 {
+  margin-bottom: 18px;
+  color: #111827;
+  font-size: 24px;
+}
+
+.card-corrida p {
+  margin-bottom: 8px;
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.card-corrida p strong {
+  color: #111827;
+}
+
+.botao-inscricao,
+.card-corrida button:disabled {
+  margin-top: 18px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.botao-inscricao {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botao-inscricao:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
+}
+
+.botao-inscricao:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.card-corrida button:disabled {
+  background: #dcfce7;
+  color: #166534;
+  cursor: default;
+}
+
+.delete-btn {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.delete-btn:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   MINHAS INSCRIÇÕES
+========================================================= */
+
+.secao-minhas-inscricoes {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.lista-minhas-inscricoes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lista-minhas-inscricoes > p {
+  padding: 22px;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #4b5563;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.card-minha-inscricao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 24px 26px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.conteudo-minha-inscricao h3 {
+  margin-bottom: 14px;
+  color: #111827;
+  font-size: 22px;
+}
+
+.conteudo-minha-inscricao p {
+  margin-bottom: 7px;
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.conteudo-minha-inscricao p strong {
+  color: #111827;
+}
+
+.status-inscricao {
+  flex-shrink: 0;
+  min-width: 128px;
+  padding: 14px 18px;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.status-inscrito {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-confirmado {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-cancelado {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* =========================================================
+   RESPONSIVIDADE
+========================================================= */
+
+@media (max-width: 700px) {
+  body {
+    padding: 20px 12px;
+  }
+
+  .header,
+  .form-area,
+  .cabecalho-corridas,
+  .card-corrida {
+    padding: 24px;
+  }
+
+  .header h1,
+  .cabecalho-corridas h1 {
+    font-size: 26px;
+  }
+
+  .grid,
+  .pix-options {
+    grid-template-columns: 1fr;
+  }
+
+  .card-staff {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .foto-staff {
+    width: 88px;
+    height: 88px;
+  }
+
+  .dados-staff h2 {
+    font-size: 22px;
+  }
+
+  .botao-sair,
+  .botao-inscricao,
+  .card-corrida button:disabled {
+    width: 100%;
+  }
+     .titulo-secao {
+    padding: 24px;
+  }
+
+  .titulo-secao h2 {
+    font-size: 24px;
+  }
+
+  .card-minha-inscricao {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-inscricao {
+    min-width: auto;
+    width: 100%;
+  }
+
+   .acoes-staff {
+  width: 100%;
+  flex-direction: column;
+}
+
+.botao-admin {
+  width: 100%;
+}
+}
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+.pagina-admin {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.admin-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-acoes .submit-btn {
+  width: auto;
+  margin-top: 0;
+}
+
+.form-admin.hidden {
+  display: none;
+}
+
+.secao-corridas-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card-corrida-admin {
+  padding: 24px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card-corrida-admin h3 {
+  margin-bottom: 16px;
+  font-size: 24px;
+}
+
+.card-corrida-admin p {
+  margin-bottom: 8px;
+}
+
+.admin-status {
+  display: inline-flex;
+  margin-top: 18px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-status.aberta {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.admin-status.encerrada {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.ativo-confirmado {
+  background: #16a34a !important;
+  color: #ffffff !important;
+}
+
+.ativo-cancelado {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.botao-ver-inscritos {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botao-ver-inscritos:hover {
+  background: #374151;
+}
+
+.lista-inscritos-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.card-inscrito-admin {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.foto-inscrito-admin {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 50%;
+  background: #e5e7eb;
+}
+
+.dados-inscrito-admin {
+  flex: 1;
+}
+
+.dados-inscrito-admin h4 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: #111827;
+}
+
+.dados-inscrito-admin p {
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.acoes-inscrito-admin {
+  display: flex;
+  gap: 10px;
+}
+
+.botao-confirmar-inscrito,
+.botao-cancelar-inscrito {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botao-confirmar-inscrito {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.botao-cancelar-inscrito {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.botao-confirmar-inscrito:disabled,
+.botao-cancelar-inscrito:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .admin-card-footer,
+  .card-inscrito-admin,
+  .acoes-inscrito-admin {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .botao-ver-inscritos,
+  .botao-confirmar-inscrito,
+  .botao-cancelar-inscrito {
+    width: 100%;
+  }
+
+  .acoes-inscrito-admin {
+    width: 100%;
+  }
+   .botao-alterar-status-corrida {
+  width: 100%;
+}
+}
+
+
+.botao-alterar-status-corrida {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #f59e0b;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botao-alterar-status-corrida:hover {
+  background: #d97706;
+}
+
+.botao-alterar-status-corrida:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   DIAS DA CORRIDA
+========================================================= */
+
+.gerenciar-dias {
+  margin-top: 24px;
+  padding: 22px;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.gerenciar-dias h4 {
+  margin-bottom: 18px;
+  color: #111827;
+  font-size: 18px;
+}
+
+.gerenciar-dias input {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #ffffff;
+  font-size: 14px;
+}
+
+.gerenciar-dias input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.gerenciar-dias button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.gerenciar-dias button:hover {
+  background: #1d4ed8;
+}
+
+#dias-corrida {
+  margin-top: 18px;
+}
+
+.dia-corrida-card {
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+.dia-corrida-card p {
+  margin-bottom: 8px;
+  color: #374151;
+  font-size: 14px;
+}
+
+.dia-corrida-card p strong {
+  color: #111827;
+}
+
+.dia-corrida-card button {
+  margin-top: 10px;
+  background: #dc2626;
+}
+
+.dia-corrida-card button:hover {
+  background: #b91c1c;
+}
+
+.campo-dia-corrida {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #cfd6df;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+}
+
+.gerenciar-dias button {
+  width: fit-content;
+  margin-top: 8px;
+}
+
+/* =========================================================
+   RESPONSIVO - DIAS DA CORRIDA
+========================================================= */
+
+@media (min-width: 768px) {
+
+  .gerenciar-dias {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .gerenciar-dias h4 {
+    grid-column: 1 / -1;
+  }
+
+  .gerenciar-dias button {
+    width: fit-content;
+  }
+
+  .gerenciar-dias #dias-corrida,
+  .gerenciar-dias div[id^="dias-corrida-"] {
+    grid-column: 1 / -1;
+  }
+}
+
+/* =========================================================
+   DISPONIBILIDADE DO STAFF
+========================================================= */
+
+.disponibilidade-corrida {
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  background: #eff6ff;
+}
+
+.disponibilidade-corrida h4 {
+  margin-bottom: 6px;
+  color: #111827;
+  font-size: 17px;
+}
+
+.disponibilidade-corrida > p {
+  margin-bottom: 14px;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.lista-dias-disponibilidade {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkbox-dia-disponibilidade {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.checkbox-dia-disponibilidade:hover {
+  border-color: #2563eb;
+  background: #f8fafc;
+}
+
+.checkbox-dia-disponibilidade:has(input:checked) {
+  border-color: #2563eb;
+  background: #dbeafe;
+}
+
+.checkbox-dia-disponibilidade input {
+  margin-top: 4px;
+  transform: scale(1.25);
+  cursor: pointer;
+}
+
+.checkbox-dia-disponibilidade span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkbox-dia-disponibilidade strong {
+  color: #111827;
+  font-size: 15px;
+}
+
+.checkbox-dia-disponibilidade small {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.botao-inscricao:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.aviso-disponibilidade {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.aviso-disponibilidade p {
+  margin-bottom: 0;
+  color: #92400e;
+}
+
+.texto-disponibilidade-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #dbeafe;
+  border: 1px solid #93c5fd;
+}
+
+.texto-disponibilidade-info strong {
+  color: #1d4ed8;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.texto-disponibilidade-info span {
+  color: #374151;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.texto-disponibilidade-alerta {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.texto-disponibilidade-alerta strong {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+
+
+/* =========================================================
+   TAGS - MINHA DISPONIBILIDADE
+========================================================= */
+
+.minha-disponibilidade {
+  margin-top: 18px;
+}
+
+.minha-disponibilidade p {
+  margin-bottom: 10px !important;
+}
+
+.tags-disponibilidade {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tag-disponibilidade {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #dbeafe;
+  border: 1px solid #93c5fd;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* =========================================================
+   MELHORIAS VISUAIS - MINHAS INSCRIÇÕES
+========================================================= */
+
+.card-minha-inscricao {
+  align-items: flex-start;
+}
+
+.conteudo-minha-inscricao {
+  flex: 1;
+}
+
+.conteudo-minha-inscricao h3 {
+  margin-bottom: 16px;
+}
+
+.conteudo-minha-inscricao p {
+  margin-bottom: 9px;
+}
+
+.status-inscricao {
+  margin-top: 4px;
+}
+
+/* =========================================================
+   RESPONSIVO - TAGS DISPONIBILIDADE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .tags-disponibilidade {
+    gap: 8px;
+  }
+
+  .tag-disponibilidade {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* =========================================================
+   DISPONIBILIDADE STAFF - ADMIN
+========================================================= */
+
+.admin-disponibilidade-staff {
+  margin-top: 14px;
+}
+
+.admin-disponibilidade-staff p {
+  margin-bottom: 8px;
+}
+
+.admin-tags-disponibilidade {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-tag-disponibilidade {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #dbeafe;
+  border: 1px solid #93c5fd;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+
+[id^="dias-corrida-"] {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.dia-corrida-card {
+  padding: 16px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #dde3ea;
+}
+
+.dia-corrida-card button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+@media (max-width: 1100px) {
+  [id^="dias-corrida-"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  [id^="dias-corrida-"] {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.botao-admin-secundario {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botao-admin-secundario:hover {
+  background: #1d4ed8;
+}
+/* =========================================================
+   AJUSTES CADASTRO DE CORRIDA - ADMIN
+========================================================= */
+
+.preview-dias-corrida {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 20px 0 28px;
+}
+
+.preview-dias-corrida > p {
+  grid-column: 1 / -1;
+  color: #6b7280;
+}
+
+.form-admin textarea#corrida-local {
+  min-height: 110px;
+  line-height: 1.45;
+}
+
+.form-admin textarea#corrida-observacoes {
+  min-height: 180px;
+  line-height: 1.5;
+  resize: vertical;
+  overflow-y: hidden;
+}
+
+@media (max-width: 900px) {
+  .preview-dias-corrida {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .preview-dias-corrida {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   CORREÇÃO FORÇADA - CADASTRO DE CORRIDA ADMIN
+   Mantém cada campo separado e corrige labels/date inputs
+========================================================= */
+
+.form-admin .grid-cadastro-corrida,
+.form-admin .grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+  row-gap: 22px;
+  align-items: start;
+}
+
+.form-admin .grid-cadastro-corrida > .field,
+.form-admin .grid > .field {
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+}
+
+.form-admin .field {
+  margin-bottom: 22px !important;
+}
+
+.form-admin .grid .field {
+  margin-bottom: 0 !important;
+}
+
+.form-admin label,
+.form-admin .field label {
+  display: block !important;
+  margin: 0 0 10px 0 !important;
+  padding: 0 !important;
+  color: #374151;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+}
+
+.form-admin input,
+.form-admin select,
+.form-admin textarea,
+.form-admin .field input,
+.form-admin .field select,
+.form-admin .field textarea {
+  display: block !important;
+  width: 100% !important;
+  min-height: 54px !important;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  border: 1px solid #d1d5db;
+  border-radius: 14px !important;
+  background: #f9fafb;
+  color: #111827;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+  box-sizing: border-box !important;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
+.form-admin input[type="date"] {
+  height: 54px !important;
+}
+
+.form-admin textarea {
+  min-height: 96px !important;
+  resize: vertical;
+}
+
+.form-admin .section-title {
+  margin: 30px 0 22px !important;
+}
+
+.form-admin .section-title:first-child {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 700px) {
+  .form-admin .grid-cadastro-corrida,
+  .form-admin .grid {
+    grid-template-columns: 1fr !important;
+    row-gap: 22px !important;
+  }
+
+  .form-admin .field {
+    margin-bottom: 22px !important;
+  }
+
+  .form-admin .grid .field {
+    margin-bottom: 0 !important;
+  }
+}
+
+
+
+/* =========================================================
+   ALTURA OBSERVAÇÕES - ADMIN
+========================================================= */
+
+#corrida-observacoes {
+  min-height: 180px !important;
+  line-height: 1.5 !important;
+  resize: vertical;
+  overflow-y: hidden;
+}
+
+/* =========================================================
+   AJUSTES ADMIN - UX CORRIDAS
+========================================================= */
+
+.form-admin .field-spaced {
+  margin-top: 26px !important;
+}
+
+.corrida-status-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid #bbf7d0;
+  background: #dcfce7;
+  color: #14532d;
+}
+
+.corrida-status-card strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.corrida-status-card span {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.corrida-status-card.encerrada {
+  border-color: #fecaca;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.admin-card-footer {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch !important;
+  gap: 12px !important;
+  margin-top: 22px !important;
+}
+
+.admin-card-footer .admin-status {
+  grid-column: 1 / -1;
+  justify-content: center;
+  width: fit-content;
+  margin: 0 0 4px !important;
+}
+
+.admin-card-footer button,
+.admin-card-footer .botao-admin-secundario,
+.admin-card-footer .delete-btn,
+.admin-card-footer .botao-ver-inscritos,
+.admin-card-footer .botao-alterar-status-corrida {
+  width: 100% !important;
+  min-height: 48px;
+  margin: 0 !important;
+  text-align: center;
+}
+
+.botao-toggle-dias {
+  width: 100%;
+  margin-bottom: 16px;
+  background: #111827 !important;
+}
+
+.botao-toggle-dias:hover {
+  background: #374151 !important;
+}
+
+.dias-corrida-container.hidden {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .admin-card-footer {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-card-footer .admin-status {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   AJUSTES CADASTRO DE DIAS - ADMIN
+========================================================= */
+
+.label-opcional {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.checkbox-admin-linha {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #374151;
+  cursor: pointer;
+}
+
+.checkbox-admin-linha input[type="checkbox"] {
+  width: 18px !important;
+  min-height: 18px !important;
+  height: 18px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.form-admin input:disabled {
+  background: #e5e7eb !important;
+  color: #6b7280 !important;
+  cursor: not-allowed;
+}
+
+/* Painel compacto de inscritos */
+.admin-inscritos-painel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-inscritos-resumo {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.admin-inscritos-resumo > div {
+  padding: 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.admin-inscritos-resumo strong {
+  display: block;
+  font-size: 22px;
+  color: #111827;
+}
+
+.admin-inscritos-resumo span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-inscritos-acoes-massa,
+.admin-inscritos-filtros,
+.admin-filtros-status,
+.admin-contador-selecao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.botao-admin-batch,
+.admin-filtro-inscrito {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.botao-admin-batch {
+  background: #111827;
+  color: #ffffff;
+}
+
+.botao-confirmar-reservar {
+  background: #2563eb;
+}
+
+.admin-filtro-inscrito {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-filtro-inscrito.ativo {
+  background: #111827;
+  color: #ffffff;
+  border-color: #111827;
+}
+
+.admin-busca-inscrito {
+  min-width: 240px;
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.admin-contador-selecao {
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-lista-compacta-inscritos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.linha-inscrito-admin {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.linha-inscrito-principal {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+}
+
+.linha-inscrito-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.linha-inscrito-check input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.botao-expandir-inscrito {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 9px;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.linha-inscrito-nome {
+  min-width: 0;
+}
+
+.linha-inscrito-nome strong,
+.linha-inscrito-nome small {
+  display: block;
+}
+
+.linha-inscrito-nome strong {
+  font-size: 15px;
+  color: #111827;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.linha-inscrito-nome small {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+
+.linha-inscrito-icones {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.icone-tipo-dia {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.icone-tipo-dia.ativo {
+  background: #ecfdf5;
+  border-color: #86efac;
+  opacity: 1;
+}
+
+.icone-tipo-dia.inativo {
+  opacity: 0.28;
+}
+
+.admin-status-inscricao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.admin-status-inscricao.pendente,
+.admin-status-inscricao.inscrito {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.admin-status-inscricao.confirmado {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.admin-status-inscricao.lista_espera {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.admin-status-inscricao.cancelado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.linha-inscrito-acoes {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.linha-inscrito-acoes button {
+  padding: 8px 10px;
+  border: none;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.botao-lista-espera-inscrito {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.linha-inscrito-acoes button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.linha-inscrito-detalhes {
+  padding: 12px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.detalhes-inscrito-header {
+  display: grid;
+  grid-template-columns: auto minmax(180px, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.foto-inscrito-admin {
+  width: 76px;
+  height: 76px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #e5e7eb;
+  border: 1px solid #d1d5db;
+  flex: 0 0 auto;
+}
+
+.foto-inscrito-admin img,
+.foto-inscrito-placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+.foto-inscrito-admin img {
+  display: block;
+  object-fit: cover;
+}
+
+.foto-inscrito-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #6b7280;
+}
+
+.detalhes-inscrito-info-principal {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detalhes-inscrito-info-principal > strong {
+  font-size: 16px;
+  color: #111827;
+}
+
+.detalhes-inscrito-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 8px 14px;
+  margin-bottom: 12px;
+}
+
+.detalhes-inscrito-grid p {
+  margin: 0;
+  font-size: 13px;
+  color: #374151;
+}
+
+@media (max-width: 900px) {
+  .admin-inscritos-resumo {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .linha-inscrito-principal {
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 10px;
+    padding: 12px 10px;
+  }
+
+  .linha-inscrito-icones {
+    grid-column: 4;
+    justify-self: end;
+  }
+
+  .linha-inscrito-principal .admin-status-inscricao {
+    grid-column: 1 / -1;
+  }
+
+  .icone-tipo-dia {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+
+  .detalhes-inscrito-header {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .linha-inscrito-acoes {
+    justify-content: stretch;
+  }
+
+  .linha-inscrito-acoes button,
+  .botao-admin-batch,
+  .admin-filtro-inscrito {
+    flex: 1;
+  }
+
+  .detalhes-inscrito-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-inscritos-resumo {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-busca-inscrito,
+  .botao-admin-batch,
+  .admin-filtro-inscrito {
+    width: 100%;
+  }
+}
+
+
+.linha-inscrito-principal {
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.linha-inscrito-nome {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.linha-inscrito-nome-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.linha-inscrito-nome-topo strong {
+  flex: 1;
+}
+
+.linha-inscrito-icones {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+@media (max-width: 640px) {
+  .linha-inscrito-principal {
+    gap: 8px;
+  }
+
+  .linha-inscrito-nome-topo {
+    gap: 8px;
+  }
+
+  .icone-tipo-dia {
+    width: 26px;
+    height: 26px;
+    font-size: 13px;
+  }
+}
+
+
+/* Ajuste: resumo compacto dos inscritos */
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.admin-inscritos-resumo-compacto .resumo-dupla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-inscritos-resumo-compacto .resumo-card {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.admin-inscritos-resumo-compacto .resumo-card-total {
+  padding: 12px;
+}
+
+.admin-inscritos-resumo-compacto .resumo-card strong {
+  display: block;
+  font-size: 22px;
+  line-height: 1.05;
+  color: #111827;
+}
+
+.admin-inscritos-resumo-compacto .resumo-card-total strong {
+  font-size: 28px;
+}
+
+.admin-inscritos-resumo-compacto .resumo-card span {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.15;
+  color: #6b7280;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+}
+
+@media (max-width: 520px) {
+  .admin-inscritos-resumo.admin-inscritos-resumo-compacto {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-inscritos-resumo-compacto .resumo-dupla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-inscritos-resumo-compacto .resumo-card {
+    padding: 9px 8px;
+  }
+
+  .admin-inscritos-resumo-compacto .resumo-card-total {
+    padding: 11px 8px;
+  }
+}
+
+
+/* FIX FINAL v111: resumo compacto real no mobile e desktop */
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto > .resumo-card,
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto > .resumo-dupla {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto > .resumo-dupla {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto .resumo-card {
+  min-height: 72px !important;
+  padding: 9px 8px !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto .resumo-card-total {
+  min-height: 78px !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto .resumo-card strong {
+  font-size: 24px !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto .resumo-card-total strong {
+  font-size: 30px !important;
+}
+
+.admin-inscritos-resumo.admin-inscritos-resumo-compacto .resumo-card span {
+  font-size: 11px !important;
+  line-height: 1.15 !important;
+  margin-top: 5px !important;
+}
+
+/* =========================================================
+   AJUSTES VISUAIS V112
+========================================================= */
+
+.botao-editar-cadastro {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botao-editar-cadastro:hover {
+  background: #1d4ed8;
+}
+
+.status-lista_espera,
+.status-reserva {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.admin-topo-painel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.admin-cabecalho-principal {
+  margin: 0;
+}
+
+.admin-acoes {
+  align-items: stretch;
+}
+
+.admin-acoes .submit-btn {
+  height: 100%;
+  min-height: 72px;
+  padding-inline: 26px;
+}
+
+.admin-corrida-status-acoes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0;
+  padding: 14px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-corrida-status-acoes .admin-status {
+  margin: 0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-corrida-status-acoes .botao-alterar-status-corrida {
+  margin: 0;
+  min-height: 42px;
+}
+
+.botao-alterar-status-corrida.acao-abrir {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.botao-alterar-status-corrida.acao-abrir:hover {
+  background: #15803d;
+}
+
+.botao-alterar-status-corrida.acao-encerrar {
+  background: #f59e0b;
+  color: #111827;
+}
+
+.gerenciar-dias {
+  margin-top: 18px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.gerenciar-dias .botao-toggle-dias {
+  width: auto;
+  margin: 0;
+  background: #475569 !important;
+}
+
+.dias-corrida-container:not(.hidden) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.admin-card-footer {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.admin-card-footer .botao-ver-inscritos {
+  background: #2563eb;
+}
+
+.admin-card-footer .botao-ver-inscritos:hover {
+  background: #1d4ed8;
+}
+
+.admin-card-footer .botao-editar-corrida {
+  background: #64748b;
+}
+
+.admin-card-footer .botao-editar-corrida:hover {
+  background: #475569;
+}
+
+.admin-card-footer .botao-exportar-admin {
+  background: #16a34a;
+}
+
+.admin-card-footer .botao-exportar-admin:hover {
+  background: #15803d;
+}
+
+.admin-inscritos-acoes-massa {
+  align-items: stretch;
+}
+
+@media (max-width: 700px) {
+  .acoes-staff {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .botao-admin,
+  .botao-editar-cadastro,
+  .botao-sair {
+    width: 100%;
+  }
+
+  .admin-topo-painel {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-acoes .submit-btn {
+    width: 100%;
+    min-height: 54px;
+  }
+
+  .admin-corrida-status-acoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-corrida-status-acoes .admin-status,
+  .admin-corrida-status-acoes .botao-alterar-status-corrida,
+  .gerenciar-dias .botao-toggle-dias {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dias-corrida-container:not(.hidden),
+  .admin-card-footer {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* =========================================================
+   AJUSTE V116 - BOTÕES DOS CARDS DE CORRIDA MAIS COMPACTOS
+   ========================================================= */
+.admin-card-footer {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  margin-top: 18px !important;
+}
+
+.admin-card-footer .botao-ver-inscritos {
+  grid-column: 1 / -1;
+}
+
+.admin-card-footer button,
+.admin-card-footer .botao-admin-secundario,
+.admin-card-footer .delete-btn,
+.admin-card-footer .botao-ver-inscritos {
+  width: 100% !important;
+  min-height: 38px !important;
+  padding: 10px 12px !important;
+  margin: 0 !important;
+  border-radius: 13px !important;
+  font-size: 14px !important;
+  line-height: 1.15 !important;
+}
+
+.gerenciar-dias {
+  margin-top: 16px !important;
+}
+
+.gerenciar-dias .botao-toggle-dias {
+  width: 100% !important;
+  min-height: 38px !important;
+  padding: 10px 12px !important;
+  border-radius: 13px !important;
+}
+
+@media (max-width: 700px) {
+  .admin-card-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin-top: 16px !important;
+  }
+
+  .admin-card-footer .botao-ver-inscritos {
+    grid-column: 1 / -1;
+  }
+
+  .admin-card-footer button,
+  .admin-card-footer .botao-admin-secundario,
+  .admin-card-footer .delete-btn,
+  .admin-card-footer .botao-ver-inscritos,
+  .gerenciar-dias .botao-toggle-dias {
+    min-height: 42px !important;
+    padding: 9px 10px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* =========================================================
+   AJUSTE V125 - BOTÕES FLUTUANTES: CALENDÁRIO ADMIN + WHATSAPP STAFF
+   ========================================================= */
+.floating-calendar-btn,
+.floating-whatsapp {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9990;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.22);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.floating-calendar-btn:hover,
+.floating-whatsapp:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.28);
+  filter: brightness(1.03);
+}
+
+.floating-calendar-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.floating-whatsapp {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.floating-whatsapp-icon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.floating-calendar-modal.hidden {
+  display: none !important;
+}
+
+.floating-calendar-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.floating-calendar-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.floating-calendar-box {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  padding: 20px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.35);
+}
+
+.floating-calendar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.floating-calendar-label {
+  margin: 0 0 4px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.floating-calendar-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.floating-calendar-close {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.floating-calendar-controls {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.floating-calendar-nav-row,
+.floating-calendar-selects {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.floating-calendar-selects {
+  grid-template-columns: minmax(0, 1fr) 110px;
+}
+
+.floating-calendar-controls button,
+.floating-calendar-selects select,
+.floating-calendar-selects input {
+  min-height: 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.floating-calendar-controls button {
+  cursor: pointer;
+}
+
+.floating-calendar-today {
+  background: #dbeafe !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+.floating-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.floating-calendar-weekdays {
+  margin-top: 14px;
+  margin-bottom: 6px;
+}
+
+.floating-calendar-weekday {
+  padding: 8px 4px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.floating-calendar-day {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+button.floating-calendar-day {
+  cursor: default;
+}
+
+.floating-calendar-day.muted {
+  background: #f8fafc;
+  color: #cbd5e1;
+}
+
+.floating-calendar-day.today {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+}
+
+@media (max-width: 700px) {
+  .floating-calendar-btn,
+  .floating-whatsapp {
+    right: 14px;
+    bottom: 14px;
+    min-height: 50px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .floating-calendar-modal {
+    align-items: flex-end;
+    padding: 10px;
+  }
+
+  .floating-calendar-box {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .floating-calendar-header h2 {
+    font-size: 21px;
+  }
+
+  .floating-calendar-controls,
+  .floating-calendar-nav-row {
+    gap: 8px;
+  }
+
+  .floating-calendar-today {
+    width: 100%;
+  }
+
+  .floating-calendar-day {
+    min-height: 40px;
+    border-radius: 11px;
+    font-size: 13px;
+  }
+}
+
+/* =========================================================
+   AJUSTES V127 - ADMIN INSCRITOS MAIS COMPACTO E OPERACIONAL
+========================================================= */
+
+.pagina-admin .card-staff {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 16px 18px !important;
+}
+
+.pagina-admin .foto-staff {
+  width: 72px !important;
+  height: 72px !important;
+}
+
+.pagina-admin .dados-staff h2 {
+  margin: 2px 0 4px !important;
+  font-size: 20px !important;
+  line-height: 1.15 !important;
+}
+
+.pagina-admin .dados-staff p {
+  margin: 2px 0 !important;
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+}
+
+.pagina-admin .label-card {
+  margin-bottom: 2px !important;
+  font-size: 11px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pagina-admin .logout-btn {
+  align-self: center;
+  min-width: 92px;
+  margin: 0 !important;
+}
+
+.corrida-progresso-vagas {
+  margin-top: 12px;
+}
+
+.corrida-progresso-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+}
+
+.corrida-progresso-topo strong {
+  font-size: 12px !important;
+}
+
+.corrida-progresso-trilho {
+  width: 100%;
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(15,23,42,0.08);
+}
+
+.corrida-progresso-barra {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.25s ease;
+}
+
+.corrida-progresso-barra.baixo { background: #fca5a5; }
+.corrida-progresso-barra.medio { background: #facc15; }
+.corrida-progresso-barra.alto { background: #60a5fa; }
+.corrida-progresso-barra.completo { background: #22c55e; }
+
+.admin-inscritos-resumo.admin-inscritos-resumo-v127 {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-dupla {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card {
+  min-height: 70px !important;
+  padding: 10px 8px !important;
+  border-radius: 11px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-total,
+.admin-inscritos-resumo-v127 .resumo-card-vagas {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-confirmados {
+  background: #ecfdf5 !important;
+  border-color: #bbf7d0 !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-pendentes {
+  background: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-espera {
+  background: #eef2ff !important;
+  border-color: #c7d2fe !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-cancelados {
+  background: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+
+.admin-inscritos-filtros-v127 {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  padding: 12px !important;
+  border-radius: 12px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.admin-inscritos-filtros-v127 .admin-busca-inscrito {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 12px;
+}
+
+.admin-filtros-linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 10px;
+  align-items: end;
+}
+
+.admin-toggles-tipo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-toggle-tipo {
+  min-height: 42px;
+  padding: 9px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-toggle-tipo.ativo {
+  background: #111827;
+  border-color: #111827;
+  color: #ffffff;
+}
+
+.admin-status-select-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-status-select-wrap span {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.admin-status-select {
+  min-height: 42px;
+  width: 100%;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-inscritos-acoes-v127 {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px !important;
+  align-items: center !important;
+  padding: 12px !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.admin-selecionar-exibidos {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-selecionar-exibidos input {
+  width: 18px;
+  height: 18px;
+}
+
+.admin-inscritos-acoes-v127 .admin-contador-selecao {
+  justify-content: flex-end;
+  font-size: 12px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.admin-inscritos-acoes-v127 .botao-confirmar-selecionados {
+  min-height: 42px;
+  background: #16a34a;
+  white-space: nowrap;
+}
+
+.admin-inscritos-acoes-v127 .botao-confirmar-selecionados:hover {
+  background: #15803d;
+}
+
+@media (max-width: 700px) {
+  .pagina-admin .card-staff {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 14px !important;
+  }
+
+  .pagina-admin .foto-staff {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .pagina-admin .dados-staff h2 {
+    font-size: 17px !important;
+  }
+
+  .pagina-admin .logout-btn {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .admin-filtros-linha,
+  .admin-inscritos-acoes-v127 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-toggles-tipo {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-toggle-tipo {
+    min-height: 40px;
+    padding: 8px 7px;
+    font-size: 12px;
+  }
+
+  .admin-inscritos-acoes-v127 .admin-contador-selecao {
+    justify-content: flex-start;
+  }
+}
+
+/* =========================================================
+   AJUSTES V128 - PAGAMENTO PIX E CARD DE CORRIDA MAIS LIMPO
+========================================================= */
+
+.corrida-status-card {
+  position: relative;
+}
+
+.corrida-status-topo-linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+}
+
+.corrida-status-topo-linha strong,
+.corrida-status-topo-linha span {
+  display: block;
+}
+
+.botao-status-compacto,
+.botao-alterar-status-corrida.botao-status-compacto {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 999px !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+
+.admin-card-footer-v128 {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+  margin-top: 14px !important;
+}
+
+.admin-card-footer-v128 .botao-gerar-pagamento-pix,
+.admin-card-footer-v128 .botao-ver-inscritos {
+  grid-column: 1 / -1 !important;
+}
+
+.admin-card-footer-v128 .botao-gerar-pagamento-pix {
+  background: #0f766e !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-gerar-pagamento-pix:hover {
+  background: #115e59 !important;
+}
+
+.admin-card-footer-v128 button,
+.admin-card-footer-v128 .botao-admin-secundario,
+.admin-card-footer-v128 .delete-btn,
+.admin-card-footer-v128 .botao-ver-inscritos {
+  min-height: 41px !important;
+  padding: 9px 11px !important;
+  font-size: 13px !important;
+}
+
+@media (max-width: 700px) {
+  .admin-card-footer-v128 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .admin-card-footer-v128 .botao-gerar-pagamento-pix,
+  .admin-card-footer-v128 .botao-ver-inscritos {
+    grid-column: 1 / -1 !important;
+  }
+
+  .admin-card-footer-v128 button,
+  .admin-card-footer-v128 .botao-admin-secundario,
+  .admin-card-footer-v128 .delete-btn,
+  .admin-card-footer-v128 .botao-ver-inscritos {
+    min-height: 39px !important;
+    padding: 8px 9px !important;
+    font-size: 12.5px !important;
+  }
+}
+
+/* =========================================================
+   AJUSTES V130 - ADMIN: QR LOCAL, STATUS MAIS CLARO E AÇÕES
+========================================================= */
+
+.admin-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-acoes .btn-ver-painel-staff {
+  width: auto !important;
+  min-height: 42px;
+  padding: 10px 14px !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+}
+
+.admin-acoes .btn-ver-painel-staff:hover {
+  background: #e2e8f0 !important;
+}
+
+.corrida-status-card.aberta,
+.card-corrida-admin .corrida-status-card.aberta {
+  background: #ecfdf5 !important;
+  border-color: #bbf7d0 !important;
+  color: #14532d !important;
+}
+
+.corrida-status-card.encerrada,
+.card-corrida-admin .corrida-status-card.encerrada {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.16) !important;
+  color: #0f172a !important;
+  font-size: 17px !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto.acao-encerrar {
+  background: #fff7ed !important;
+  border-color: #fed7aa !important;
+  color: #7c2d12 !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto.acao-abrir {
+  background: #ecfdf5 !important;
+  border-color: #86efac !important;
+  color: #14532d !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.98);
+}
+
+.corrida-vagas-texto,
+.corrida-progresso-percentual {
+  transition: color 0.2s ease;
+}
+
+@media (max-width: 700px) {
+  .admin-acoes {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-acoes .btn-ver-painel-staff,
+  .admin-acoes .btn-admin {
+    width: 100% !important;
+  }
+}
+
+
+/* =========================================================
+   AJUSTES V131 - CARD ADMIN LOGADO E VAGAS ATUALIZADAS
+========================================================= */
+
+.pagina-admin .card-staff {
+  grid-template-columns: auto minmax(0, 1fr) minmax(230px, auto) !important;
+}
+
+.admin-card-acoes-logado {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-items: center;
+  min-width: 250px;
+}
+
+.admin-card-acao,
+.pagina-admin .admin-card-acao.logout-btn {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+  font-size: 12.5px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  text-align: center !important;
+  cursor: pointer;
+}
+
+.admin-card-acao-perfil,
+.admin-card-acao-corridas {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.admin-card-acao-perfil:hover,
+.admin-card-acao-corridas:hover {
+  background: #e2e8f0 !important;
+}
+
+.pagina-admin .admin-card-acao-sair.logout-btn {
+  background: #fee2e2 !important;
+  border-color: #fecaca !important;
+  color: #991b1b !important;
+}
+
+.pagina-admin .admin-card-acao-sair.logout-btn:hover {
+  background: #fecaca !important;
+}
+
+@media (max-width: 760px) {
+  .pagina-admin .card-staff {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+  }
+
+  .admin-card-acoes-logado {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-card-acao,
+  .pagina-admin .admin-card-acao.logout-btn {
+    min-height: 36px !important;
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+  }
+}
+
+.pagina-admin .admin-card-acoes-logado .logout-btn {
+  grid-column: auto !important;
+}
+
+@media (max-width: 700px) {
+  .pagina-admin .admin-card-acoes-logado .logout-btn {
+    grid-column: auto !important;
+    width: 100% !important;
+  }
+}
+
+/* =========================================================
+   AJUSTES V132 - CARD LOGADO PADRÃO EM ADMIN/CORRIDAS/CADASTRO
+========================================================= */
+.pagina-corridas .card-staff,
+.card-staff-cadastro,
+.pagina-admin .card-staff {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) minmax(230px, auto) !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 16px 18px !important;
+}
+
+.pagina-corridas .foto-staff,
+.card-staff-cadastro .foto-staff,
+.pagina-admin .foto-staff {
+  width: 72px !important;
+  height: 72px !important;
+}
+
+.pagina-corridas .dados-staff h2,
+.card-staff-cadastro .dados-staff h2,
+.pagina-admin .dados-staff h2 {
+  margin: 2px 0 4px !important;
+  font-size: 20px !important;
+  line-height: 1.15 !important;
+}
+
+.pagina-corridas .dados-staff p,
+.card-staff-cadastro .dados-staff p,
+.pagina-admin .dados-staff p {
+  margin: 2px 0 !important;
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+}
+
+.pagina-corridas .acoes-staff.admin-card-acoes-logado,
+.card-staff-cadastro .admin-card-acoes-logado,
+.pagina-admin .admin-card-acoes-logado {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-items: center;
+  min-width: 250px;
+  width: auto;
+}
+
+.card-staff-cadastro {
+  margin-bottom: 20px;
+}
+
+.pagina-corridas .admin-card-acoes-logado .logout-btn,
+.card-staff-cadastro .admin-card-acoes-logado .logout-btn,
+.pagina-admin .admin-card-acoes-logado .logout-btn {
+  grid-column: auto !important;
+  width: 100% !important;
+}
+
+@media (max-width: 760px) {
+  .pagina-corridas .card-staff,
+  .card-staff-cadastro,
+  .pagina-admin .card-staff {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 14px !important;
+  }
+
+  .pagina-corridas .foto-staff,
+  .card-staff-cadastro .foto-staff,
+  .pagina-admin .foto-staff {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .pagina-corridas .admin-card-acoes-logado,
+  .card-staff-cadastro .admin-card-acoes-logado,
+  .pagina-admin .admin-card-acoes-logado {
+    grid-column: 1 / -1;
+    width: 100% !important;
+    min-width: 0 !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .pagina-corridas .admin-card-acao,
+  .card-staff-cadastro .admin-card-acao,
+  .pagina-admin .admin-card-acao,
+  .pagina-corridas .admin-card-acao.logout-btn,
+  .card-staff-cadastro .admin-card-acao.logout-btn,
+  .pagina-admin .admin-card-acao.logout-btn {
+    min-height: 36px !important;
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .pagina-corridas .admin-card-acoes-logado,
+  .card-staff-cadastro .admin-card-acoes-logado,
+  .pagina-admin .admin-card-acoes-logado {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* v133 - WhatsApp operacional */
+.botao-whatsapp-inscrito {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 9px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.botao-whatsapp-inscrito:hover {
+  background: #bbf7d0;
+}
+
+.botao-whatsapp-inscrito:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   AJUSTES V135 - ADMIN: INSCRITOS, STATUS E EDIÇÃO DE DIAS
+========================================================= */
+
+.card-corrida-admin .corrida-status-card.aberta {
+  background: #ecfdf5 !important;
+  border: 1px solid #22c55e !important;
+  color: #14532d !important;
+}
+
+.card-corrida-admin .corrida-status-card.encerrada {
+  background: #fef2f2 !important;
+  border: 1px solid #ef4444 !important;
+  color: #7f1d1d !important;
+}
+
+.corrida-status-topo-linha > div {
+  min-width: 0;
+}
+
+.corrida-vagas-texto {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.25;
+}
+
+.corrida-inscritos-texto {
+  font-weight: 700;
+}
+
+.corrida-confirmados-texto {
+  opacity: 0.88;
+}
+
+.corrida-progresso-vagas + .corrida-progresso-vagas {
+  margin-top: 9px;
+}
+
+.corrida-progresso-inscritos .corrida-progresso-barra.baixo {
+  background: #38bdf8;
+}
+
+.corrida-progresso-inscritos .corrida-progresso-barra.medio {
+  background: #0ea5e9;
+}
+
+.corrida-progresso-inscritos .corrida-progresso-barra.alto,
+.corrida-progresso-inscritos .corrida-progresso-barra.completo {
+  background: #0284c7;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto:disabled {
+  font-size: 18px !important;
+  opacity: 0.75;
+}
+
+.dia-corrida-acoes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dia-corrida-acoes button {
+  margin-top: 0 !important;
+  min-height: 38px;
+}
+
+.dia-corrida-acoes .botao-editar-dia {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+.dia-corrida-acoes .botao-editar-dia:hover {
+  background: #1d4ed8 !important;
+}
+
+.dia-corrida-acoes .delete-btn {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 700px) {
+  .corrida-status-topo-linha {
+    grid-template-columns: minmax(0, 1fr) 34px;
+  }
+
+  .corrida-vagas-texto {
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   AJUSTES V136 - ADMIN MAIS COMPACTO + BOTÕES COLORIDOS
+========================================================= */
+
+/* Botões do card logado: padrão mais forte e consistente */
+.pagina-corridas .admin-card-acao,
+.card-staff-cadastro .admin-card-acao,
+.pagina-admin .admin-card-acao,
+.pagina-corridas .admin-card-acao.logout-btn,
+.card-staff-cadastro .admin-card-acao.logout-btn,
+.pagina-admin .admin-card-acao.logout-btn {
+  border: none !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease !important;
+}
+
+.pagina-corridas .admin-card-acao:hover,
+.card-staff-cadastro .admin-card-acao:hover,
+.pagina-admin .admin-card-acao:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14) !important;
+  filter: brightness(0.98);
+}
+
+/* Staff / página corridas */
+.pagina-corridas .admin-card-acao-corridas {
+  background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
+  color: #ffffff !important;
+}
+
+.pagina-corridas .admin-card-acao-perfil,
+.card-staff-cadastro .admin-card-acao-perfil {
+  background: linear-gradient(135deg, #2563eb, #60a5fa) !important;
+  color: #ffffff !important;
+}
+
+.pagina-corridas .admin-card-acao-sair.logout-btn,
+.card-staff-cadastro .admin-card-acao-sair.logout-btn {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  color: #ffffff !important;
+}
+
+/* Admin: diferenciação azul + roxo */
+.pagina-admin .admin-card-acao-perfil {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  color: #ffffff !important;
+}
+
+.pagina-admin .admin-card-acao-corridas {
+  background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
+  color: #ffffff !important;
+}
+
+.pagina-admin .admin-card-acao-sair.logout-btn {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  border: none !important;
+  color: #ffffff !important;
+}
+
+/* Mantém botões do card logado em colunas também no mobile estreito */
+@media (max-width: 430px) {
+  .pagina-corridas .admin-card-acoes-logado,
+  .card-staff-cadastro .admin-card-acoes-logado,
+  .pagina-admin .admin-card-acoes-logado {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Hero único do admin */
+.admin-hero-gerenciamento {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  background:
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.35), transparent 34%),
+    linear-gradient(135deg, #111827 0%, #1e1b4b 52%, #312e81 100%) !important;
+  border: 1px solid rgba(129, 140, 248, 0.35);
+}
+
+.admin-hero-gerenciamento h1 {
+  margin: 0 0 8px;
+}
+
+.admin-eyebrow {
+  margin: 0 0 6px !important;
+  font-size: 12px !important;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c4b5fd;
+  opacity: 1 !important;
+}
+
+.admin-hero-btn {
+  width: auto !important;
+  min-width: 180px;
+  margin: 0 !important;
+  padding: 15px 22px !important;
+  border: none !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #7c3aed, #2563eb) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.28);
+}
+
+.admin-hero-btn:hover {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.secao-corridas-admin {
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  .admin-hero-gerenciamento {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .admin-hero-btn {
+    width: 100% !important;
+    min-width: 0;
+    min-height: 52px;
+  }
+}
+
+/* =========================================================
+   AJUSTES V137 - POLIMENTO VISUAL COMPLETO DO ADMIN
+========================================================= */
+
+.pagina-admin {
+  gap: 20px;
+}
+
+.pagina-admin .card-staff {
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+  box-shadow: 0 18px 48px rgba(30, 27, 75, 0.10) !important;
+}
+
+.pagina-admin .label-card {
+  color: #6d28d9 !important;
+}
+
+.pagina-admin .foto-staff {
+  border: 3px solid #ede9fe !important;
+  box-shadow: 0 10px 24px rgba(76, 29, 149, 0.15) !important;
+}
+
+.admin-hero-gerenciamento {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 22px 50px rgba(30, 27, 75, 0.26) !important;
+}
+
+.admin-hero-gerenciamento::after {
+  content: "";
+  position: absolute;
+  right: -70px;
+  bottom: -90px;
+  width: 220px;
+  height: 220px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.admin-hero-texto,
+.admin-hero-btn {
+  position: relative;
+  z-index: 1;
+}
+
+.admin-hero-btn {
+  box-shadow: 0 16px 34px rgba(124, 58, 237, 0.34) !important;
+}
+
+.form-admin {
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  border-radius: 26px;
+  background: linear-gradient(180deg, #ffffff 0%, #fafaff 100%);
+  box-shadow: 0 18px 44px rgba(30, 27, 75, 0.10);
+  overflow: hidden;
+}
+
+.form-admin .form-area {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.form-admin .section-title {
+  color: #1e1b4b !important;
+}
+
+.form-admin .section-title::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 4px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+}
+
+.form-admin label,
+.form-admin .field label {
+  color: #334155 !important;
+}
+
+.form-admin input,
+.form-admin select,
+.form-admin textarea,
+.form-admin .field input,
+.form-admin .field select,
+.form-admin .field textarea {
+  border-color: #dbe3f0 !important;
+  background: #ffffff !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
+}
+
+.form-admin input:focus,
+.form-admin select:focus,
+.form-admin textarea:focus,
+.form-admin .field input:focus,
+.form-admin .field select:focus,
+.form-admin .field textarea:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12) !important;
+  outline: none !important;
+}
+
+.preview-dias-corrida {
+  border-radius: 18px !important;
+  background: #f8fafc !important;
+  border: 1px dashed #c4b5fd !important;
+}
+
+.card-corrida-admin {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(124, 58, 237, 0.10);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%) !important;
+  box-shadow: 0 18px 46px rgba(30, 27, 75, 0.10) !important;
+}
+
+.card-corrida-admin::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: linear-gradient(90deg, #7c3aed, #2563eb, #14b8a6);
+}
+
+.card-corrida-admin h3 {
+  color: #0f172a;
+  letter-spacing: -0.03em;
+}
+
+.card-corrida-admin p {
+  color: #475569;
+}
+
+.card-corrida-admin p strong {
+  color: #111827;
+}
+
+.card-corrida-admin .corrida-status-card.aberta {
+  background: linear-gradient(180deg, #ecfdf5 0%, #f0fdf4 100%) !important;
+  border-color: #86efac !important;
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.12) !important;
+}
+
+.card-corrida-admin .corrida-status-card.encerrada {
+  background: linear-gradient(180deg, #fef2f2 0%, #fff7f7 100%) !important;
+  border-color: #fca5a5 !important;
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.10) !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto {
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12) !important;
+}
+
+.dias-corrida-container:not(.hidden) {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%) !important;
+  border-color: #e2e8f0 !important;
+}
+
+.dia-corrida-card {
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+.gerenciar-dias .botao-toggle-dias {
+  background: linear-gradient(135deg, #334155, #475569) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 22px rgba(51, 65, 85, 0.16) !important;
+}
+
+.admin-card-footer-v128 .botao-editar-corrida {
+  background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-excluir-corrida,
+.admin-card-footer-v128 .delete-btn {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-exportar-pdf {
+  background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-exportar-excel {
+  background: linear-gradient(135deg, #15803d, #22c55e) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-gerar-pagamento-pix {
+  background: linear-gradient(135deg, #7c2d12, #f97316) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 .botao-ver-inscritos {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+  color: #ffffff !important;
+}
+
+.admin-card-footer-v128 button,
+.admin-card-footer-v128 .botao-admin-secundario,
+.admin-card-footer-v128 .delete-btn,
+.admin-card-footer-v128 .botao-ver-inscritos,
+.botao-admin-secundario,
+.botao-admin-batch,
+.admin-filtro-inscrito,
+.admin-toggle-tipo,
+.botao-confirmar-inscrito,
+.botao-cancelar-inscrito,
+.linha-inscrito-acoes button,
+.botao-whatsapp-inscrito {
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease !important;
+}
+
+.admin-card-footer-v128 button:hover,
+.admin-card-footer-v128 .botao-admin-secundario:hover,
+.admin-card-footer-v128 .delete-btn:hover,
+.admin-card-footer-v128 .botao-ver-inscritos:hover,
+.botao-admin-secundario:hover,
+.botao-admin-batch:hover,
+.admin-filtro-inscrito:hover,
+.admin-toggle-tipo:hover,
+.botao-confirmar-inscrito:hover,
+.botao-cancelar-inscrito:hover,
+.linha-inscrito-acoes button:hover,
+.botao-whatsapp-inscrito:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 24px rgba(15, 23, 42, 0.14) !important;
+  filter: brightness(1.02);
+}
+
+.lista-inscritos-admin {
+  border-top-color: #e0e7ff !important;
+}
+
+.admin-inscritos-painel {
+  padding: 14px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e0e7ff;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card {
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.055) !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-total,
+.admin-inscritos-resumo-v127 .resumo-card-vagas {
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%) !important;
+  border-color: #bfdbfe !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-confirmados {
+  background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%) !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-pendentes {
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%) !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-espera {
+  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 100%) !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card-cancelados {
+  background: linear-gradient(180deg, #fef2f2 0%, #ffffff 100%) !important;
+}
+
+.admin-inscritos-filtros-v127,
+.admin-inscritos-acoes-v127 {
+  border-color: #e0e7ff !important;
+  box-shadow: 0 10px 24px rgba(30, 27, 75, 0.06) !important;
+}
+
+.admin-toggle-tipo.ativo,
+.admin-filtro-inscrito.ativo {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+.admin-status-select,
+.admin-busca-inscrito {
+  border-color: #dbe3f0 !important;
+}
+
+.admin-status-select:focus,
+.admin-busca-inscrito:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.11) !important;
+  outline: none !important;
+}
+
+.linha-inscrito-admin {
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.045) !important;
+}
+
+.linha-inscrito-admin:hover {
+  border-color: #c4b5fd !important;
+}
+
+.botao-expandir-inscrito {
+  background: #eef2ff !important;
+  color: #3730a3 !important;
+}
+
+.linha-inscrito-detalhes {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%) !important;
+}
+
+.foto-inscrito-admin {
+  border-color: #c4b5fd !important;
+  box-shadow: 0 8px 20px rgba(76, 29, 149, 0.10) !important;
+}
+
+.botao-confirmar-inscrito {
+  background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+  color: #ffffff !important;
+}
+
+.botao-cancelar-inscrito {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  color: #ffffff !important;
+}
+
+.botao-lista-espera-inscrito {
+  background: linear-gradient(135deg, #2563eb, #60a5fa) !important;
+  color: #ffffff !important;
+}
+
+.botao-whatsapp-inscrito {
+  background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+  color: #ffffff !important;
+}
+
+.floating-calendar-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  box-shadow: 0 16px 32px rgba(79, 70, 229, 0.28) !important;
+}
+
+@media (max-width: 700px) {
+  .card-corrida-admin {
+    padding: 22px 18px !important;
+    border-radius: 24px !important;
+  }
+
+  .admin-inscritos-painel {
+    padding: 10px;
+    border-radius: 18px;
+  }
+
+  .admin-card-footer-v128 button,
+  .admin-card-footer-v128 .botao-admin-secundario,
+  .admin-card-footer-v128 .delete-btn,
+  .admin-card-footer-v128 .botao-ver-inscritos {
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.10) !important;
+  }
+}
+
+/* v138 - polimento visual geral */
+:root{
+  --admin-indigo:#4f46e5;
+  --admin-purple:#7c3aed;
+  --admin-cyan:#0891b2;
+  --soft-border:#dbe3ef;
+}
+body{background:linear-gradient(180deg,#f7f8fc 0%,#eef2f8 42%,#f8fafc 100%);}
+.pagina-admin,.container{animation:fadeInSistema .28s ease-out;}
+@keyframes fadeInSistema{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card-staff{border:1px solid rgba(148,163,184,.22);box-shadow:0 22px 55px rgba(15,23,42,.10);}
+.admin-card-acoes-logado{gap:10px;}
+.admin-card-acao{border:0!important;color:#fff!important;font-weight:800;box-shadow:0 10px 22px rgba(15,23,42,.12);transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;}
+.admin-card-acao:hover{transform:translateY(-1px);filter:saturate(1.08);box-shadow:0 14px 30px rgba(15,23,42,.16);}
+.admin-card-acao-perfil{background:linear-gradient(135deg,#2563eb,#06b6d4)!important;}
+.admin-card-acao-corridas{background:linear-gradient(135deg,#0f766e,#14b8a6)!important;}
+.admin-card-acao-sair,.logout-btn{background:linear-gradient(135deg,#ef4444,#b91c1c)!important;color:#fff!important;}
+.pagina-admin .admin-card-acao-perfil{background:linear-gradient(135deg,var(--admin-indigo),var(--admin-purple))!important;}
+.pagina-admin .admin-card-acao-corridas{background:linear-gradient(135deg,#0e7490,#2563eb)!important;}
+.admin-hero-gerenciamento{background:radial-gradient(circle at top right,rgba(168,85,247,.34),transparent 34%),linear-gradient(135deg,#101827 0%,#1e1b4b 46%,#312e81 100%)!important;box-shadow:0 22px 48px rgba(49,46,129,.22);}
+.admin-hero-btn,.btn-admin{background:linear-gradient(135deg,#22c55e,#0ea5e9)!important;border:0!important;box-shadow:0 16px 32px rgba(14,165,233,.25);}
+.form-area,.form-admin .form-area,.card-corrida-admin,.login-card{border:1px solid rgba(148,163,184,.22);box-shadow:0 20px 50px rgba(15,23,42,.09);}
+.form-area input,.form-area select,.form-area textarea,.login-card input{background:#f8fafc;border:1px solid #dbe3ef!important;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+.form-area input:focus,.form-area select:focus,.form-area textarea:focus,.login-card input:focus{outline:none;border-color:#6366f1!important;box-shadow:0 0 0 4px rgba(99,102,241,.12);background:#fff;}
+.field-checkbox-admin{display:flex;align-items:stretch;}
+.checkbox-admin-card{width:100%;display:flex;gap:12px;align-items:flex-start;padding:15px 16px;border-radius:18px;background:linear-gradient(135deg,#f8fafc,#eef2ff);border:1px solid #c7d2fe;box-shadow:0 10px 24px rgba(79,70,229,.08);cursor:pointer;}
+.checkbox-admin-card input{width:22px;height:22px;margin-top:2px;accent-color:#4f46e5;flex:0 0 auto;}
+.checkbox-admin-card strong{display:block;color:#172033;font-size:15px;line-height:1.25;}
+.checkbox-admin-card small{display:block;margin-top:3px;color:#64748b;font-size:12px;line-height:1.35;}
+.checkbox-admin-card-compacto{min-height:100%;align-items:center;}
+.field-ate-ultimo{align-self:end;}
+.checkbox-admin-linha{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.botao-admin-secundario,.botao-ver-inscritos,.botao-toggle-dias{border:0!important;background:linear-gradient(135deg,#eef2ff,#e0f2fe)!important;color:#1e3a8a!important;font-weight:800;box-shadow:0 10px 22px rgba(37,99,235,.10);}
+.botao-ver-inscritos{background:linear-gradient(135deg,#2563eb,#4f46e5)!important;color:#fff!important;}
+.delete-btn{background:linear-gradient(135deg,#fee2e2,#fecaca)!important;color:#991b1b!important;border:1px solid #fecaca!important;}
+.card-corrida-admin{background:linear-gradient(180deg,#ffffff,#fbfdff);border-radius:28px;}
+.card-corrida-admin h3{letter-spacing:-.03em;}
+.badge-tenis{display:inline-flex;align-items:center;gap:6px;margin:0 0 14px;padding:7px 11px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:13px;font-weight:800;border:1px solid #c7d2fe;}
+.corrida-status-card.aberta{background:linear-gradient(135deg,#ecfdf5,#f0fdfa)!important;border:1px solid #86efac!important;}
+.corrida-status-card.encerrada{background:linear-gradient(135deg,#fef2f2,#fff7ed)!important;border:1px solid #fca5a5!important;}
+.file-preview-foto img{width:78px!important;height:78px!important;border-radius:22px!important;object-fit:cover;object-position:center;}
+.helper-foto{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:14px;padding:10px 12px;margin:8px 0;color:#475569;line-height:1.4;}
+.label-obrigatorio{font-size:12px;color:#2563eb;font-weight:800;}
+#calcado{min-height:48px;}
+.login-card h1,.header h1,.cabecalho-corridas h1{letter-spacing:-.04em;}
+@media (max-width:720px){.admin-card-acoes-logado{grid-template-columns:repeat(3,1fr)!important;display:grid!important}.admin-card-acao{font-size:13px;padding:13px 8px!important}.admin-hero-gerenciamento{gap:18px}.checkbox-admin-card{border-radius:16px}.field-ate-ultimo{align-self:stretch}}
+
+/* v139 - gestão de dias e checkboxes inline */
+.checkbox-admin-card,
+.checkbox-admin-inline {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+}
+
+.checkbox-admin-card input[type="checkbox"],
+.checkbox-admin-inline input[type="checkbox"],
+#novo-dia-ate-ultimo,
+#corrida-patrocinador-tenis {
+  width: 18px !important;
+  min-width: 18px !important;
+  max-width: 18px !important;
+  height: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: 0 0 18px !important;
+  accent-color: #4f46e5;
+}
+
+.checkbox-admin-card span,
+.checkbox-admin-inline span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.field-ate-ultimo-inline {
+  align-self: end;
+}
+
+.dia-corrida-card-editavel {
+  border: 1px solid rgba(99, 102, 241, .18) !important;
+  background: linear-gradient(180deg, #ffffff, #f8fafc) !important;
+}
+
+.dia-editavel-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.badge-dia-existente,
+.badge-dia-novo {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.badge-dia-existente {
+  color: #3730a3;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+}
+
+.badge-dia-novo {
+  color: #166534;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+}
+
+.grid-dia-editavel {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.dia-corrida-acoes-editavel {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 720px) {
+  .grid-dia-editavel {
+    grid-template-columns: 1fr;
+  }
+
+  .field-ate-ultimo-inline {
+    align-self: stretch;
+  }
+}
+
+
+/* v141 - correção mobile: checkbox inline e cadastro de novo dia recolhido na edição */
+.novo-dia-form-bloco.hidden,
+.botao-toggle-novo-dia.hidden {
+  display: none !important;
+}
+
+.botao-toggle-novo-dia {
+  width: 100%;
+  margin: 8px 0 16px;
+}
+
+.field-checkbox-admin {
+  min-width: 0;
+}
+
+.field-checkbox-admin .checkbox-admin-card,
+.field-checkbox-admin .checkbox-admin-inline {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 58px;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.field-checkbox-admin .checkbox-admin-card input[type="checkbox"],
+.field-checkbox-admin .checkbox-admin-inline input[type="checkbox"],
+#novo-dia-ate-ultimo,
+#corrida-patrocinador-tenis {
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  display: inline-block !important;
+  position: static !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  flex: 0 0 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+}
+
+.field-checkbox-admin .checkbox-admin-card span,
+.field-checkbox-admin .checkbox-admin-inline span {
+  display: block !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 720px) {
+  .field-checkbox-admin .checkbox-admin-card,
+  .field-checkbox-admin .checkbox-admin-inline {
+    align-items: center !important;
+    padding: 14px 16px !important;
+  }
+
+  .field-checkbox-admin .checkbox-admin-card strong,
+  .field-checkbox-admin .checkbox-admin-inline strong {
+    font-size: 15px !important;
+    line-height: 1.25 !important;
+  }
+}
+
+/* v142 - painel de relatórios e correção definitiva dos checkboxes mobile */
+.relatorios-admin {
+  width: 100%;
+  display: block;
+}
+
+.botao-relatorios-toggle {
+  width: 100%;
+}
+
+.relatorios-painel {
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid #dbe4ef;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, .08);
+}
+
+.relatorios-painel.hidden {
+  display: none !important;
+}
+
+.relatorios-secao + .relatorios-secao {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.relatorios-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.relatorios-formato-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.relatorio-formato-opcao,
+.relatorio-acao {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #172033;
+  border-radius: 14px;
+  padding: 11px 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.relatorio-formato-opcao:hover,
+.relatorio-acao:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .10);
+}
+
+.relatorio-formato-opcao.ativo {
+  border-color: #4f46e5;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  color: #312e81;
+  box-shadow: inset 0 0 0 1px rgba(79, 70, 229, .25);
+}
+
+.relatorios-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.relatorio-acao:disabled {
+  opacity: .65;
+  cursor: wait;
+  transform: none;
+}
+
+.relatorio-feedback {
+  display: none;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.relatorio-feedback.ativo {
+  display: block;
+}
+
+.relatorio-feedback.info {
+  color: #334155;
+  background: #f1f5f9;
+}
+
+.relatorio-feedback.sucesso {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.relatorio-feedback.erro {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.field-checkbox-admin,
+.field-ate-ultimo,
+.field-ate-ultimo-inline {
+  display: block !important;
+  align-self: stretch !important;
+}
+
+.field-checkbox-admin > label.checkbox-admin-card,
+.field-checkbox-admin > label.checkbox-admin-inline,
+.checkbox-admin-card.checkbox-admin-card-compacto,
+.checkbox-admin-card.checkbox-admin-inline {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 58px !important;
+  box-sizing: border-box !important;
+}
+
+.field-checkbox-admin > label.checkbox-admin-card input[type="checkbox"],
+.field-checkbox-admin > label.checkbox-admin-inline input[type="checkbox"],
+.checkbox-admin-card.checkbox-admin-inline input[type="checkbox"],
+#novo-dia-ate-ultimo,
+#corrida-patrocinador-tenis {
+  position: static !important;
+  display: inline-block !important;
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  flex: 0 0 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+}
+
+.field-checkbox-admin > label.checkbox-admin-card span,
+.field-checkbox-admin > label.checkbox-admin-inline span,
+.checkbox-admin-card.checkbox-admin-inline span {
+  display: block !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+@media (max-width: 720px) {
+  .relatorios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .relatorio-formato-opcao,
+  .relatorio-acao {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+
+  .field-checkbox-admin > label.checkbox-admin-card,
+  .field-checkbox-admin > label.checkbox-admin-inline,
+  .checkbox-admin-card.checkbox-admin-card-compacto,
+  .checkbox-admin-card.checkbox-admin-inline {
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 14px 16px !important;
+  }
+}
+
+/* v143 - acabamento relatórios, checkbox mobile e atalhos flutuantes */
+.admin-card-footer .relatorios-admin,
+.admin-card-footer-v128 .relatorios-admin {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  margin-top: 4px !important;
+}
+
+.botao-relatorios-toggle {
+  width: 100% !important;
+  min-height: 56px !important;
+  border: none !important;
+  border-radius: 18px !important;
+  padding: 15px 18px !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  font-size: 15px !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #2563eb 55%, #0891b2 100%) !important;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, .24) !important;
+}
+
+.relatorios-painel {
+  margin-top: 6px !important;
+  padding: 16px !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(99, 102, 241, .18) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, .10) !important;
+}
+
+.relatorios-label {
+  margin-bottom: 10px !important;
+  color: #334155 !important;
+  font-size: 13px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.relatorios-formato-toggle,
+.relatorios-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.relatorio-formato-opcao,
+.relatorio-acao {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-height: 52px !important;
+  padding: 12px 10px !important;
+  border: 1px solid #dbe4f0 !important;
+  border-radius: 12px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  color: #172033 !important;
+  font-size: 14px !important;
+  font-weight: 850 !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .06) !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+.relatorio-formato-opcao.ativo {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  box-shadow: 0 12px 26px rgba(79, 70, 229, .26) !important;
+}
+
+.relatorio-acao:hover,
+.relatorio-formato-opcao:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: none !important;
+}
+
+.relatorio-feedback.ativo {
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+}
+
+.form-admin .field-checkbox-admin,
+.form-admin .field-ate-ultimo,
+.grid .field-checkbox-admin,
+.grid-dia-editavel .field-checkbox-admin {
+  display: block !important;
+  width: 100% !important;
+}
+
+.form-admin .field-checkbox-admin > label.checkbox-admin-card,
+.form-admin .field-checkbox-admin > label.checkbox-admin-inline,
+.grid .field-checkbox-admin > label.checkbox-admin-card,
+.grid-dia-editavel .field-checkbox-admin > label.checkbox-admin-card,
+.field-checkbox-admin > label.checkbox-admin-card.checkbox-admin-inline {
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr) !important;
+  align-items: center !important;
+  column-gap: 12px !important;
+  row-gap: 0 !important;
+  width: 100% !important;
+  min-height: 64px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+}
+
+.form-admin .field-checkbox-admin > label.checkbox-admin-card > input[type="checkbox"],
+.form-admin .field-checkbox-admin > label.checkbox-admin-inline > input[type="checkbox"],
+.grid .field-checkbox-admin > label.checkbox-admin-card > input[type="checkbox"],
+.grid-dia-editavel .field-checkbox-admin > label.checkbox-admin-card > input[type="checkbox"],
+.field-checkbox-admin > label.checkbox-admin-card.checkbox-admin-inline > input[type="checkbox"],
+#corrida-patrocinador-tenis,
+#novo-dia-ate-ultimo {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  position: static !important;
+  display: block !important;
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 5px !important;
+  flex: none !important;
+  transform: none !important;
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+}
+
+.form-admin .field-checkbox-admin > label.checkbox-admin-card > span,
+.form-admin .field-checkbox-admin > label.checkbox-admin-inline > span,
+.grid .field-checkbox-admin > label.checkbox-admin-card > span,
+.grid-dia-editavel .field-checkbox-admin > label.checkbox-admin-card > span,
+.field-checkbox-admin > label.checkbox-admin-card.checkbox-admin-inline > span {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  display: block !important;
+  margin: 0 !important;
+  min-width: 0 !important;
+}
+
+.field-checkbox-admin > label.checkbox-admin-card.checkbox-admin-inline strong {
+  display: block !important;
+  margin: 0 !important;
+  line-height: 1.25 !important;
+}
+
+.floating-calendar-btn,
+.floating-yescom-btn {
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  border-radius: 999px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 23px !important;
+  gap: 0 !important;
+}
+
+.floating-calendar-btn span:not(:first-child) {
+  display: none !important;
+}
+
+.floating-yescom-btn {
+  position: fixed !important;
+  right: 94px !important;
+  bottom: 24px !important;
+  z-index: 999 !important;
+  border: none !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
+  box-shadow: 0 14px 28px rgba(15, 118, 110, .28) !important;
+  cursor: pointer !important;
+}
+
+.floating-yescom-modal.hidden { display: none !important; }
+.floating-yescom-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1001 !important;
+}
+.floating-yescom-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, .46) !important;
+}
+.floating-yescom-box {
+  position: relative !important;
+  width: min(1040px, calc(100vw - 28px)) !important;
+  height: min(760px, calc(100vh - 52px)) !important;
+  margin: 26px auto !important;
+  background: #ffffff !important;
+  border-radius: 22px !important;
+  box-shadow: 0 28px 70px rgba(15, 23, 42, .34) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+.floating-yescom-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  padding: 16px 18px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+.floating-yescom-header h2 { margin: 0 !important; font-size: 20px !important; color: #172033 !important; }
+.floating-yescom-frame {
+  width: 100% !important;
+  flex: 1 1 auto !important;
+  border: 0 !important;
+  background: #ffffff !important;
+}
+.floating-yescom-help {
+  margin: 0 !important;
+  padding: 10px 16px 4px !important;
+  font-size: 12px !important;
+  color: #64748b !important;
+}
+.floating-yescom-link {
+  margin: 0 16px 14px !important;
+  display: inline-flex !important;
+  align-self: flex-start !important;
+  padding: 10px 14px !important;
+  border-radius: 999px !important;
+  background: #eef2ff !important;
+  color: #3730a3 !important;
+  font-weight: 800 !important;
+  text-decoration: none !important;
+}
+
+@media (max-width: 720px) {
+  .relatorios-formato-toggle,
+  .relatorios-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .relatorio-formato-opcao,
+  .relatorio-acao {
+    min-height: 50px !important;
+    padding: 11px 8px !important;
+    font-size: 13px !important;
+  }
+
+  .floating-calendar-btn {
+    right: 22px !important;
+    bottom: 24px !important;
+  }
+
+  .floating-yescom-btn {
+    right: 90px !important;
+    bottom: 24px !important;
+  }
+
+  .floating-yescom-box {
+    width: calc(100vw - 20px) !important;
+    height: calc(100vh - 38px) !important;
+    margin: 19px auto !important;
+    border-radius: 18px !important;
+  }
+}
+
+/* v144 - ajustes visuais relatórios, checkbox e atalhos flutuantes */
+.admin-card-footer,
+.admin-card-footer-v128 {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  align-items: stretch !important;
+}
+
+.admin-card-footer > .relatorios-admin,
+.admin-card-footer-v128 > .relatorios-admin {
+  grid-column: 1 / -1 !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 2px 0 0 !important;
+  justify-self: stretch !important;
+}
+
+.admin-card-footer > .relatorios-admin > .botao-relatorios-toggle,
+.admin-card-footer-v128 > .relatorios-admin > .botao-relatorios-toggle {
+  width: 100% !important;
+  max-width: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 56px !important;
+  border-radius: 18px !important;
+  background: linear-gradient(135deg, #5638f2 0%, #2364e8 58%, #07a5b8 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, .24) !important;
+}
+
+.admin-card-footer > .relatorios-admin > .relatorios-painel,
+.admin-card-footer-v128 > .relatorios-admin > .relatorios-painel {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+.relatorios-formato-toggle,
+.relatorios-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.relatorio-formato-opcao,
+.relatorio-acao {
+  border: 1px solid rgba(148, 163, 184, .45) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, .08) !important;
+  color: #172033 !important;
+  font-weight: 900 !important;
+}
+
+.relatorio-formato-opcao.ativo {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 12px 28px rgba(79, 70, 229, .28) !important;
+}
+
+.field-checkbox-admin,
+.field-ate-ultimo,
+.field-ate-ultimo-inline {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.field-checkbox-admin > .checkbox-admin-card,
+.field-checkbox-admin > .checkbox-admin-inline,
+.field-checkbox-admin label.checkbox-admin-card,
+.field-checkbox-admin label.checkbox-admin-inline,
+label.checkbox-admin-card.checkbox-admin-inline,
+label.checkbox-admin-card.checkbox-admin-card-compacto {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 62px !important;
+  padding: 14px 16px !important;
+  box-sizing: border-box !important;
+}
+
+.field-checkbox-admin input[type="checkbox"],
+.checkbox-admin-card input[type="checkbox"],
+.checkbox-admin-inline input[type="checkbox"],
+#corrida-patrocinador-tenis,
+#novo-dia-ate-ultimo {
+  position: relative !important;
+  inset: auto !important;
+  display: inline-block !important;
+  float: none !important;
+  width: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  flex: 0 0 22px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  align-self: center !important;
+}
+
+.field-checkbox-admin span,
+.checkbox-admin-card span,
+.checkbox-admin-inline span {
+  display: block !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+.field-checkbox-admin strong,
+.checkbox-admin-card strong,
+.checkbox-admin-inline strong {
+  display: block !important;
+  margin: 0 !important;
+  line-height: 1.22 !important;
+}
+
+.floating-calendar-btn,
+.floating-yescom-btn {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  border-radius: 999px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 22px !important;
+}
+
+.floating-calendar-btn span:not(:first-child),
+.floating-yescom-btn span:not(:first-child) {
+  display: none !important;
+}
+
+.floating-yescom-btn {
+  position: fixed !important;
+  right: 92px !important;
+  bottom: 24px !important;
+  z-index: 999 !important;
+  border: 0 !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0891b2, #14b8a6) !important;
+  box-shadow: 0 14px 28px rgba(8, 145, 178, .28) !important;
+  cursor: pointer !important;
+}
+
+@media (max-width: 720px) {
+  .admin-card-footer,
+  .admin-card-footer-v128 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-card-footer > .botao-toggle-dias,
+  .admin-card-footer-v128 > .botao-toggle-dias,
+  .admin-card-footer > .relatorios-admin,
+  .admin-card-footer-v128 > .relatorios-admin,
+  .admin-card-footer > .botao-ver-inscritos,
+  .admin-card-footer-v128 > .botao-ver-inscritos {
+    grid-column: 1 / -1 !important;
+  }
+
+  .relatorios-formato-toggle,
+  .relatorios-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .relatorio-formato-opcao,
+  .relatorio-acao {
+    min-height: 52px !important;
+    font-size: 13px !important;
+    padding: 11px 8px !important;
+  }
+
+  .floating-calendar-btn {
+    right: 20px !important;
+    bottom: 24px !important;
+  }
+
+  .floating-yescom-btn {
+    right: 86px !important;
+    bottom: 24px !important;
+  }
+}
+
+/* =====================================================
+   V146 - Ajustes visuais e operacionais
+   ===================================================== */
+
+/* Cadeado sempre com fundo branco; o card mantém cor por status */
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto {
+  background: #ffffff !important;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14) !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto.acao-encerrar {
+  background: #ffffff !important;
+  border-color: #86efac !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto.acao-abrir {
+  background: #ffffff !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Ícones nos botões dos cards */
+.admin-card-footer-v128 button,
+.gerenciar-dias .botao-toggle-dias,
+.relatorios-admin .botao-relatorios-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.btn-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15em;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+/* Quantidade exibida nos filtros de inscritos */
+.admin-inscritos-contagem-exibidos {
+  margin: 14px 0 10px;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  color: #475569;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* Novo cadastro não deve reservar espaço visual para card logado */
+.card-staff-cadastro.hidden {
+  display: none !important;
+}
+
+/* =====================================================
+   V147 - Banner da corrida, ícones persistentes e WhatsApp circular
+   ===================================================== */
+.field-banner-corrida {
+  grid-column: 1 / -1;
+}
+
+.field-banner-corrida input[type="file"] {
+  padding: 13px;
+  background: #f8fafc;
+  border: 1px dashed rgba(37, 99, 235, 0.35);
+  cursor: pointer;
+}
+
+.corrida-banner-preview {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+.corrida-banner-preview img {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+}
+
+.corrida-banner-preview span {
+  display: block;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.botao-remover-banner {
+  margin-top: 10px !important;
+  width: auto !important;
+  min-height: 38px !important;
+  padding: 9px 14px !important;
+  background: #fff1f2 !important;
+  color: #be123c !important;
+  border: 1px solid #fecdd3 !important;
+  box-shadow: none !important;
+}
+
+.corrida-card-banner,
+.corrida-card-banner-admin {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 20px;
+  margin: 0 0 18px;
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.16);
+  background: #e5e7eb;
+}
+
+.card-corrida .corrida-card-banner {
+  margin: -4px 0 20px;
+}
+
+.card-corrida-admin .corrida-card-banner-admin {
+  margin-bottom: 18px;
+}
+
+/* Botão de WhatsApp como círculo simples, no padrão dos flutuantes */
+.floating-whatsapp {
+  width: 74px !important;
+  min-width: 74px !important;
+  height: 74px !important;
+  min-height: 74px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  gap: 0 !important;
+}
+
+.floating-whatsapp-icon {
+  width: 44px !important;
+  height: 38px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  font-size: 25px !important;
+}
+
+.floating-whatsapp-text {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .corrida-card-banner,
+  .corrida-card-banner-admin {
+    border-radius: 18px;
+    margin-bottom: 16px;
+  }
+
+  .floating-whatsapp {
+    width: 70px !important;
+    min-width: 70px !important;
+    height: 70px !important;
+    min-height: 70px !important;
+  }
+}
+
+
+/* V148 - ícone de WhatsApp/chat centralizado */
+.floating-whatsapp-icon svg {
+  display: block;
+  width: 30px;
+  height: 30px;
+}
+.botao-ver-inscritos .btn-ico {
+  display: inline-flex !important;
+}
+
+/* =========================================================
+   V149 - AJUSTES BANNER / WHATSAPP / DIAS EDITÁVEIS
+========================================================= */
+.card-minha-inscricao .minha-inscricao-banner,
+.card-minha-inscricao .corrida-card-banner {
+  display: block;
+  width: calc(100% + 48px);
+  margin: -24px -24px 22px;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 24px 24px 0 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.floating-whatsapp {
+  width: 72px;
+  height: 72px;
+  min-height: 72px;
+  padding: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #25d366, #16a34a);
+}
+
+.floating-whatsapp-icon {
+  width: 54px;
+  height: 54px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.whatsapp-logo-svg {
+  display: block;
+  width: 38px;
+  height: 38px;
+}
+
+.dia-corrida-card-editavel {
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: #ffffff;
+}
+
+.dia-editavel-resumo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 14px;
+}
+
+.dia-resumo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111827;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dia-toggle-ico {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #e0f2fe, #ede9fe);
+  color: #2563eb;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.dia-resumo-texto {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dia-resumo-texto strong {
+  font-size: 15px;
+  color: #111827;
+}
+
+.dia-resumo-texto small {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.delete-btn-dia-resumo {
+  padding: 9px 12px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  white-space: nowrap;
+}
+
+.dia-editavel-corpo {
+  padding: 0 14px 16px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.dia-editavel-corpo.hidden {
+  display: none !important;
+}
+
+.dia-corrida-card-editavel.is-open .dia-editavel-resumo {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(124, 58, 237, 0.05));
+}
+
+@media (max-width: 650px) {
+  .card-minha-inscricao .minha-inscricao-banner,
+  .card-minha-inscricao .corrida-card-banner {
+    width: calc(100% + 32px);
+    margin: -16px -16px 18px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .dia-editavel-resumo {
+    grid-template-columns: 1fr;
+  }
+
+  .delete-btn-dia-resumo {
+    width: 100%;
+  }
+}
+
+/* v153 - semáforo de inscrições e revisão de espaçamento do cadastro */
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto {
+  background: #ffffff !important;
+  border: 2px solid rgba(148, 163, 184, 0.28) !important;
+  color: #0f172a !important;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 62px !important;
+  height: 62px !important;
+  min-width: 62px !important;
+  min-height: 62px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto.acao-encerrar,
+.botao-status-compacto.acao-encerrar {
+  background: #ffffff !important;
+  border-color: rgba(34, 197, 94, 0.55) !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto.acao-abrir,
+.botao-status-compacto.acao-abrir {
+  background: #ffffff !important;
+  border-color: rgba(239, 68, 68, 0.55) !important;
+}
+
+.status-semaforo-indicador {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32), 0 5px 14px rgba(15, 23, 42, 0.18);
+}
+
+.status-semaforo-indicador.status-aberto {
+  background: #19d653;
+}
+
+.status-semaforo-indicador.status-fechado {
+  background: #ef1f2d;
+}
+
+.status-semaforo-indicador.status-aberto::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(25, 214, 83, 0.24);
+  animation: statusPulseVerde 1.8s ease-out infinite;
+}
+
+@keyframes statusPulseVerde {
+  0% { transform: scale(1); opacity: .75; }
+  80%, 100% { transform: scale(2.05); opacity: 0; }
+}
+
+.status-semaforo-texto {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.status-semaforo-carregando {
+  font-size: 26px;
+  line-height: 1;
+  color: #475569;
+}
+
+#staffForm.form-area {
+  padding-top: 34px;
+}
+
+#staffForm .section-title {
+  margin: 30px 0 18px !important;
+  line-height: 1.15;
+}
+
+#staffForm .section-title:first-child {
+  margin-top: 0 !important;
+}
+
+#staffForm .field {
+  margin: 0 0 20px !important;
+}
+
+#staffForm .grid {
+  gap: 20px !important;
+  margin: 0 0 0 !important;
+}
+
+#staffForm label {
+  display: block;
+  margin: 0 0 8px !important;
+  line-height: 1.25;
+}
+
+#staffForm input,
+#staffForm select,
+#staffForm textarea {
+  margin: 0 !important;
+}
+
+#staffForm .helper,
+#staffForm .error {
+  margin-top: 8px !important;
+  line-height: 1.38;
+}
+
+#staffForm .pix-options {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 12px !important;
+}
+
+#staffForm .pix-card {
+  margin: 0 !important;
+}
+
+#staffForm #fieldObservacoes {
+  margin-top: 22px !important;
+}
+
+#staffForm #fieldTermos.checkbox {
+  margin: 22px 0 22px !important;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+#staffForm #fieldTermos input[type="checkbox"] {
+  flex: 0 0 20px;
+  width: 20px !important;
+  height: 20px !important;
+  margin-top: 3px !important;
+}
+
+@media (max-width: 720px) {
+  #staffForm.form-area {
+    padding: 30px 22px !important;
+  }
+
+  #staffForm .section-title {
+    margin: 26px 0 16px !important;
+  }
+
+  #staffForm .field {
+    margin-bottom: 18px !important;
+  }
+
+  #staffForm .grid {
+    gap: 0 !important;
+  }
+
+  #staffForm input,
+  #staffForm select,
+  #staffForm textarea {
+    min-height: 56px;
+  }
+}
+.status-semaforo-indicador { position: relative; }
+
+/* v154 - correções críticas: semáforo menor e edição estável */
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto {
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  min-height: 46px !important;
+  border-width: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  position: absolute !important;
+  right: 18px !important;
+  top: 18px !important;
+  transform: none !important;
+  overflow: visible !important;
+}
+
+.status-semaforo-indicador {
+  position: relative !important;
+  width: 24px !important;
+  height: 24px !important;
+  border: 3px solid #ffffff !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22) !important;
+}
+
+.status-semaforo-indicador.status-aberto::after {
+  width: 24px !important;
+  height: 24px !important;
+  left: -3px !important;
+  top: -3px !important;
+}
+
+.card-corrida-admin .corrida-status-card,
+.corrida-status-card {
+  position: relative !important;
+  padding-right: 76px !important;
+}
+
+@media (max-width: 520px) {
+  .botao-alterar-status-corrida.botao-status-compacto,
+  .botao-status-compacto {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    right: 14px !important;
+    top: 16px !important;
+  }
+
+  .status-semaforo-indicador {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .status-semaforo-indicador.status-aberto::after {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .card-corrida-admin .corrida-status-card,
+  .corrida-status-card {
+    padding-right: 64px !important;
+  }
+}
+
+/* v155 - ajustes críticos: semáforo transparente e dias editáveis */
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  right: 20px !important;
+  top: 20px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.status-semaforo-indicador {
+  width: 20px !important;
+  height: 20px !important;
+  border: 3px solid rgba(255,255,255,.88) !important;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.22) !important;
+}
+
+.status-semaforo-indicador.status-aberto::after {
+  width: 20px !important;
+  height: 20px !important;
+  left: -3px !important;
+  top: -3px !important;
+}
+
+.card-corrida-admin .corrida-status-card,
+.corrida-status-card {
+  padding-right: 58px !important;
+}
+
+.dia-corrida-card-editavel .dia-resumo-toggle,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle,
+.dia-corrida-card .dia-resumo-toggle {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+}
+
+.dia-corrida-card-editavel .dia-resumo-toggle:hover,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle:hover,
+.dia-corrida-card .dia-resumo-toggle:hover {
+  background: transparent !important;
+  color: #111827 !important;
+}
+
+.dia-corrida-card-editavel .dia-toggle-ico,
+.gerenciar-dias .dia-corrida-card-editavel .dia-toggle-ico {
+  background: linear-gradient(135deg, #e0f2fe, #ede9fe) !important;
+  color: #2563eb !important;
+}
+
+.dia-corrida-card-editavel .delete-btn-dia-resumo,
+.gerenciar-dias .dia-corrida-card-editavel .delete-btn-dia-resumo,
+.dia-corrida-card .delete-btn-dia-resumo {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  border: 1px solid rgba(239, 68, 68, .22) !important;
+  box-shadow: none !important;
+}
+
+.dia-corrida-card-editavel .delete-btn-dia-resumo:hover,
+.gerenciar-dias .dia-corrida-card-editavel .delete-btn-dia-resumo:hover,
+.dia-corrida-card .delete-btn-dia-resumo:hover {
+  background: #fecaca !important;
+}
+
+@media (max-width: 520px) {
+  .botao-alterar-status-corrida.botao-status-compacto,
+  .botao-status-compacto {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    right: 18px !important;
+    top: 18px !important;
+  }
+
+  .status-semaforo-indicador {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .status-semaforo-indicador.status-aberto::after {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .card-corrida-admin .corrida-status-card,
+  .corrida-status-card {
+    padding-right: 52px !important;
+  }
+}
+
+/* v156 - correções finais: semáforo sem disco branco, cabeçalho padronizado e dias editáveis */
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  right: 24px !important;
+  top: 24px !important;
+  overflow: visible !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto::before,
+.botao-alterar-status-corrida.botao-status-compacto::after,
+.botao-status-compacto::before,
+.botao-status-compacto::after {
+  display: none !important;
+  content: none !important;
+}
+
+.status-semaforo-indicador {
+  display: block !important;
+  position: relative !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.45), 0 7px 16px rgba(15,23,42,.18) !important;
+}
+
+.status-semaforo-indicador.status-aberto {
+  background: #18d957 !important;
+}
+
+.status-semaforo-indicador.status-fechado {
+  background: #ff1f35 !important;
+}
+
+.status-semaforo-indicador.status-aberto::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -6px !important;
+  width: auto !important;
+  height: auto !important;
+  left: -6px !important;
+  top: -6px !important;
+  border-radius: 999px !important;
+  background: rgba(24,217,87,.18) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  animation: statusPulseVerde 1.8s ease-out infinite !important;
+}
+
+.status-semaforo-indicador.status-fechado::after {
+  display: none !important;
+  content: none !important;
+}
+
+.status-semaforo-texto {
+  display: none !important;
+}
+
+/* Padroniza cabeçalhos de admin/corridas: botão do meio sempre roxo */
+.pagina-corridas .admin-card-acao-perfil,
+.pagina-admin .admin-card-acao-perfil,
+.card-staff-cadastro .admin-card-acao-perfil {
+  background: linear-gradient(135deg, #5b3df5, #8b2ff5) !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  box-shadow: 0 14px 28px rgba(91, 61, 245, .22) !important;
+}
+
+.pagina-corridas .admin-card-acao-corridas,
+.pagina-admin .admin-card-acao-corridas,
+.card-staff-cadastro .admin-card-acao-corridas {
+  background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  box-shadow: 0 14px 28px rgba(20, 184, 166, .20) !important;
+}
+
+/* Corrige resumo fechado dos dias no formulário de edição */
+.dia-corrida-card-editavel .dia-resumo-toggle,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle,
+.dia-corrida-card .dia-resumo-toggle {
+  background: linear-gradient(135deg, #eef6ff, #f8fbff) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(148, 163, 184, .22) !important;
+  box-shadow: none !important;
+}
+
+.dia-corrida-card-editavel .dia-resumo-toggle strong,
+.dia-corrida-card-editavel .dia-resumo-toggle span,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle strong,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle span {
+  color: #0f172a !important;
+}
+
+.dia-corrida-card-editavel .dia-toggle-ico,
+.gerenciar-dias .dia-corrida-card-editavel .dia-toggle-ico {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  border: 1px solid rgba(37, 99, 235, .16) !important;
+}
+
+/* Versão visível do pacote */
+.version-badge {
+  position: fixed;
+  top: 8px;
+  right: 10px;
+  z-index: 9999;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, .18);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+/* v164 - ações rápidas refinadas, WhatsApp oficial e dias sem borda */
+.linha-inscrito-principal {
+  grid-template-columns: auto auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+}
+
+.linha-inscrito-acoes-rapidas {
+  grid-column: 1 / -1;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 10px !important;
+  flex-wrap: nowrap !important;
+}
+
+.botao-acao-inscrito,
+.linha-inscrito-acoes .botao-acao-inscrito,
+.botao-whatsapp-inscrito.botao-acao-inscrito {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, .10) !important;
+}
+
+.botao-confirmar-inscrito.botao-acao-inscrito {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+}
+
+.botao-lista-espera-inscrito.botao-acao-inscrito {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+}
+
+.botao-cancelar-inscrito.botao-acao-inscrito {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+.botao-whatsapp-confirmado {
+  background: #16a34a !important;
+  color: #ffffff !important;
+}
+
+.botao-whatsapp-bloqueado,
+.botao-whatsapp-bloqueado:disabled {
+  background: #e5e7eb !important;
+  color: #9ca3af !important;
+  opacity: .75 !important;
+  cursor: not-allowed !important;
+}
+
+.linha-inscrito-acoes-rapidas .botao-acao-inscrito:disabled {
+  opacity: .42 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+.detalhes-inscrito-header {
+  grid-template-columns: auto minmax(180px, 1fr) !important;
+}
+
+.admin-card-footer,
+.admin-card-footer-v128 {
+  gap: 8px !important;
+}
+
+.admin-card-footer > .relatorios-admin,
+.admin-card-footer-v128 > .relatorios-admin {
+  margin: 0 !important;
+}
+
+.admin-card-footer > .relatorios-admin > .botao-relatorios-toggle,
+.admin-card-footer-v128 > .relatorios-admin > .botao-relatorios-toggle {
+  min-height: 48px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  border-radius: 12px !important;
+}
+
+.card-corrida-admin .botao-ver-inscritos,
+.card-corrida-admin .botao-editar-corrida,
+.card-corrida-admin .delete-btn,
+.card-corrida-admin .botao-toggle-dias {
+  min-height: 48px !important;
+}
+
+.preview-dias-corrida,
+.dia-corrida-card-editavel,
+.dia-corrida-card-editavel.is-open,
+.dia-corrida-card-editavel.is-open .dia-editavel-resumo,
+.dia-corrida-card-editavel .dia-editavel-resumo,
+.gerenciar-dias .dia-corrida-card-editavel,
+.gerenciar-dias .dia-corrida-card-editavel.is-open .dia-editavel-resumo {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+.dia-corrida-card-editavel .dia-resumo-toggle,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle,
+.dia-corrida-card .dia-resumo-toggle {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+@media (max-width: 520px) {
+  .linha-inscrito-acoes-rapidas {
+    justify-content: flex-start !important;
+    padding-left: 58px !important;
+  }
+
+  .botao-acao-inscrito,
+  .linha-inscrito-acoes .botao-acao-inscrito,
+  .botao-whatsapp-inscrito.botao-acao-inscrito {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    font-size: 16px !important;
+  }
+}
+
+
+/* v164 - refinamento dos botões rápidos dos inscritos */
+.linha-inscrito-acoes-rapidas {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  padding: 0 !important;
+  margin-top: 6px !important;
+}
+
+.botao-acao-inscrito,
+.linha-inscrito-acoes .botao-acao-inscrito,
+.botao-whatsapp-inscrito.botao-acao-inscrito {
+  width: 100% !important;
+  height: 38px !important;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  border-radius: 12px !important;
+  border: 2px solid currentColor !important;
+  box-shadow: none !important;
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease !important;
+}
+
+.botao-acao-inscrito:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 16px 28px rgba(15, 23, 42, .14) !important;
+  filter: saturate(1.05) !important;
+}
+
+.icone-acao-svg {
+  width: 21px !important;
+  height: 21px !important;
+  stroke: currentColor !important;
+  stroke-width: 3 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: none !important;
+}
+
+.icone-whatsapp-oficial {
+  width: 25px !important;
+  height: 25px !important;
+  display: block !important;
+}
+
+.botao-confirmar-inscrito.botao-acao-inscrito {
+  background: transparent !important;
+  color: #16a34a !important;
+}
+
+.botao-lista-espera-inscrito.botao-acao-inscrito {
+  background: transparent !important;
+  color: #2563eb !important;
+}
+
+.botao-cancelar-inscrito.botao-acao-inscrito {
+  background: transparent !important;
+  color: #dc2626 !important;
+}
+
+.botao-whatsapp-confirmado.botao-acao-inscrito {
+  background: transparent !important;
+  color: #16a34a !important;
+}
+
+.botao-whatsapp-bloqueado.botao-acao-inscrito,
+.botao-whatsapp-bloqueado.botao-acao-inscrito:disabled {
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb) !important;
+  color: #9ca3af !important;
+  opacity: .82 !important;
+  box-shadow: none !important;
+}
+
+.linha-inscrito-acoes-rapidas .botao-acao-inscrito:disabled:not(.botao-whatsapp-bloqueado) {
+  opacity: .50 !important;
+  filter: grayscale(.15) !important;
+}
+
+/* v164 - remove fundo e bordas internas dos dias cadastrados na edição */
+.gerenciar-dias .dia-corrida-card-editavel,
+.gerenciar-dias .dia-corrida-card-editavel.is-open,
+.gerenciar-dias .dia-corrida-card-editavel .dia-editavel-resumo,
+.gerenciar-dias .dia-corrida-card-editavel.is-open .dia-editavel-resumo,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle:hover,
+.dia-corrida-card-editavel .dia-resumo-toggle,
+.dia-corrida-card .dia-resumo-toggle {
+  background: #ffffff !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+@media (max-width: 520px) {
+  .linha-inscrito-acoes-rapidas {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    padding-left: 0 !important;
+  }
+
+  .botao-acao-inscrito,
+  .linha-inscrito-acoes .botao-acao-inscrito,
+  .botao-whatsapp-inscrito.botao-acao-inscrito {
+    width: 100% !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    border-radius: 11px !important;
+  }
+}
+
+
+/* v165 */
+.gerenciar-dias .dia-editavel-resumo * { border-color: transparent !important; }
+
+
+/* v169 - refinamento real dos botões rápidos e dias editáveis */
+.linha-inscrito-acoes-rapidas {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  margin-top: 2px !important;
+  padding: 0 !important;
+}
+
+.linha-inscrito-principal .admin-status-inscricao {
+  margin-bottom: 2px !important;
+}
+
+.botao-acao-inscrito,
+.linha-inscrito-acoes .botao-acao-inscrito,
+.botao-whatsapp-inscrito.botao-acao-inscrito {
+  width: 100% !important;
+  height: 32px !important;
+  min-width: 0 !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border-radius: 10px !important;
+  border: 1.5px solid currentColor !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.botao-acao-inscrito:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, .08) !important;
+}
+
+.botao-confirmar-inscrito.botao-acao-inscrito {
+  color: #16a34a !important;
+  background: transparent !important;
+}
+
+.botao-lista-espera-inscrito.botao-acao-inscrito {
+  color: #2563eb !important;
+  background: transparent !important;
+}
+
+.botao-cancelar-inscrito.botao-acao-inscrito {
+  color: #dc2626 !important;
+  background: transparent !important;
+}
+
+.botao-whatsapp-confirmado.botao-acao-inscrito {
+  color: #16a34a !important;
+  background: transparent !important;
+}
+
+.botao-whatsapp-bloqueado.botao-acao-inscrito,
+.botao-whatsapp-bloqueado.botao-acao-inscrito:disabled {
+  color: #9ca3af !important;
+  background: transparent !important;
+  opacity: .55 !important;
+}
+
+.icone-acao-svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor !important;
+  stroke-width: 3 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: none !important;
+}
+
+.icone-whatsapp-outline {
+  width: 19px !important;
+  height: 19px !important;
+  display: block !important;
+  stroke: currentColor !important;
+  stroke-width: 1.85 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: none !important;
+}
+
+.linha-inscrito-acoes-rapidas .botao-acao-inscrito:disabled:not(.botao-whatsapp-bloqueado) {
+  opacity: .38 !important;
+  background: transparent !important;
+}
+
+.gerenciar-dias .dia-corrida-card-editavel,
+.gerenciar-dias .dia-corrida-card-editavel.is-open {
+  background: #ffffff !important;
+  background-image: none !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, .05) !important;
+}
+
+.gerenciar-dias .dia-corrida-card-editavel .dia-editavel-resumo,
+.gerenciar-dias .dia-corrida-card-editavel.is-open .dia-editavel-resumo,
+.gerenciar-dias .dia-corrida-card-editavel .dia-resumo-toggle,
+.gerenciar-dias .dia-corrida-card-editavel.is-open .dia-resumo-toggle,
+.gerenciar-dias .dia-editavel-resumo,
+.gerenciar-dias .dia-resumo-toggle {
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.gerenciar-dias .dia-editavel-resumo::before,
+.gerenciar-dias .dia-editavel-resumo::after,
+.gerenciar-dias .dia-resumo-toggle::before,
+.gerenciar-dias .dia-resumo-toggle::after {
+  display: none !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+@media (max-width: 520px) {
+  .linha-inscrito-acoes-rapidas {
+    gap: 7px !important;
+    margin-top: 2px !important;
+  }
+
+  .botao-acao-inscrito,
+  .linha-inscrito-acoes .botao-acao-inscrito,
+  .botao-whatsapp-inscrito.botao-acao-inscrito {
+    height: 32px !important;
+    min-height: 32px !important;
+    border-radius: 10px !important;
+  }
+}
+
+
+/* v169 - refinamento do card de inscritos: espaçamento e seta */
+.linha-inscrito-principal {
+  column-gap: 9px !important;
+  row-gap: 6px !important;
+}
+
+.linha-inscrito-nome {
+  gap: 0 !important;
+}
+
+.linha-inscrito-nome strong {
+  line-height: 1.12 !important;
+}
+
+.linha-inscrito-nome small {
+  margin-top: 0 !important;
+  line-height: 1.15 !important;
+}
+
+.botao-expandir-inscrito {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  border: 1px solid #dbe3ff !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, #f8faff 0%, #eef2ff 100%) !important;
+  color: #4f46e5 !important;
+  box-shadow: 0 6px 14px rgba(79, 70, 229, .10) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease !important;
+}
+
+.botao-expandir-inscrito:hover {
+  transform: translateY(-1px) !important;
+  border-color: #c4b5fd !important;
+  box-shadow: 0 8px 18px rgba(79, 70, 229, .16) !important;
+}
+
+.icone-expandir-inscrito {
+  width: 15px !important;
+  height: 15px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.7 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  transition: transform .18s ease !important;
+}
+
+.linha-inscrito-admin:not(.is-collapsed) .icone-expandir-inscrito,
+.linha-inscrito-admin.aberto .icone-expandir-inscrito,
+.linha-inscrito-admin.expandido .icone-expandir-inscrito {
+  transform: rotate(90deg) !important;
+}
+
+@media (max-width: 520px) {
+  .linha-inscrito-principal {
+    row-gap: 5px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+
+  .linha-inscrito-nome strong {
+    font-size: 15px !important;
+    line-height: 1.08 !important;
+  }
+
+  .linha-inscrito-nome small {
+    font-size: 12px !important;
+    margin-top: -1px !important;
+  }
+
+  .botao-expandir-inscrito {
+    width: 27px !important;
+    height: 27px !important;
+    min-width: 27px !important;
+    border-radius: 9px !important;
+  }
+}
+
+
+/* v169 - ajuste real do card de inscritos: nome/dias próximos e seta refinada */
+.linha-inscrito-principal {
+  display: grid !important;
+  grid-template-columns: auto auto minmax(0, 1fr) auto !important;
+  grid-template-areas:
+    "check expand nome tipos"
+    "status status status status"
+    "acoes acoes acoes acoes" !important;
+  align-items: center !important;
+  column-gap: 9px !important;
+  row-gap: 8px !important;
+  padding: 11px 12px 12px !important;
+}
+
+.linha-inscrito-check { grid-area: check !important; }
+.botao-expandir-inscrito { grid-area: expand !important; }
+.linha-inscrito-nome { 
+  grid-area: nome !important; 
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 1px !important;
+  align-self: center !important;
+}
+.linha-inscrito-icones { 
+  grid-area: tipos !important; 
+  justify-self: end !important; 
+  align-self: center !important;
+  margin-top: 0 !important;
+}
+.admin-status-inscricao { grid-area: status !important; width: 100% !important; }
+.linha-inscrito-acoes-rapidas { grid-area: acoes !important; }
+
+.linha-inscrito-nome-topo { display: contents !important; }
+.linha-inscrito-nome strong {
+  display: block !important;
+  margin: 0 !important;
+  font-size: 15px !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.01em !important;
+}
+.linha-inscrito-nome small {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.12 !important;
+  color: #6b7280 !important;
+}
+
+.botao-expandir-inscrito {
+  width: 29px !important;
+  height: 29px !important;
+  min-width: 29px !important;
+  border: 1px solid #dbe3ff !important;
+  border-radius: 10px !important;
+  background: #f4f6ff !important;
+  color: #4f46e5 !important;
+  box-shadow: 0 5px 12px rgba(79, 70, 229, .09) !important;
+}
+
+.botao-expandir-inscrito .icone-expandir-inscrito {
+  width: 14px !important;
+  height: 14px !important;
+  stroke-width: 2.4 !important;
+}
+
+.linha-inscrito-admin.aberto .botao-expandir-inscrito,
+.linha-inscrito-admin.expandido .botao-expandir-inscrito,
+.linha-inscrito-admin:not(.is-collapsed) .botao-expandir-inscrito {
+  background: #eef2ff !important;
+  border-color: #c7d2fe !important;
+}
+
+.linha-inscrito-admin.aberto .icone-expandir-inscrito,
+.linha-inscrito-admin.expandido .icone-expandir-inscrito,
+.linha-inscrito-admin:not(.is-collapsed) .icone-expandir-inscrito {
+  transform: rotate(90deg) !important;
+}
+
+@media (max-width: 520px) {
+  .linha-inscrito-principal {
+    column-gap: 8px !important;
+    row-gap: 7px !important;
+    padding: 10px 10px 11px !important;
+  }
+  .linha-inscrito-nome strong { font-size: 15px !important; line-height: 1.06 !important; }
+  .linha-inscrito-nome small { font-size: 12px !important; line-height: 1.08 !important; }
+  .botao-expandir-inscrito { width: 28px !important; height: 28px !important; min-width: 28px !important; }
+}
+
+
+/* v169 - mantém a seta SVG estilizada após abrir/fechar card */
+.linha-inscrito-admin.is-collapsed .icone-expandir-inscrito {
+  transform: rotate(0deg) !important;
+}
+
+.linha-inscrito-admin.is-expanded .icone-expandir-inscrito,
+.linha-inscrito-admin:not(.is-collapsed) .icone-expandir-inscrito {
+  transform: rotate(90deg) !important;
+}
+
+.botao-expandir-inscrito {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+.botao-expandir-inscrito svg {
+  display: block !important;
+}
+
+
+/* v185 - seta outline consistente no card de inscritos */
+.botao-expandir-inscrito {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+.botao-expandir-inscrito .icone-expandir-inscrito {
+  width: 15px !important;
+  height: 15px !important;
+  display: block !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.6 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  transform-origin: 50% 50% !important;
+  transition: transform .16s ease !important;
+}
+.botao-expandir-inscrito .icone-expandir-inscrito path {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.6 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+.linha-inscrito-admin.is-collapsed .botao-expandir-inscrito .icone-expandir-inscrito {
+  transform: rotate(0deg) !important;
+}
+.linha-inscrito-admin.is-expanded .botao-expandir-inscrito .icone-expandir-inscrito {
+  transform: rotate(90deg) !important;
+}
+
+/* v185 - busca admin na edição de cadastro */
+.admin-editar-staff-panel {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  border-radius: 18px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.07);
+  padding: 16px;
+  margin: 0 0 18px;
+}
+
+.admin-editar-staff-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.admin-editar-staff-header strong {
+  display: block;
+  color: #1f2937;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.admin-editar-staff-header span {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.admin-editar-staff-busca {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-editar-staff-busca input {
+  height: 42px;
+  border: 1px solid #d8dce8;
+  border-radius: 12px;
+  padding: 0 12px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+}
+
+.admin-editar-staff-busca input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.admin-editar-staff-busca button {
+  height: 42px;
+  border: 0;
+  border-radius: 12px;
+  padding: 0 18px;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  box-shadow: 0 8px 18px rgba(124, 58, 237, 0.22);
+}
+
+.admin-editar-staff-busca button:disabled {
+  opacity: .7;
+  cursor: wait;
+}
+
+.admin-editar-staff-status {
+  min-height: 18px;
+  color: #475569;
+  font-size: 12px;
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.campo-bloqueado-edicao {
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .admin-editar-staff-busca {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-editar-staff-busca button {
+    width: 100%;
+  }
+}
+
+
+/* v185 - melhoria visual cadastro/edição, blocos e foto */
+body.pagina-cadastro-geral,
+body.pagina-editar-cadastro {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 14% 0%, rgba(124, 58, 237, 0.13), transparent 32%),
+    radial-gradient(circle at 86% 12%, rgba(14, 165, 233, 0.15), transparent 30%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 44%, #f8fafc 100%) !important;
+}
+
+body.pagina-editar-cadastro {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(16, 185, 129, 0.13), transparent 31%),
+    radial-gradient(circle at 84% 8%, rgba(124, 58, 237, 0.14), transparent 32%),
+    linear-gradient(180deg, #f7fdfb 0%, #eef7ff 48%, #f8fafc 100%) !important;
+}
+
+body.pagina-cadastro-geral .container,
+body.pagina-editar-cadastro .container {
+  position: relative;
+}
+
+body.pagina-cadastro-geral .header,
+body.pagina-editar-cadastro .header {
+  background: rgba(255,255,255,0.82);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 24px;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.09);
+  backdrop-filter: blur(10px);
+  padding: 24px 22px;
+  margin-bottom: 18px;
+}
+
+body.pagina-cadastro-geral #staffForm.form-area,
+body.pagina-editar-cadastro #staffForm.form-area {
+  background: rgba(255,255,255,0.94);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 26px;
+  box-shadow: 0 20px 54px rgba(15, 23, 42, 0.10);
+  overflow: hidden;
+}
+
+#staffForm .section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 12px 14px 12px 46px !important;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(124,58,237,.10), rgba(14,165,233,.08));
+  border: 1px solid rgba(124,58,237,.13);
+  color: #312e81 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: .01em;
+  position: relative;
+}
+
+#staffForm .section-title::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  box-shadow: 0 7px 14px rgba(124,58,237,.20);
+}
+
+body.pagina-editar-cadastro #staffForm .section-title {
+  background: linear-gradient(135deg, rgba(16,185,129,.11), rgba(124,58,237,.08));
+  border-color: rgba(16,185,129,.18);
+  color: #064e3b !important;
+}
+
+body.pagina-editar-cadastro #staffForm .section-title::before {
+  background: linear-gradient(135deg, #10b981, #7c3aed);
+}
+
+#staffForm .field {
+  background: rgba(248,250,252,0.62);
+  border: 1px solid rgba(226,232,240,.72);
+  border-radius: 16px;
+  padding: 12px !important;
+}
+
+#staffForm .grid .field {
+  height: calc(100% - 20px);
+}
+
+#staffForm .pix-card {
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 20px rgba(15,23,42,.04);
+}
+
+.foto-input-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.foto-input-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid rgba(124,58,237,.22);
+  color: #5b21b6;
+  background: rgba(124,58,237,.07);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.foto-input-btn-camera {
+  color: #047857;
+  border-color: rgba(16,185,129,.28);
+  background: rgba(16,185,129,.08);
+}
+
+.foto-input-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15,23,42,.08);
+}
+
+.foto-input-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.photo-cropper-stage {
+  touch-action: none;
+}
+
+@media (max-width: 720px) {
+  body.pagina-cadastro-geral .header,
+  body.pagina-editar-cadastro .header {
+    padding: 20px 18px;
+    border-radius: 22px;
+  }
+
+  #staffForm .section-title {
+    padding-left: 44px !important;
+  }
+
+  #staffForm .field {
+    padding: 11px !important;
+  }
+
+  .foto-input-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* v185 - ajustes visuais cadastro/admin */
+body.pagina-cadastro-geral .header,
+body.pagina-editar-cadastro .header {
+  color: #ffffff !important;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(14,165,233,.28), transparent 28%),
+    linear-gradient(135deg, #111827 0%, #1e1b4b 52%, #312e81 100%) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow: 0 22px 48px rgba(30, 27, 75, .22) !important;
+}
+
+body.pagina-editar-cadastro .header {
+  background:
+    radial-gradient(circle at 88% 14%, rgba(34,197,94,.24), transparent 30%),
+    linear-gradient(135deg, #052e2b 0%, #0f3b59 52%, #312e81 100%) !important;
+}
+
+body.pagina-cadastro-geral .header h1,
+body.pagina-editar-cadastro .header h1,
+body.pagina-cadastro-geral .header p,
+body.pagina-editar-cadastro .header p {
+  color: #ffffff !important;
+}
+
+body.pagina-cadastro-geral .header p,
+body.pagina-editar-cadastro .header p {
+  opacity: .88 !important;
+}
+
+.foto-input-actions {
+  gap: 12px !important;
+}
+
+.foto-input-btn {
+  min-height: 54px !important;
+  border-radius: 18px !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  padding: 13px 16px !important;
+  font-size: 14px !important;
+  background: linear-gradient(135deg, rgba(124,58,237,.10), rgba(14,165,233,.08)) !important;
+  border: 1px solid rgba(124,58,237,.26) !important;
+  box-shadow: 0 10px 22px rgba(124,58,237,.10) !important;
+}
+
+.foto-input-btn-camera {
+  color: #047857 !important;
+  background: linear-gradient(135deg, rgba(16,185,129,.12), rgba(20,184,166,.07)) !important;
+  border-color: rgba(16,185,129,.32) !important;
+  box-shadow: 0 10px 22px rgba(16,185,129,.10) !important;
+}
+
+.foto-input-ico {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 34px;
+  border-radius: 13px;
+  background: rgba(255,255,255,.82);
+  box-shadow: inset 0 0 0 1px rgba(148,163,184,.22);
+  font-size: 17px;
+}
+
+.corrida-status-card .corrida-progresso-vagas {
+  display: none !important;
+}
+
+.corrida-progressos-fora-card {
+  margin: 14px 0 24px;
+  padding: 0 12px;
+}
+
+.corrida-progressos-fora-card .corrida-progresso-vagas {
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.corrida-progressos-fora-card .corrida-progresso-topo {
+  padding: 0 2px 6px !important;
+}
+
+.corrida-progressos-fora-card .corrida-progresso-trilho {
+  height: 9px !important;
+  background: #f8fafc !important;
+  border: 1px solid rgba(148,163,184,.25) !important;
+}
+
+@media (max-width: 720px) {
+  .foto-input-btn {
+    min-height: 50px !important;
+    padding: 12px 14px !important;
+  }
+  .corrida-progressos-fora-card {
+    padding: 0 10px;
+    margin-top: 12px;
+  }
+}
+
+/* =========================================================
+   AJUSTES V186 - BANNER, CARD CORRIDA E INSCRITOS
+========================================================= */
+.form-admin .section-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 40px !important;
+  padding: 12px 14px 12px 46px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, rgba(124,58,237,.10), rgba(14,165,233,.08)) !important;
+  border: 1px solid rgba(124,58,237,.13) !important;
+  color: #312e81 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: .01em !important;
+  position: relative !important;
+}
+
+.form-admin .section-title::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  box-shadow: 0 7px 14px rgba(124,58,237,.20);
+}
+
+.form-admin .section-title::after { display: none !important; }
+
+.field-banner-corrida small { line-height: 1.35; }
+
+.card-corrida-admin {
+  margin-bottom: 34px !important;
+}
+
+.corrida-status-label-destaque {
+  font-size: 15px !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.corrida-status-subtitulo {
+  margin-top: 4px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  opacity: .82;
+}
+
+.corrida-progresso-rotulo {
+  font-size: 12.5px !important;
+  font-weight: 900 !important;
+  color: #334155 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.corrida-progresso-confirmados .corrida-progresso-barra.confirmados-verde,
+.corrida-progresso-confirmados-barra.confirmados-verde {
+  background: #22c55e !important;
+}
+
+.corrida-resumo-sutil {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 13px 0 4px;
+}
+
+.corrida-resumo-sutil > div {
+  padding: 10px 11px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  min-width: 0;
+}
+
+.corrida-resumo-sutil strong,
+.corrida-resumo-sutil span {
+  display: block;
+}
+
+.corrida-resumo-sutil strong {
+  margin-bottom: 4px;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.corrida-resumo-sutil span {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #0f172a;
+}
+
+.admin-inscritos-filtros-v186 {
+  display: grid !important;
+  gap: 11px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.admin-filtros-topo-v186 {
+  display: grid;
+  grid-template-columns: minmax(165px, 220px) minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.admin-busca-wrap-v186 {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-busca-wrap-v186 span,
+.admin-status-select-wrap span {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.admin-inscritos-filtros-v186 .admin-busca-inscrito,
+.admin-inscritos-filtros-v186 .admin-status-select {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 13px;
+}
+
+.admin-inscritos-filtros-v186 .admin-toggles-tipo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.admin-inscritos-contagem-exibidos {
+  margin: 11px 0 0;
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #475569;
+}
+
+.admin-inscritos-acoes-v127 {
+  margin-top: 10px !important;
+}
+
+.admin-lista-compacta-inscritos {
+  margin-top: 14px;
+}
+
+@media (max-width: 700px) {
+  .corrida-resumo-sutil,
+  .admin-filtros-topo-v186 {
+    grid-template-columns: 1fr;
+  }
+
+  .card-corrida-admin {
+    margin-bottom: 28px !important;
+  }
+}
+
+/* AJUSTES V187 - layout solicitado */
+.corrida-resumo-sutil-v187{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+.corrida-resumo-sutil-v187 > div{
+  margin:0;
+}
+.corrida-resumo-sutil-v187 .corrida-resumo-duas-colunas{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  padding:0;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+}
+.corrida-resumo-sutil-v187 .corrida-resumo-duas-colunas > div{
+  min-width:0;
+  border:1px solid rgba(148,163,184,.28);
+  background:rgba(248,250,252,.92);
+  border-radius:18px;
+  padding:14px 16px;
+}
+.admin-inscritos-filtros-v186 .admin-toggles-tipo .admin-toggle-tipo{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.admin-inscritos-filtros-v186 .admin-toggles-tipo .btn-ico{
+  display:inline-flex;
+  line-height:1;
+}
+.admin-inscritos-filtros-v186 .admin-inscritos-contagem-exibidos{
+  margin-top:14px;
+  width:100%;
+}
+.admin-inscritos-acoes-v187{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:0;
+  margin:14px 0 14px;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+}
+.admin-inscritos-acoes-v187 .admin-contador-selecao{
+  order:1;
+  width:100%;
+}
+.admin-inscritos-acoes-v187 .admin-selecionar-exibidos{
+  order:2;
+  width:100%;
+  justify-content:flex-start;
+  padding:14px 16px;
+  border:1px solid rgba(148,163,184,.28);
+  border-radius:16px;
+  background:#fff;
+}
+.botao-confirmar-selecionados-final{
+  width:100%;
+  margin:16px 0 4px;
+}
+@media(max-width:520px){
+  .corrida-resumo-sutil-v187 .corrida-resumo-duas-colunas{grid-template-columns:1fr 1fr;gap:10px;}
+  .corrida-resumo-sutil-v187 .corrida-resumo-duas-colunas > div{padding:13px 14px;}
+}
+
+/* =========================================================
+   AJUSTES V188 - painel de inscritos limpo e intuitivo
+========================================================= */
+.admin-inscritos-painel {
+  background: #ffffff !important;
+  border-radius: 22px !important;
+  padding: 14px !important;
+  border: 1px solid rgba(226, 232, 240, .75) !important;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, .06) !important;
+}
+
+.admin-inscritos-resumo-v127 {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  gap: 8px !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card {
+  border: 0 !important;
+  background: #f8fafc !important;
+  box-shadow: none !important;
+  border-radius: 16px !important;
+  padding: 12px 10px !important;
+}
+
+.admin-inscritos-filtros-v188 {
+  margin-top: 14px !important;
+  padding: 14px !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 26px rgba(15, 23, 42, .055) !important;
+  display: grid !important;
+  gap: 12px !important;
+}
+
+.admin-filtros-grid-v188 {
+  display: grid !important;
+  grid-template-columns: minmax(138px, 180px) minmax(0, 1fr) !important;
+  gap: 10px !important;
+  align-items: end !important;
+}
+
+.admin-inscritos-filtros-v188 label {
+  min-width: 0 !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-status-select-wrap,
+.admin-inscritos-filtros-v188 .admin-busca-wrap-v186,
+.admin-dia-filtro-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-status-select-wrap span,
+.admin-inscritos-filtros-v188 .admin-busca-wrap-v186 span,
+.admin-dia-filtro-wrap span {
+  font-size: 10.5px !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .055em !important;
+  color: #64748b !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-status-select,
+.admin-inscritos-filtros-v188 .admin-busca-inscrito,
+.admin-inscritos-filtros-v188 .admin-dia-select {
+  width: 100% !important;
+  min-height: 42px !important;
+  border-radius: 14px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-toggles-tipo {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-toggle-tipo {
+  min-height: 40px !important;
+  border-radius: 14px !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 7px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-toggle-tipo:not(.ativo) {
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+  opacity: .72 !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-toggle-tipo .btn-ico {
+  display: inline-flex !important;
+  line-height: 1 !important;
+  font-size: 16px !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-inscritos-contagem-exibidos {
+  margin: 0 !important;
+  padding-top: 2px !important;
+  font-size: 12.5px !important;
+  font-weight: 900 !important;
+  color: #475569 !important;
+}
+
+.admin-selecao-clean-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  padding-top: 4px !important;
+  border-top: 1px solid #f1f5f9 !important;
+}
+
+.admin-selecionar-exibidos,
+.admin-somente-selecionados {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #334155 !important;
+  font-size: 12.5px !important;
+  font-weight: 900 !important;
+}
+
+.admin-selecionar-exibidos input,
+.admin-somente-selecionados input {
+  width: 18px !important;
+  height: 18px !important;
+  accent-color: #7c3aed !important;
+}
+
+.admin-lista-compacta-inscritos {
+  margin-top: 14px !important;
+  display: grid !important;
+  gap: 9px !important;
+}
+
+.linha-inscrito-admin {
+  border: 0 !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .055) !important;
+  overflow: hidden !important;
+}
+
+.linha-inscrito-admin:hover {
+  box-shadow: 0 12px 30px rgba(15, 23, 42, .075) !important;
+}
+
+.linha-inscrito-principal {
+  grid-template-columns: auto auto minmax(0, 1fr) auto !important;
+  grid-template-areas:
+    "check expand nome tipos"
+    "status status status status"
+    "acoes acoes acoes acoes" !important;
+  padding: 11px 11px 12px !important;
+  row-gap: 7px !important;
+  column-gap: 8px !important;
+}
+
+.linha-inscrito-check span {
+  border-color: #cbd5e1 !important;
+  background: #ffffff !important;
+}
+
+.botao-expandir-inscrito {
+  border: 0 !important;
+  background: #f8fafc !important;
+  color: #64748b !important;
+  box-shadow: none !important;
+}
+
+.linha-inscrito-nome strong {
+  color: #0f172a !important;
+  font-size: 15px !important;
+  letter-spacing: -.015em !important;
+}
+
+.linha-inscrito-nome small {
+  color: #64748b !important;
+  font-size: 12px !important;
+}
+
+.linha-inscrito-icones {
+  gap: 5px !important;
+}
+
+.icone-tipo-dia {
+  width: 25px !important;
+  height: 25px !important;
+  border-radius: 999px !important;
+  background: #f1f5f9 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+}
+
+.icone-tipo-dia.ativo {
+  background: #eef2ff !important;
+}
+
+.admin-status-inscricao {
+  width: fit-content !important;
+  max-width: 100% !important;
+  justify-self: start !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: .01em !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+}
+
+.admin-status-inscricao::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .75;
+}
+
+.admin-status-inscricao.pendente,
+.admin-status-inscricao.inscrito {
+  background: #f8fafc !important;
+  color: #64748b !important;
+}
+
+.admin-status-inscricao.confirmado {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+}
+
+.admin-status-inscricao.lista_espera {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+}
+
+.admin-status-inscricao.cancelado {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+.linha-inscrito-acoes-rapidas {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 7px !important;
+  margin-top: 0 !important;
+  width: 100% !important;
+}
+
+.botao-acao-inscrito,
+.linha-inscrito-acoes .botao-acao-inscrito,
+.botao-whatsapp-inscrito.botao-acao-inscrito {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.botao-confirmar-inscrito.botao-acao-inscrito {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+}
+
+.botao-lista-espera-inscrito.botao-acao-inscrito {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+}
+
+.botao-cancelar-inscrito.botao-acao-inscrito {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+.botao-whatsapp-confirmado.botao-acao-inscrito {
+  background: #22c55e !important;
+  color: #22c55e !important;
+}
+
+.botao-whatsapp-bloqueado.botao-acao-inscrito,
+.botao-whatsapp-bloqueado.botao-acao-inscrito:disabled {
+  background: #f1f5f9 !important;
+  color: #cbd5e1 !important;
+  opacity: 1 !important;
+}
+
+.icone-acao-svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor !important;
+  stroke-width: 3 !important;
+  fill: none !important;
+}
+
+.botao-lista-espera-inscrito .icone-acao-svg circle {
+  fill: none !important;
+}
+
+.icone-whatsapp-oficial-v188 {
+  width: 24px !important;
+  height: 24px !important;
+  display: block !important;
+}
+
+.linha-inscrito-acoes-rapidas .botao-acao-inscrito:disabled:not(.botao-whatsapp-bloqueado) {
+  opacity: .38 !important;
+  filter: grayscale(.2) !important;
+}
+
+.linha-inscrito-detalhes {
+  background: #f8fafc !important;
+  border-top: 1px solid #f1f5f9 !important;
+}
+
+.admin-barra-lote-v188 {
+  position: sticky !important;
+  bottom: 12px !important;
+  z-index: 40 !important;
+  display: none !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 14px !important;
+  padding: 10px !important;
+  border-radius: 18px !important;
+  background: rgba(15, 23, 42, .92) !important;
+  color: #ffffff !important;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, .26) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.admin-barra-lote-v188.ativo {
+  display: grid !important;
+}
+
+.admin-barra-lote-v188 .admin-contador-selecao {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  line-height: 1.15 !important;
+}
+
+.admin-barra-lote-v188 .admin-contador-selecao strong {
+  color: #ffffff !important;
+  font-size: 13px !important;
+}
+
+.admin-barra-lote-v188 .admin-contador-selecao span {
+  color: rgba(255,255,255,.76) !important;
+}
+
+.admin-barra-lote-v188 .botao-confirmar-selecionados-final {
+  width: auto !important;
+  min-height: 42px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 13px !important;
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 520px) {
+  .admin-inscritos-painel {
+    padding: 10px !important;
+    border-radius: 18px !important;
+  }
+
+  .admin-filtros-grid-v188 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-selecao-clean-row {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+
+  .linha-inscrito-acoes-rapidas {
+    gap: 7px !important;
+  }
+
+  .botao-acao-inscrito,
+  .linha-inscrito-acoes .botao-acao-inscrito,
+  .botao-whatsapp-inscrito.botao-acao-inscrito {
+    width: 33px !important;
+    height: 33px !important;
+    min-width: 33px !important;
+    min-height: 33px !important;
+  }
+
+  .admin-barra-lote-v188 {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-barra-lote-v188 .botao-confirmar-selecionados-final {
+    width: 100% !important;
+  }
+}
+
+/* =========================================================
+   AJUSTES V189 - limpeza visual inscritos, filtros e barra flutuante
+========================================================= */
+.card-corrida-admin .admin-inscritos-painel {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 18px 0 96px !important;
+  margin-top: 18px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin: 0 0 18px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-dupla {
+  display: contents !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card {
+  min-height: 74px !important;
+  padding: 10px 6px !important;
+  border-radius: 15px !important;
+  background: #f8fafc !important;
+  border: 1px solid rgba(226, 232, 240, .55) !important;
+  box-shadow: none !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card strong {
+  font-size: 25px !important;
+  line-height: 1 !important;
+  margin-bottom: 6px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card span {
+  font-size: 9.5px !important;
+  letter-spacing: .045em !important;
+  line-height: 1.15 !important;
+}
+
+.card-corrida-admin .admin-inscritos-filtros-v188 {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 0 14px !important;
+}
+
+.card-corrida-admin .admin-inscritos-filtros-v188 .admin-status-select,
+.card-corrida-admin .admin-inscritos-filtros-v188 .admin-busca-inscrito,
+.card-corrida-admin .admin-inscritos-filtros-v188 .admin-dia-select {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .035) !important;
+}
+
+.card-corrida-admin .admin-inscritos-filtros-v188 .admin-inscritos-contagem-exibidos {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  padding: 8px 12px !important;
+  border-radius: 999px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+.card-corrida-admin .admin-selecao-clean-row {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+
+.card-corrida-admin .admin-selecionar-exibidos,
+.card-corrida-admin .admin-somente-selecionados {
+  min-height: 44px !important;
+  padding: 9px 10px !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .035) !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  font-size: 12px !important;
+  line-height: 1.15 !important;
+}
+
+.card-corrida-admin .admin-selecionar-exibidos input,
+.card-corrida-admin .admin-somente-selecionados input,
+.card-corrida-admin .linha-inscrito-check input {
+  accent-color: #7c3aed !important;
+}
+
+.card-corrida-admin .admin-lista-compacta-inscritos {
+  margin-top: 14px !important;
+  gap: 10px !important;
+}
+
+.card-corrida-admin .linha-inscrito-admin {
+  background: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, .62) !important;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, .045) !important;
+}
+
+.card-corrida-admin .botao-acao-inscrito,
+.card-corrida-admin .linha-inscrito-acoes .botao-acao-inscrito,
+.card-corrida-admin .botao-whatsapp-inscrito.botao-acao-inscrito {
+  width: 42px !important;
+  height: 36px !important;
+  min-width: 42px !important;
+  min-height: 36px !important;
+  border-radius: 999px !important;
+}
+
+.card-corrida-admin .linha-inscrito-acoes-rapidas {
+  justify-content: space-between !important;
+}
+
+.card-corrida-admin .admin-barra-lote-v188 {
+  position: fixed !important;
+  left: max(14px, calc((100vw - 620px) / 2 + 14px)) !important;
+  right: max(14px, calc((100vw - 620px) / 2 + 14px)) !important;
+  bottom: 18px !important;
+  z-index: 9999 !important;
+  display: none !important;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, auto) !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 10px !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, .96) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(226, 232, 240, .9) !important;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, .18) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+.card-corrida-admin .admin-barra-lote-v188.ativo {
+  display: grid !important;
+}
+
+.card-corrida-admin .admin-barra-lote-v188 .admin-contador-selecao {
+  min-height: 48px !important;
+  justify-content: center !important;
+  padding: 8px 12px !important;
+  border-radius: 15px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+.card-corrida-admin .admin-barra-lote-v188 .admin-contador-selecao strong {
+  color: #0f172a !important;
+  font-size: 14px !important;
+}
+
+.card-corrida-admin .admin-barra-lote-v188 .admin-contador-selecao span {
+  color: #64748b !important;
+  font-weight: 800 !important;
+}
+
+.card-corrida-admin .admin-barra-lote-v188 .botao-confirmar-selecionados-final {
+  min-height: 50px !important;
+  width: 100% !important;
+  border-radius: 15px !important;
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(22, 163, 74, .22) !important;
+}
+
+@media (max-width: 520px) {
+  .card-corrida-admin .admin-inscritos-painel {
+    padding: 16px 0 116px !important;
+  }
+
+  .card-corrida-admin .admin-inscritos-resumo-v127 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+  }
+
+  .card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card {
+    min-height: 68px !important;
+    border-radius: 14px !important;
+    padding: 9px 4px !important;
+  }
+
+  .card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card strong {
+    font-size: 23px !important;
+  }
+
+  .card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card span {
+    font-size: 8.8px !important;
+  }
+
+  .card-corrida-admin .admin-selecao-clean-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+  }
+
+  .card-corrida-admin .admin-selecionar-exibidos,
+  .card-corrida-admin .admin-somente-selecionados {
+    font-size: 11.2px !important;
+    padding: 8px 8px !important;
+  }
+
+  .card-corrida-admin .admin-barra-lote-v188 {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 12px !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    padding: 9px !important;
+  }
+
+  .card-corrida-admin .admin-barra-lote-v188 .admin-contador-selecao {
+    min-height: 42px !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+}
+
+/* v190 - barra única de ocupação e ajustes finos painel inscritos */
+.corrida-progresso-segmentado {
+  margin-top: 8px;
+}
+
+.corrida-progresso-segmentado-topo strong {
+  font-size: 13px;
+  color: #334155;
+}
+
+.corrida-progresso-segmentado-trilho {
+  display: flex;
+  width: 100%;
+  height: 13px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f1f5f9;
+  border: 1px solid rgba(226, 232, 240, .9);
+}
+
+.corrida-progresso-segmentado-trilho .segmento {
+  display: block;
+  min-width: 0;
+  height: 100%;
+  transition: width .25s ease;
+}
+
+.segmentado-confirmados { background: #22c55e; }
+.segmentado-pendentes { background: #60a5fa; }
+.segmentado-livres { background: #e5e7eb; }
+
+.corrida-progresso-segmentado-legenda {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  margin-top: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.corrida-progresso-segmentado-legenda span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.legenda-cor {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.legenda-cor.confirmados { background: #22c55e; }
+.legenda-cor.pendentes { background: #60a5fa; }
+.legenda-cor.livres { background: #e5e7eb; border: 1px solid #cbd5e1; }
+
+.card-corrida-admin .admin-inscritos-painel {
+  gap: 10px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 {
+  margin: 6px 0 10px !important;
+  gap: 6px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card {
+  min-height: 58px !important;
+  padding: 7px 4px !important;
+  border-radius: 13px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card strong {
+  font-size: 21px !important;
+  margin-bottom: 4px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card span {
+  font-size: 8.3px !important;
+}
+
+.card-corrida-admin .admin-inscritos-filtros-v188 {
+  margin: 0 0 8px !important;
+}
+
+.card-corrida-admin .admin-tag-exibindo,
+.card-corrida-admin .admin-inscritos-filtros-v188 .admin-inscritos-contagem-exibidos {
+  font-size: 12px !important;
+  padding: 7px 11px !important;
+  margin-top: 2px !important;
+}
+
+.botao-whatsapp-confirmado.botao-acao-inscrito,
+.card-corrida-admin .botao-whatsapp-confirmado.botao-acao-inscrito {
+  background: #ecfdf5 !important;
+  color: #22c55e !important;
+}
+
+.botao-whatsapp-confirmado .icone-whatsapp-oficial-v188 path:first-child {
+  fill: currentColor !important;
+}
+
+@media (max-width: 520px) {
+  .card-corrida-admin .admin-inscritos-painel {
+    padding: 10px 0 110px !important;
+  }
+  .card-corrida-admin .admin-inscritos-resumo-v127 {
+    margin-top: 4px !important;
+    margin-bottom: 8px !important;
+  }
+  .card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card {
+    min-height: 54px !important;
+    padding: 6px 3px !important;
+  }
+  .card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card strong {
+    font-size: 20px !important;
+  }
+  .corrida-progresso-segmentado-legenda {
+    gap: 5px 8px;
+    font-size: 10px;
+  }
+}
+
+/* v192 - ajustes finos: barra unificada, espaçamentos e ordem da tag exibindo */
+.corrida-progresso-segmentado-trilho {
+  height: 9px !important;
+  border-radius: 999px !important;
+  background: #f8fafc !important;
+  border: 1px solid rgba(148, 163, 184, .25) !important;
+}
+
+.corrida-progresso-segmentado {
+  margin-top: 6px !important;
+}
+
+.card-corrida-admin .admin-inscritos-painel {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 {
+  margin-top: -2px !important;
+  margin-bottom: 8px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card {
+  min-height: 50px !important;
+  padding: 5px 3px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card strong {
+  font-size: 18px !important;
+  margin-bottom: 2px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card span {
+  font-size: 7.8px !important;
+  line-height: 1.05 !important;
+}
+
+.card-corrida-admin .admin-inscritos-filtros-v188 {
+  margin-top: 0 !important;
+  gap: 9px !important;
+}
+
+.card-corrida-admin .admin-selecao-clean-row {
+  order: 10 !important;
+  border-top: 0 !important;
+  padding-top: 2px !important;
+  margin-top: 0 !important;
+}
+
+.card-corrida-admin .admin-tag-exibindo,
+.card-corrida-admin .admin-inscritos-filtros-v188 .admin-inscritos-contagem-exibidos {
+  order: 11 !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin-top: -2px !important;
+  padding: 6px 10px !important;
+  font-size: 11.5px !important;
+  border-radius: 999px !important;
+}
+
+.card-corrida-admin .admin-lista-compacta-inscritos {
+  margin-top: 8px !important;
+}
+
+@media (max-width: 520px) {
+  .card-corrida-admin .admin-inscritos-painel {
+    padding-top: 0 !important;
+  }
+  .card-corrida-admin .admin-inscritos-resumo-v127 {
+    margin-top: -4px !important;
+    margin-bottom: 6px !important;
+  }
+  .card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card {
+    min-height: 48px !important;
+  }
+}
+
+
+/* v195 - ajuste real do semáforo dentro do box de inscrições */
+.corrida-status-topo-linha{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:16px !important;
+}
+.card-corrida-admin .corrida-status-card,
+.corrida-status-card{
+  display:flex !important;
+  align-items:center !important;
+  min-height:86px !important;
+}
+.card-corrida-admin .corrida-status-card .corrida-status-topo-linha,
+.corrida-status-card .corrida-status-topo-linha{
+  width:100% !important;
+}
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto{
+  position:static !important;
+  flex:0 0 42px !important;
+  width:42px !important;
+  height:42px !important;
+  min-width:42px !important;
+  min-height:42px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin:0 !important;
+  transform:none !important;
+}
+.status-semaforo-indicador{
+  margin:0 auto !important;
+}
+@media (max-width:520px){
+  .card-corrida-admin .corrida-status-card,
+  .corrida-status-card{
+    min-height:82px !important;
+    padding-right:18px !important;
+  }
+  .botao-alterar-status-corrida.botao-status-compacto,
+  .botao-status-compacto{
+    flex-basis:40px !important;
+    width:40px !important;
+    height:40px !important;
+    min-width:40px !important;
+    min-height:40px !important;
+  }
+}
+
+
+/* =========================================================
+   LOGIN / INDEX
+   Estilos da tela inicial unificados a partir do antigo login.css.
+   Mantidos escopados em .login-page para não afetar Admin/Cadastro/Corridas.
+   ========================================================= */
+.login-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at top left, rgba(37,99,235,.13), transparent 34%), linear-gradient(180deg, #f7f8fc 0%, #eef2f8 48%, #f8fafc 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.login-page .container {
+  width: 100%;
+  max-width: 520px;
+}
+
+.login-page .login-card {
+  background: #fff;
+  padding: 35px;
+  border-radius: 28px;
+  border: 1px solid rgba(148,163,184,.22);
+  box-shadow: 0 24px 60px rgba(15,23,42,.13);
+}
+
+.login-page .login-card h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  color: #111827;
+  letter-spacing: -.04em;
+}
+
+.login-page .subtitle {
+  color: #6b7280;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.login-page .field {
+  margin-bottom: 20px;
+}
+
+.login-page .field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.login-page .field input {
+  width: 100%;
+  padding: 15px;
+  border-radius: 14px;
+  border: 1px solid #dbe3ef;
+  background: #f8fafc;
+  font-size: 15px;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.login-page .field input:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(99,102,241,.12);
+}
+
+.login-page .error {
+  display: none;
+  margin-top: 6px;
+  color: #dc2626;
+  font-size: 12px;
+}
+
+.login-page .field.invalid .error {
+  display: block;
+}
+
+.login-page #loginBtn,
+.login-page button[type="submit"] {
+  width: 100%;
+  border: 0;
+  padding: 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 16px 32px rgba(37,99,235,.24);
+}
+
+.login-page .result {
+  margin-top: 30px;
+}
+
+.login-page .hidden {
+  display: none;
+}
+
+.login-page .staff-card {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.login-page .staff-card img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e5e7eb;
+}
+
+.login-page .staff-info h2 {
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.login-page .staff-info p {
+  color: #4b5563;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.login-page .cadastro-link {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 15px;
+  border-radius: 16px;
+  border: 1px solid #d1d5db;
+  background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+  color: #1e3a8a;
+  text-align: center;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.login-page .cadastro-link:hover {
+  background: #eef2ff;
+  border-color: #2563eb;
+  color: #1d4ed8;
+}

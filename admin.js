@@ -2964,7 +2964,7 @@ function gerarMensagemPagamentoWhatsapp({ staff, corrida, dias, valorTotal, tipo
 
 function garantirBibliotecaQRCode() {
   if (window.QRCode && window.QRCode.toDataURL) return Promise.resolve();
-  return Promise.reject(new Error("Biblioteca de QR Code não carregada. Confira se o arquivo qrcode.min.js está na raiz do projeto."));
+  return Promise.reject(new Error("Biblioteca de QR Code não carregada. Confira se o arquivo qrcode.min.js está carregado no projeto."));
 }
 
 async function gerarQRCodeDataURLPix(payload) {
