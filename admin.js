@@ -1468,10 +1468,6 @@ async function carregarInscritosDaCorrida(
           </select>
         </label>
 
-        <div class="admin-inscritos-contagem-exibidos admin-tag-exibindo" aria-live="polite">
-          Exibindo 0 de ${inscricoesComPrioridade.length} inscritos
-        </div>
-
         <div class="admin-selecao-clean-row">
           <label class="admin-selecionar-exibidos">
             <input type="checkbox" class="checkbox-selecionar-exibidos">
@@ -1481,6 +1477,10 @@ async function carregarInscritosDaCorrida(
             <input type="checkbox" class="checkbox-somente-selecionados">
             <span>Somente selecionados</span>
           </label>
+        </div>
+
+        <div class="admin-inscritos-contagem-exibidos admin-tag-exibindo" aria-live="polite">
+          Exibindo 0 de ${inscricoesComPrioridade.length} inscritos
         </div>
       </div>
 

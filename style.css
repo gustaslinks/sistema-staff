@@ -7622,3 +7622,80 @@ body.pagina-editar-cadastro .header p {
     font-size: 10px;
   }
 }
+
+/* v192 - ajustes finos: barra unificada, espaçamentos e ordem da tag exibindo */
+.corrida-progresso-segmentado-trilho {
+  height: 9px !important;
+  border-radius: 999px !important;
+  background: #f8fafc !important;
+  border: 1px solid rgba(148, 163, 184, .25) !important;
+}
+
+.corrida-progresso-segmentado {
+  margin-top: 6px !important;
+}
+
+.card-corrida-admin .admin-inscritos-painel {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 {
+  margin-top: -2px !important;
+  margin-bottom: 8px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card {
+  min-height: 50px !important;
+  padding: 5px 3px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card strong {
+  font-size: 18px !important;
+  margin-bottom: 2px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card span {
+  font-size: 7.8px !important;
+  line-height: 1.05 !important;
+}
+
+.card-corrida-admin .admin-inscritos-filtros-v188 {
+  margin-top: 0 !important;
+  gap: 9px !important;
+}
+
+.card-corrida-admin .admin-selecao-clean-row {
+  order: 10 !important;
+  border-top: 0 !important;
+  padding-top: 2px !important;
+  margin-top: 0 !important;
+}
+
+.card-corrida-admin .admin-tag-exibindo,
+.card-corrida-admin .admin-inscritos-filtros-v188 .admin-inscritos-contagem-exibidos {
+  order: 11 !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin-top: -2px !important;
+  padding: 6px 10px !important;
+  font-size: 11.5px !important;
+  border-radius: 999px !important;
+}
+
+.card-corrida-admin .admin-lista-compacta-inscritos {
+  margin-top: 8px !important;
+}
+
+@media (max-width: 520px) {
+  .card-corrida-admin .admin-inscritos-painel {
+    padding-top: 0 !important;
+  }
+  .card-corrida-admin .admin-inscritos-resumo-v127 {
+    margin-top: -4px !important;
+    margin-bottom: 6px !important;
+  }
+  .card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card {
+    min-height: 48px !important;
+  }
+}
