@@ -9657,3 +9657,251 @@ body.body-corridas .secao-minhas-inscricoes {
     flex-basis: 28px !important;
   }
 }
+
+/* =========================================================
+   v3.1 - padronização cards Corridas/Admin
+   - Corrige radius/padding da página Corridas no mobile
+   - Padroniza card inscrições abertas/encerradas
+   - Mantém texto à esquerda e semáforo à direita
+   - Corrige alinhamento do título quando existe banner
+========================================================= */
+:root {
+  --staff-card-radius: 24px;
+  --staff-mobile-page-gutter: 12px;
+}
+
+body.body-corridas .pagina-corridas {
+  max-width: 760px !important;
+  width: 100% !important;
+  padding: 14px var(--staff-mobile-page-gutter) 64px !important;
+  gap: 18px !important;
+  box-sizing: border-box !important;
+}
+
+body.body-corridas .card-staff,
+body.body-corridas .cabecalho-corridas,
+body.body-corridas .card-corrida,
+body.body-corridas .card-minha-inscricao,
+body.body-corridas .lista-corridas > p,
+body.body-corridas .lista-minhas-inscricoes > p,
+.card-corrida-admin {
+  border-radius: var(--staff-card-radius) !important;
+}
+
+body.body-corridas .card-corrida,
+body.body-corridas .card-minha-inscricao {
+  padding: 24px !important;
+}
+
+body.body-corridas .card-corrida-com-banner,
+body.body-corridas .card-minha-inscricao:has(.corrida-card-banner),
+body.body-corridas .card-minha-inscricao:has(.minha-inscricao-banner) {
+  padding-top: 0 !important;
+}
+
+body.body-corridas .card-corrida-com-banner .corrida-banner-wrap,
+body.body-corridas .card-minha-inscricao .corrida-banner-wrap {
+  margin: 0 -24px 24px !important;
+  border-radius: var(--staff-card-radius) var(--staff-card-radius) 0 0 !important;
+  overflow: hidden !important;
+}
+
+body.body-corridas .card-corrida-com-banner .corrida-card-banner,
+body.body-corridas .card-minha-inscricao .corrida-card-banner,
+body.body-corridas .card-minha-inscricao .minha-inscricao-banner {
+  border-radius: var(--staff-card-radius) var(--staff-card-radius) 0 0 !important;
+}
+
+body.body-corridas .corrida-card-head {
+  width: 100% !important;
+  margin: 0 0 18px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body.body-corridas .corrida-card-head > div:first-child {
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.body-corridas .card-corrida h2 {
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+/* Status cards: mesmo desenho para aberto e encerrado em Corridas e Admin */
+.corrida-status-card.aberta,
+.corrida-status-card.encerrada,
+.card-corrida-admin .corrida-status-card.aberta,
+.card-corrida-admin .corrida-status-card.encerrada {
+  position: relative !important;
+  width: 100% !important;
+  min-height: 82px !important;
+  margin: 0 0 18px !important;
+  padding: 16px 20px !important;
+  border-radius: 22px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+}
+
+.corrida-status-card.aberta {
+  background: linear-gradient(135deg, #ecfdf5, #e0f2fe) !important;
+  border: 1px solid rgba(34, 197, 94, .32) !important;
+  color: #047857 !important;
+}
+
+.corrida-status-card.encerrada {
+  background: linear-gradient(135deg, #fff7ed, #fff1f2) !important;
+  border: 1px solid rgba(244, 63, 94, .34) !important;
+  color: #991b1b !important;
+}
+
+.corrida-status-card.aberta > div,
+.corrida-status-card.encerrada > div {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.card-corrida-admin .corrida-status-card.aberta > .corrida-status-topo-linha,
+.card-corrida-admin .corrida-status-card.encerrada > .corrida-status-topo-linha,
+.card-corrida-admin .corrida-status-topo-linha {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+}
+
+.card-corrida-admin .corrida-status-topo-linha > div {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.corrida-status-card strong,
+.card-corrida-admin .corrida-status-label-destaque {
+  display: block !important;
+  margin: 0 0 5px !important;
+  font-size: clamp(20px, 4.2vw, 30px) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.035em !important;
+}
+
+.corrida-status-card span:not(.status-semaforo-indicador),
+.card-corrida-admin .corrida-status-subtitulo {
+  display: block !important;
+  margin: 0 !important;
+  font-size: clamp(14px, 3vw, 18px) !important;
+  line-height: 1.28 !important;
+  font-weight: 800 !important;
+}
+
+.corrida-status-card.aberta strong,
+.corrida-status-card.aberta span:not(.status-semaforo-indicador),
+.card-corrida-admin .corrida-status-card.aberta strong,
+.card-corrida-admin .corrida-status-card.aberta span:not(.status-semaforo-indicador) {
+  color: #047857 !important;
+}
+
+.corrida-status-card.encerrada strong,
+.corrida-status-card.encerrada span:not(.status-semaforo-indicador),
+.card-corrida-admin .corrida-status-card.encerrada strong,
+.card-corrida-admin .corrida-status-card.encerrada span:not(.status-semaforo-indicador) {
+  color: #991b1b !important;
+}
+
+/* Botão do admin deixa de ficar absoluto: ele vira somente o farol à direita */
+.card-corrida-admin .botao-alterar-status-corrida.botao-status-compacto,
+.botao-alterar-status-corrida.botao-status-compacto {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  flex: 0 0 48px !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.72) !important;
+  border: 1px solid rgba(255,255,255,.88) !important;
+  box-shadow: 0 12px 28px rgba(15,23,42,.10) !important;
+}
+
+.card-corrida-admin .botao-alterar-status-corrida .status-semaforo-texto {
+  display: none !important;
+}
+
+.corrida-status-card .status-semaforo-indicador,
+.card-corrida-admin .status-semaforo-indicador,
+.card-corrida-admin .botao-alterar-status-corrida .status-semaforo-indicador {
+  position: relative !important;
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  flex: 0 0 30px !important;
+  align-self: center !important;
+  border-width: 5px !important;
+}
+
+.corrida-status-card .status-semaforo-indicador::after,
+.card-corrida-admin .status-semaforo-indicador::after {
+  inset: -9px !important;
+}
+
+@media (max-width: 520px) {
+  :root {
+    --staff-card-radius: 22px;
+    --staff-mobile-page-gutter: 10px;
+  }
+
+  body.body-corridas .card-corrida,
+  body.body-corridas .card-minha-inscricao {
+    padding: 20px !important;
+  }
+
+  body.body-corridas .card-corrida-com-banner .corrida-banner-wrap,
+  body.body-corridas .card-minha-inscricao .corrida-banner-wrap {
+    margin: 0 -20px 22px !important;
+  }
+
+  .corrida-status-card.aberta,
+  .corrida-status-card.encerrada,
+  .card-corrida-admin .corrida-status-card.aberta,
+  .card-corrida-admin .corrida-status-card.encerrada {
+    min-height: 76px !important;
+    padding: 14px 16px !important;
+    border-radius: 20px !important;
+    gap: 14px !important;
+  }
+
+  .card-corrida-admin .botao-alterar-status-corrida.botao-status-compacto,
+  .botao-alterar-status-corrida.botao-status-compacto {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    flex-basis: 44px !important;
+  }
+
+  .corrida-status-card .status-semaforo-indicador,
+  .card-corrida-admin .status-semaforo-indicador,
+  .card-corrida-admin .botao-alterar-status-corrida .status-semaforo-indicador {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    flex-basis: 28px !important;
+  }
+}
