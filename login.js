@@ -69,15 +69,6 @@ function isEmailLogin(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
-function pareceEmail(value) {
-  return /[a-zA-Z@]/.test(String(value || ""));
-}
-
-function pareceCpf(value) {
-  const valor = String(value || "").trim();
-  return !!valor && !pareceEmail(valor);
-}
-
 function setStatus(message, type = "info") {
   if (!loginStatus) return;
   loginStatus.textContent = message || "";
@@ -189,9 +180,8 @@ function configurarToggleSenha() {
 
 if (loginCpf) {
   loginCpf.addEventListener("input", () => {
-    const valor = loginCpf.value;
-    if (pareceCpf(valor)) {
-      loginCpf.value = maskCPF(valor);
+    if (!loginCpf.value.includes("@")) {
+      loginCpf.value = maskCPF(loginCpf.value);
     }
     setStatus("");
   });
@@ -251,19 +241,34 @@ if (forgotPasswordBtn) {
   forgotPasswordBtn.addEventListener("click", async () => {
     forgotPasswordBtn.disabled = true;
     setStatus("");
+
     try {
-      const loginInformado = String(loginCpf.value || "").trim();
-      if (!loginInformado) {
-        throw new Error("Digite seu CPF ou e-mail para receber o link de redefinição de senha.");
+      const valorDigitado = String(loginCpf.value || "").trim();
+
+      if (!valorDigitado) {
+        throw new Error("Digite seu CPF ou e-mail para recuperar a senha.");
       }
 
-      const email = await resolverEmailLogin(loginInformado);
-      const redirectTo = window.location.origin + window.location.pathname.replace(/index\.html?$/i, "") + "alterar-senha.html";
-      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
+      const email = await resolverEmailLogin(valorDigitado);
+
+      const redirectTo =
+        window.location.origin +
+        window.location.pathname.replace(/index\.html?$/i, "") +
+        "alterar-senha.html";
+
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo
+      });
+
       if (error) throw error;
-      setStatus("Pronto. Se o cadastro estiver ativo, enviaremos um link para redefinir sua senha no e-mail cadastrado.", "success");
+
+      setStatus(
+        "Se existir um cadastro vinculado a este CPF ou e-mail, você receberá um link para redefinir sua senha.",
+        "success"
+      );
     } catch (error) {
-      setStatus(error.message, "error");
+      console.error("Erro recuperação senha:", error);
+      setStatus(error.message || "Não foi possível solicitar a recuperação de senha.", "error");
     } finally {
       forgotPasswordBtn.disabled = false;
     }
