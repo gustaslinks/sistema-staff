@@ -49,6 +49,24 @@ async function processarLogoutManualNaTelaLogin() {
 }
 
 
+
+function mensagemErroRecuperacaoSenha(error){
+  const msg = String((error && error.message) || error || '').toLowerCase();
+  if(msg.includes('rate limit')){
+    return 'Muitas tentativas realizadas. Aguarde alguns minutos antes de solicitar um novo e-mail.';
+  }
+  if(msg.includes('invalid email')){
+    return 'Digite um e-mail válido ou informe seu CPF cadastrado.';
+  }
+  if(msg.includes('not found') || msg.includes('não encontrado') || msg.includes('nenhum cadastro')){
+    return 'Não encontramos um cadastro ativo com esse CPF ou e-mail.';
+  }
+  if(msg.includes('network') || msg.includes('failed to fetch')){
+    return 'Não foi possível conectar agora. Verifique sua internet e tente novamente.';
+  }
+  return 'Não foi possível solicitar a recuperação de senha. Confira CPF/e-mail e tente novamente.';
+}
+
 function onlyNumbers(value) {
   return String(value || "").replace(/\D/g, "");
 }
@@ -275,7 +293,7 @@ async function solicitarRecuperacaoSenha() {
     setStatus("Pronto. Se existir um cadastro ativo com esse CPF ou e-mail, enviaremos um link para redefinir sua senha.", "success");
   } catch (error) {
     console.error("Erro ao solicitar recuperação de senha:", error);
-    setStatus(error.message || "Não foi possível solicitar a recuperação de senha. Confira CPF/e-mail e tente novamente.", "error");
+    setStatus(mensagemErroRecuperacaoSenha(error), "error");
   } finally {
     forgotPasswordBtn.disabled = false;
     forgotPasswordBtn.textContent = textoOriginal || "Esqueci minha senha";

@@ -63,6 +63,7 @@ const fotoStaff = document.getElementById("foto-staff");
 const botaoSair = document.getElementById("botao-sair");
 const botaoAdmin = document.getElementById("botao-admin");
 const botaoEditarCadastro = document.getElementById("botao-editar-cadastro");
+const labelCardStaff = document.querySelector("#card-staff .label-card");
 
 // STAFF LOGADO
 const staffLogado = JSON.parse(localStorage.getItem("staffLogado"));
@@ -77,6 +78,8 @@ if (!staffLogado || !staffLogado.id) {
 // =========================================================
 
 function carregarCardStaff() {
+  const adminLogado = staffLogado.is_admin === true || staffLogado.is_admin === "true";
+  if (labelCardStaff) labelCardStaff.textContent = adminLogado ? "Administrador logado" : "Você está logado como";
   nomeStaff.textContent = staffLogado.nome_completo || "Staff";
 
   cidadeStaff.textContent = staffLogado.cidade

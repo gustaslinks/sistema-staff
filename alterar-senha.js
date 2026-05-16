@@ -38,6 +38,21 @@ const newPasswordConfirm = document.getElementById('newPasswordConfirm');
 const resetPasswordBtn = document.getElementById('resetPasswordBtn');
 const resetStatus = document.getElementById('resetStatus');
 
+
+function mensagemErroAlterarSenha(error){
+  const msg = String((error && error.message) || error || '').toLowerCase();
+  if(msg.includes('expired') || msg.includes('invalid') || msg.includes('session')){
+    return 'Este link expirou ou já foi usado. Solicite um novo link em “Esqueci minha senha”.';
+  }
+  if(msg.includes('rate limit')){
+    return 'Muitas tentativas realizadas. Aguarde alguns minutos e tente novamente.';
+  }
+  if(msg.includes('weak') || msg.includes('password')){
+    return 'A senha não foi aceita. Use pelo menos 6 caracteres.';
+  }
+  return 'Não foi possível alterar a senha. Abra o link recebido novamente ou solicite outro reset.';
+}
+
 function setStatus(message, type='info'){
   resetStatus.textContent = message || '';
   resetStatus.className = `login-status ${type}`;
@@ -74,7 +89,7 @@ form.addEventListener('submit', async (event) => {
     setTimeout(() => { sairDoSistemaSeguro(); }, 900);
   }catch(error){
     console.error(error);
-    setStatus('Erro ao alterar senha. Abra o link recebido novamente ou solicite outro reset.', 'error');
+    setStatus(mensagemErroAlterarSenha(error), 'error');
   }finally{
     resetPasswordBtn.disabled = false;
     resetPasswordBtn.textContent = 'Salvar nova senha';

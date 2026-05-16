@@ -10069,3 +10069,18 @@ body.body-corridas .card-minha-inscricao .minha-inscricao-banner {
   background: #eff6ff;
   border-color: rgba(37, 99, 235, 0.18);
 }
+
+/* v3.6 - evita piscada do cadastro antes do JS definir modo novo/edição */
+body.cadastro-loading .container {
+  opacity: 0;
+  visibility: hidden;
+}
+body.cadastro-loading::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(16, 185, 129, .10), transparent 35%),
+              radial-gradient(circle at top right, rgba(124, 58, 237, .12), transparent 35%),
+              #f8fafc;
+  z-index: 9998;
+}

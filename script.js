@@ -82,6 +82,8 @@ const staffIdEdicao = modoEdicao
   : null;
 let fotoAtualUrl = '';
 document.body.classList.add(modoEdicao ? 'pagina-editar-cadastro' : 'pagina-cadastro-geral');
+function finalizarLoadingCadastro(){ document.body.classList.remove('cadastro-loading'); }
+setTimeout(finalizarLoadingCadastro, 5000);
 const camposSenhaCadastro = document.getElementById('camposSenhaCadastro');
 const dadosAcessoTitle = document.getElementById('dadosAcessoTitle');
 const tituloAcessoCadastro = document.querySelector('.section-title-acesso');
@@ -133,6 +135,7 @@ const emailStaffCadastro = document.getElementById('email-staff-cadastro');
 const botaoAdminCadastro = document.getElementById('botao-admin-cadastro');
 const botaoCorridasCadastro = document.getElementById('botao-corridas-cadastro');
 const botaoSairCadastro = document.getElementById('botao-sair-cadastro');
+const labelCardCadastro = document.querySelector('#card-staff-cadastro .label-card');
 const adminEditarStaffPanel = document.getElementById('adminEditarStaffPanel');
 const adminBuscaCpfStaff = document.getElementById('adminBuscaCpfStaff');
 const adminBtnBuscarStaff = document.getElementById('adminBtnBuscarStaff');
@@ -321,6 +324,10 @@ function renderizarCardLogadoCadastro(){
 
   if(fotoStaffCadastro){
     fotoStaffCadastro.src = staffLogadoEdicao.foto_url || 'https://placehold.co/120x120?text=Foto';
+  }
+
+  if(labelCardCadastro){
+    labelCardCadastro.textContent = isAdminEdicao ? 'Administrador logado' : 'Você está logado como';
   }
 
   if(nomeStaffCadastro){
@@ -1228,6 +1235,7 @@ async function iniciarModoEdicao(){
 
 
 iniciarModoEdicao().finally(() => {
+  finalizarLoadingCadastro();
   if (modoEdicao) {
     refreshSubmitState();
     liberarBotaoEdicao();
