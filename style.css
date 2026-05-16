@@ -9478,3 +9478,182 @@ body.pagina-editar-cadastro .header p {
     flex-basis: 30px !important;
   }
 }
+
+
+/* =========================================================
+   v3.0 - correções finais Corridas/Admin
+========================================================= */
+body.body-corridas {
+  padding-top: 14px !important;
+}
+
+body.body-corridas .pagina-corridas {
+  padding-top: 14px !important;
+  gap: 18px !important;
+}
+
+body.body-corridas .version-badge {
+  top: 18px !important;
+}
+
+body.body-corridas .card-staff,
+body.body-corridas .cabecalho-corridas,
+body.body-corridas .card-corrida,
+body.body-corridas .card-minha-inscricao,
+body.body-corridas .lista-corridas > p,
+body.body-corridas .lista-minhas-inscricoes > p {
+  border-radius: 28px !important;
+}
+
+body.body-corridas .card-staff {
+  margin-top: 0 !important;
+}
+
+body.body-corridas .cabecalho-corridas {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+body.body-corridas .lista-corridas,
+body.body-corridas .lista-minhas-inscricoes,
+body.body-corridas .secao-minhas-inscricoes {
+  gap: 16px !important;
+}
+
+/* Card de status: texto à esquerda, farol à direita, mesmo padrão para aberto/encerrado */
+.corrida-status-card.aberta,
+.corrida-status-card.encerrada,
+.card-corrida-admin .corrida-status-card.aberta,
+.card-corrida-admin .corrida-status-card.encerrada {
+  min-height: 82px !important;
+  padding: 16px 24px !important;
+  border-radius: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  text-align: left !important;
+}
+
+.corrida-status-card.aberta > div,
+.corrida-status-card.encerrada > div,
+.card-corrida-admin .corrida-status-card.aberta > .corrida-status-topo-linha,
+.card-corrida-admin .corrida-status-card.encerrada > .corrida-status-topo-linha {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.card-corrida-admin .corrida-status-topo-linha {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+}
+
+.card-corrida-admin .corrida-status-topo-linha > div {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.corrida-status-card strong,
+.card-corrida-admin .corrida-status-card strong,
+.card-corrida-admin .corrida-status-label-destaque {
+  display: block !important;
+  font-size: clamp(19px, 4.2vw, 28px) !important;
+  line-height: 1.15 !important;
+  margin: 0 0 6px !important;
+}
+
+.corrida-status-card span:not(.status-semaforo-indicador),
+.card-corrida-admin .corrida-status-subtitulo {
+  display: block !important;
+  font-size: clamp(14px, 3vw, 19px) !important;
+  line-height: 1.28 !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto {
+  width: auto !important;
+  min-width: 46px !important;
+  height: 46px !important;
+  padding: 0 !important;
+  flex: 0 0 46px !important;
+  border-radius: 999px !important;
+  display: grid !important;
+  place-items: center !important;
+  background: rgba(255,255,255,.72) !important;
+  border: 1px solid rgba(255,255,255,.8) !important;
+  box-shadow: 0 12px 28px rgba(15,23,42,.10) !important;
+}
+
+.botao-alterar-status-corrida.botao-status-compacto .status-semaforo-texto {
+  display: none !important;
+}
+
+.corrida-status-card .status-semaforo-indicador,
+.card-corrida-admin .status-semaforo-indicador,
+.botao-alterar-status-corrida.botao-status-compacto .status-semaforo-indicador {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  flex: 0 0 30px !important;
+  border-width: 5px !important;
+  align-self: center !important;
+}
+
+.corrida-status-card .status-semaforo-indicador::after,
+.card-corrida-admin .status-semaforo-indicador::after,
+.botao-alterar-status-corrida.botao-status-compacto .status-semaforo-indicador::after {
+  inset: -9px !important;
+}
+
+.card-corrida-com-banner .corrida-banner-wrap,
+.card-minha-inscricao .corrida-banner-wrap {
+  margin-top: 0 !important;
+}
+
+.card-corrida-com-banner .corrida-card-banner,
+.card-minha-inscricao .corrida-card-banner,
+.card-minha-inscricao .minha-inscricao-banner {
+  border-radius: 28px 28px 0 0 !important;
+}
+
+@media (max-width: 420px) {
+  body.body-corridas {
+    padding-top: 12px !important;
+  }
+
+  body.body-corridas .pagina-corridas {
+    padding-top: 12px !important;
+    gap: 16px !important;
+  }
+
+  body.body-corridas .version-badge {
+    top: 16px !important;
+  }
+
+  .corrida-status-card.aberta,
+  .corrida-status-card.encerrada,
+  .card-corrida-admin .corrida-status-card.aberta,
+  .card-corrida-admin .corrida-status-card.encerrada {
+    min-height: 76px !important;
+    padding: 14px 18px !important;
+  }
+
+  .botao-alterar-status-corrida.botao-status-compacto {
+    min-width: 42px !important;
+    height: 42px !important;
+    flex-basis: 42px !important;
+  }
+
+  .corrida-status-card .status-semaforo-indicador,
+  .card-corrida-admin .status-semaforo-indicador,
+  .botao-alterar-status-corrida.botao-status-compacto .status-semaforo-indicador {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    flex-basis: 28px !important;
+  }
+}

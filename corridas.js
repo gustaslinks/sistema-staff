@@ -136,11 +136,12 @@ async function encerrarCorridasLotadas(corridas, inscritosPorCorrida) {
 async function carregarCorridas() {
   listaCorridas.innerHTML = `<p>Carregando corridas...</p>`;
 
-  const { data: corridas, error: erroCorridas } = await supabaseClient
+  const { data: corridasRaw, error: erroCorridas } = await supabaseClient
     .from("corridas")
     .select("*")
-    .eq("status", "aberta")
     .order("data_corrida", { ascending: true });
+
+  const corridas = (corridasRaw || []).filter(corridaEstaVigenteParaStaff);
 
   if (erroCorridas) {
     console.error("Erro ao buscar corridas:", erroCorridas);
@@ -153,7 +154,7 @@ async function carregarCorridas() {
 
   if (!corridas || corridas.length === 0) {
     listaCorridas.innerHTML =
-      `<p>Não há corridas abertas para inscrição.</p>`;
+      `<p>Não há corridas disponíveis no momento.</p>`;
 
     return;
   }
@@ -177,7 +178,8 @@ async function carregarCorridas() {
       )
     : [];
 
-  // REMOVE CORRIDAS JÁ INSCRITAS
+  // Remove corridas em que o staff já está inscrito.
+  // Corridas encerradas continuam visíveis como informação até a data do evento.
   const corridasDisponiveis = corridas.filter(
     corrida => !corridasJaInscritas.includes(corrida.id)
   );
@@ -243,21 +245,25 @@ async function carregarCorridas() {
 
   await encerrarCorridasLotadas(corridasDisponiveis, inscritosPorCorrida);
 
-  const corridasComVaga = corridasDisponiveis.filter(corrida => {
+  const corridasParaExibir = corridasDisponiveis.map(corrida => {
     const vagasTotal = Number(corrida.vagas_total || 0);
     const totalInscritos = inscritosPorCorrida[corrida.id] || 0;
 
-    return vagasTotal <= 0 || totalInscritos < vagasTotal;
+    if (corrida.status === "aberta" && vagasTotal > 0 && totalInscritos >= vagasTotal) {
+      return { ...corrida, status: "encerrada" };
+    }
+
+    return corrida;
   });
 
-  if (corridasComVaga.length === 0) {
+  if (corridasParaExibir.length === 0) {
     listaCorridas.innerHTML =
-      `<p>Não há corridas com vagas abertas no momento.</p>`;
+      `<p>Não há corridas disponíveis no momento.</p>`;
 
     return;
   }
 
-  listaCorridas.innerHTML = corridasComVaga.map(corrida => {
+  listaCorridas.innerHTML = corridasParaExibir.map(corrida => {
 
     const dataFormatada =
       formatarPeriodoCorrida(corrida);
@@ -276,8 +282,10 @@ async function carregarCorridas() {
     const diasDaCorrida =
       diasPorCorrida[corrida.id] || [];
 
+    const inscricaoAberta = corrida.status === "aberta";
+
     const htmlDias =
-      diasDaCorrida.length > 0
+      inscricaoAberta && diasDaCorrida.length > 0
         ? `
         <div class="disponibilidade-corrida">
 
@@ -352,10 +360,18 @@ async function carregarCorridas() {
 
         </div>
       `
-        : `
+        : inscricaoAberta
+          ? `
         <div class="disponibilidade-corrida aviso-disponibilidade">
           <p>
             Dias de trabalho ainda não cadastrados pelo administrador.
+          </p>
+        </div>
+      `
+          : `
+        <div class="disponibilidade-corrida aviso-disponibilidade aviso-inscricao-encerrada">
+          <p>
+            Esta corrida permanece visível para consulta, mas as inscrições estão encerradas.
           </p>
         </div>
       `;
@@ -376,12 +392,12 @@ async function carregarCorridas() {
             <span class="corrida-eyebrow">Corrida disponível</span>
             <h2>${corrida.nome}</h2>
           </div>
-          <div class="corrida-status-card aberta">
-            <span class="status-semaforo-indicador status-aberto" aria-hidden="true"></span>
+          <div class="corrida-status-card ${inscricaoAberta ? "aberta" : "encerrada"}">
             <div>
-              <strong>Inscrições abertas</strong>
-              <span>${textoVagas} vagas preenchidas</span>
+              <strong>${inscricaoAberta ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
+              <span>${inscricaoAberta ? `${textoVagas} vagas preenchidas` : "Cadastro bloqueado para novas inscrições"}</span>
             </div>
+            <span class="status-semaforo-indicador ${inscricaoAberta ? "status-aberto" : "status-fechado"}" aria-hidden="true"></span>
           </div>
         </div>
 
@@ -395,6 +411,7 @@ async function carregarCorridas() {
 
         ${htmlDias}
 
+        ${inscricaoAberta ? `
         <button
           class="botao-inscricao"
           data-corrida-id="${corrida.id}"
@@ -402,6 +419,7 @@ async function carregarCorridas() {
         >
           Quero me inscrever
         </button>
+        ` : ``}
 
       </article>
     `;
@@ -737,6 +755,27 @@ function escapeHtml(texto) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function obterDataFinalCorrida(corrida) {
+  return corrida.data_fim || corrida.data_corrida || corrida.data_inicio || null;
+}
+
+function normalizarDataLocal(dataISO) {
+  if (!dataISO) return null;
+  const partes = String(dataISO).slice(0, 10).split("-").map(Number);
+  if (partes.length !== 3 || partes.some(Number.isNaN)) return null;
+  return new Date(partes[0], partes[1] - 1, partes[2], 23, 59, 59, 999);
+}
+
+function corridaEstaVigenteParaStaff(corrida) {
+  const dataFinal = normalizarDataLocal(obterDataFinalCorrida(corrida));
+  if (!dataFinal) return true;
+
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  return dataFinal >= hoje;
 }
 
 function formatarData(dataISO) {
