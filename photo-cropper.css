@@ -16,7 +16,7 @@
 .photo-cropper-stage.is-photo-crop .photo-cropper-grid{border-radius:50%;}
 
 
-/* v2.1 - banner 16:9 deve caber inteiro no zoom mínimo */
+/* v2.2 - banner 16:9 deve caber inteiro no zoom mínimo */
 .photo-cropper-stage.is-banner-crop{
   aspect-ratio:16/9 !important;
   background:#ffffff !important;

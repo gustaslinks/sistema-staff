@@ -1,5 +1,19 @@
 const SUPABASE_URL = "https://klpxoffkajijjktxztmc.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_O_MlVkyfreG125LVia6nag_1GL5bUli";
+const MANUAL_LOGOUT_KEY = "sistemaStaffManualLogout";
+async function sairDoSistemaSeguro() {
+  try {
+    sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+    localStorage.removeItem("staffLogado");
+    await supabaseClient.auth.signOut({ scope: "global" });
+  } catch (error) {
+    console.warn("Falha ao encerrar sessão:", error);
+  } finally {
+    localStorage.removeItem("staffLogado");
+    window.location.replace("index.html?logout=1");
+  }
+}
+
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
@@ -43,10 +57,7 @@ form.addEventListener('submit', async (event) => {
     const { error } = await supabaseClient.auth.updateUser({ password: senha });
     if(error) throw error;
     setStatus('Senha alterada com sucesso. Redirecionando para o login...', 'success');
-    setTimeout(async () => {
-      await supabaseClient.auth.signOut();
-      window.location.href = 'index.html';
-    }, 900);
+    setTimeout(() => { sairDoSistemaSeguro(); }, 900);
   }catch(error){
     console.error(error);
     setStatus('Erro ao alterar senha. Abra o link recebido novamente ou solicite outro reset.', 'error');

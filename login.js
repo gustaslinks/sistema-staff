@@ -15,6 +15,7 @@ const loginPassword = document.getElementById("loginPassword");
 const loginBtn = document.getElementById("loginBtn");
 const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
 const loginStatus = document.getElementById("loginStatus");
+const MANUAL_LOGOUT_KEY = "sistemaStaffManualLogout";
 
 function onlyNumbers(value) {
   return String(value || "").replace(/\D/g, "");
@@ -99,6 +100,7 @@ async function carregarStaffDaSessao(userId) {
 }
 
 async function verificarSessaoExistente() {
+  if (sessionStorage.getItem(MANUAL_LOGOUT_KEY) === "1") return;
   const { data } = await supabaseClient.auth.getSession();
   const user = data && data.session && data.session.user;
   if (!user) return;
@@ -134,6 +136,7 @@ if (loginCpf) {
 
 form.addEventListener("submit", async function (event) {
   event.preventDefault();
+  sessionStorage.removeItem(MANUAL_LOGOUT_KEY);
 
   loginBtn.disabled = true;
   loginBtn.textContent = "Entrando...";

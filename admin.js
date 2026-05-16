@@ -7,21 +7,34 @@ const supabaseClient = supabase.createClient(
   { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
 );
 
+
+const MANUAL_LOGOUT_KEY = "sistemaStaffManualLogout";
+async function sairDoSistemaSeguro() {
+  try {
+    sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+    localStorage.removeItem("staffLogado");
+    await supabaseClient.auth.signOut({ scope: "global" });
+  } catch (error) {
+    console.warn("Falha ao encerrar sessão:", error);
+  } finally {
+    localStorage.removeItem("staffLogado");
+    window.location.replace("index.html?logout=1");
+  }
+}
 async function validarSessaoSupabaseObrigatoria() {
   const { data } = await supabaseClient.auth.getUser();
   const user = data && data.user ? data.user : null;
   if (!user) {
     localStorage.removeItem("staffLogado");
-    window.location.href = "index.html";
+    window.location.replace("index.html");
     throw new Error("Sessão expirada.");
   }
   const staffCache = (() => {
     try { return JSON.parse(localStorage.getItem("staffLogado") || "null"); } catch (e) { return null; }
   })();
   if (staffCache && staffCache.auth_user_id && staffCache.auth_user_id !== user.id) {
-    await supabaseClient.auth.signOut();
-    localStorage.removeItem("staffLogado");
-    window.location.href = "index.html";
+    await sairDoSistemaSeguro();
+    window.location.replace("index.html");
     throw new Error("Sessão inválida.");
   }
 }
@@ -74,10 +87,7 @@ let staffLogado = null;
 try {
   staffLogado = staffLogadoRaw ? JSON.parse(staffLogadoRaw) : null;
 } catch (error) {
-  supabaseClient.auth.signOut().finally(() => {
-    localStorage.removeItem("staffLogado");
-    window.location.href = "index.html";
-  });
+  sairDoSistemaSeguro();
 }
 
 const isAdmin =
@@ -85,7 +95,7 @@ const isAdmin =
   (staffLogado.is_admin === true || staffLogado.is_admin === "true");
 
 if (!isAdmin) {
-  window.location.href = "index.html";
+  window.location.replace("index.html");
 }
 
 document.getElementById("foto-staff").src =
@@ -4383,7 +4393,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", function () {
     localStorage.removeItem("staffLogado");
-    window.location.href = "index.html";
+    window.location.replace("index.html");
   });
 }
 

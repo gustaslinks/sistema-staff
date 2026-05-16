@@ -7706,7 +7706,7 @@ body.pagina-editar-cadastro .header p {
 }
 
 
-/* v2.1 - ajuste real do semáforo dentro do box de inscrições */
+/* v2.2 - ajuste real do semáforo dentro do box de inscrições */
 .corrida-status-topo-linha{
   display:flex !important;
   align-items:center !important;
@@ -7909,7 +7909,7 @@ body.pagina-editar-cadastro .header p {
   color: #1d4ed8;
 }
 
-/* v2.1 - segurança, senha e controles admin */
+/* v2.2 - segurança, senha e controles admin */
 .password-wrapper {
   position: relative;
   display: flex;
@@ -8014,4 +8014,355 @@ body.pagina-editar-cadastro .header p {
 
 .danger-delete-btn:hover {
   filter: brightness(0.96);
+}
+
+
+/* =========================================================
+   v2.2 - correção logout + polimento página Corridas
+========================================================= */
+.version-badge {
+  cursor: help;
+  user-select: none;
+}
+.version-badge:hover,
+.version-badge:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, .18);
+}
+
+.pagina-corridas {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 34px clamp(16px, 4vw, 34px) 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.pagina-corridas .card-staff {
+  border-radius: 34px;
+  background: rgba(255, 255, 255, .92);
+  border: 1px solid rgba(124, 58, 237, .13);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, .10);
+}
+
+.cabecalho-corridas {
+  position: relative;
+  overflow: hidden;
+  padding: 34px clamp(22px, 4vw, 42px) !important;
+  border-radius: 30px !important;
+  background: radial-gradient(circle at top right, rgba(34, 211, 238, .24), transparent 32%),
+              radial-gradient(circle at bottom left, rgba(168, 85, 247, .30), transparent 38%),
+              linear-gradient(135deg, #101827 0%, #1e1b4b 48%, #312e81 100%) !important;
+  border: 1px solid rgba(129, 140, 248, .35);
+  box-shadow: 0 22px 48px rgba(49, 46, 129, .22) !important;
+}
+.cabecalho-corridas::before {
+  content: "";
+  position: absolute;
+  right: -80px;
+  bottom: -110px;
+  width: 320px;
+  height: 320px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .10);
+}
+.cabecalho-corridas h1,
+.cabecalho-corridas h2 {
+  position: relative;
+  margin: 0 0 10px !important;
+  font-size: clamp(32px, 5vw, 56px) !important;
+  line-height: .98;
+  letter-spacing: -.055em !important;
+  color: #ffffff;
+}
+.cabecalho-corridas p {
+  position: relative;
+  margin: 0;
+  max-width: 720px;
+  color: rgba(255, 255, 255, .84) !important;
+  font-size: clamp(16px, 2.8vw, 20px) !important;
+}
+
+.lista-corridas,
+.lista-minhas-inscricoes {
+  gap: 22px !important;
+}
+.lista-corridas > p,
+.lista-minhas-inscricoes > p {
+  border: 1px solid rgba(148, 163, 184, .22);
+  border-radius: 24px !important;
+  background: linear-gradient(180deg, #ffffff, #f8fafc) !important;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, .08) !important;
+}
+
+.card-corrida,
+.card-minha-inscricao {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(22px, 3.5vw, 34px) !important;
+  border-radius: 30px !important;
+  background: linear-gradient(180deg, #ffffff, #fbfdff) !important;
+  border: 1px solid rgba(148, 163, 184, .22);
+  box-shadow: 0 22px 55px rgba(15, 23, 42, .10) !important;
+}
+.card-corrida::before,
+.card-minha-inscricao::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: linear-gradient(90deg, #22c55e, #06b6d4, #7c3aed);
+}
+
+.corrida-banner-wrap {
+  margin: calc(-1 * clamp(22px, 3.5vw, 34px)) calc(-1 * clamp(22px, 3.5vw, 34px)) 24px;
+  background: linear-gradient(135deg, #0f172a, #312e81);
+}
+.corrida-card-banner,
+.card-corrida .corrida-card-banner,
+.card-minha-inscricao .corrida-card-banner,
+.card-minha-inscricao .minha-inscricao-banner {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.corrida-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.corrida-eyebrow {
+  display: inline-flex;
+  margin-bottom: 8px;
+  color: #7c3aed;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+}
+.card-corrida h2,
+.conteudo-minha-inscricao h3 {
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: clamp(28px, 4vw, 44px) !important;
+  line-height: 1.02;
+  letter-spacing: -.055em;
+}
+.card-corrida-sem-banner h2 {
+  font-size: clamp(38px, 7vw, 68px) !important;
+}
+.card-corrida-com-banner h2 {
+  max-width: 820px;
+}
+
+.corrida-status-card.aberta {
+  min-width: 190px;
+  margin: 0 !important;
+  padding: 13px 16px !important;
+  border-radius: 20px !important;
+  background: linear-gradient(135deg, #ecfdf5, #e0f2fe) !important;
+  border: 1px solid rgba(34, 197, 94, .26) !important;
+  box-shadow: 0 12px 26px rgba(14, 165, 233, .10);
+}
+.corrida-status-card.aberta strong {
+  color: #047857 !important;
+  font-size: 14px;
+}
+.corrida-status-card.aberta span {
+  color: #475569 !important;
+  font-size: 12px;
+}
+
+.corrida-resumo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0 22px;
+}
+.corrida-resumo-item {
+  padding: 14px 15px;
+  border-radius: 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+.corrida-resumo-item strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .10em;
+}
+.corrida-resumo-item span {
+  display: block;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+.corrida-resumo-local {
+  grid-column: 1 / -1;
+}
+
+.disponibilidade-corrida {
+  margin-top: 22px !important;
+  padding: clamp(18px, 3vw, 24px) !important;
+  border-radius: 26px !important;
+  background: linear-gradient(180deg, #f8fafc, #eef2ff) !important;
+  border: 1px solid rgba(199, 210, 254, .9) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .75);
+}
+.disponibilidade-corrida h4 {
+  margin: 0 0 14px !important;
+  color: #111827 !important;
+  font-size: clamp(20px, 3vw, 26px) !important;
+  letter-spacing: -.035em;
+}
+.texto-disponibilidade-info,
+.texto-disponibilidade-alerta {
+  border-radius: 20px !important;
+  padding: 15px 17px !important;
+}
+.texto-disponibilidade-info {
+  background: linear-gradient(135deg, #eff6ff, #eef2ff) !important;
+  border: 1px solid #bfdbfe !important;
+}
+.texto-disponibilidade-alerta {
+  background: linear-gradient(135deg, #fff7ed, #fef2f2) !important;
+  border: 1px solid #fed7aa !important;
+  color: #9a3412 !important;
+}
+.texto-disponibilidade-alerta strong {
+  color: #c2410c !important;
+}
+.lista-dias-disponibilidade {
+  gap: 12px !important;
+}
+.checkbox-dia-disponibilidade {
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 16px !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, .78) !important;
+  border: 1px solid #dbe3ef !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, .05);
+}
+.checkbox-dia-disponibilidade:hover {
+  transform: translateY(-1px);
+  border-color: #818cf8 !important;
+  box-shadow: 0 14px 28px rgba(79, 70, 229, .10);
+}
+.checkbox-dia-disponibilidade:has(input:checked) {
+  background: linear-gradient(135deg, #ecfeff, #eef2ff) !important;
+  border-color: #6366f1 !important;
+}
+.checkbox-dia-disponibilidade input[type="checkbox"] {
+  width: 22px !important;
+  min-width: 22px !important;
+  height: 22px !important;
+  margin: 0 !important;
+  accent-color: #4f46e5;
+}
+.checkbox-dia-disponibilidade strong {
+  font-size: 15px !important;
+}
+.checkbox-dia-disponibilidade small {
+  color: #64748b !important;
+}
+
+.botao-inscricao {
+  width: 100%;
+  min-height: 56px;
+  margin-top: 22px !important;
+  border-radius: 20px !important;
+  background: linear-gradient(135deg, #22c55e, #0ea5e9) !important;
+  color: #ffffff !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+  box-shadow: 0 16px 32px rgba(14, 165, 233, .22);
+}
+.botao-inscricao:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 38px rgba(14, 165, 233, .28);
+}
+.botao-inscricao:disabled {
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1) !important;
+  color: #64748b !important;
+  box-shadow: none !important;
+}
+
+.card-minha-inscricao {
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+  align-items: start !important;
+}
+.conteudo-minha-inscricao {
+  min-width: 0;
+}
+.status-inscricao {
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, .08);
+}
+.tags-disponibilidade {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tag-disponibilidade {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #4338ca;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+@media (max-width: 760px) {
+  .pagina-corridas {
+    padding-top: 22px;
+    gap: 22px;
+  }
+  .corrida-card-head,
+  .card-minha-inscricao {
+    display: flex !important;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .corrida-status-card.aberta,
+  .status-inscricao {
+    width: 100%;
+    min-width: 0;
+  }
+  .corrida-resumo-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .corrida-resumo-local {
+    grid-column: 1 / -1;
+  }
+  .card-corrida h2,
+  .conteudo-minha-inscricao h3 {
+    font-size: clamp(28px, 9vw, 42px) !important;
+  }
+  .card-corrida-sem-banner h2 {
+    font-size: clamp(36px, 11vw, 54px) !important;
+  }
+}
+@media (max-width: 480px) {
+  .corrida-resumo-grid {
+    grid-template-columns: 1fr;
+  }
 }

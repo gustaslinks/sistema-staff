@@ -5,6 +5,20 @@
 const SUPABASE_URL = "https://klpxoffkajijjktxztmc.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_O_MlVkyfreG125LVia6nag_1GL5bUli";
 // NÃO use service_role, direct connection string ou senha do banco.
+const MANUAL_LOGOUT_KEY = "sistemaStaffManualLogout";
+async function sairDoSistemaSeguro() {
+  try {
+    sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+    localStorage.removeItem("staffLogado");
+    await supabaseClient.auth.signOut({ scope: "global" });
+  } catch (error) {
+    console.warn("Falha ao encerrar sessão:", error);
+  } finally {
+    localStorage.removeItem("staffLogado");
+    window.location.replace("index.html?logout=1");
+  }
+}
+
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
@@ -91,9 +105,7 @@ async function validarSessaoEdicao(){
   if(!modoEdicao) return;
   const user = await getUsuarioAtual();
   if(!user){
-    await supabaseClient.auth.signOut();
-    localStorage.removeItem('staffLogado');
-    window.location.href = 'index.html';
+    await sairDoSistemaSeguro();
     throw new Error('Sessão expirada. Faça login novamente.');
   }
 }
@@ -295,9 +307,7 @@ if(botaoCorridasCadastro){
 
 if(botaoSairCadastro){
   botaoSairCadastro.addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    localStorage.removeItem('staffLogado');
-    window.location.href = 'index.html';
+    await sairDoSistemaSeguro();
   });
 }
 
@@ -1178,4 +1188,4 @@ updatePixPreviews();
 refreshSubmitState();
 
 
-// v2.1 - login por CPF, sessão persistente, controles de senha e segurança admin.
+// v2.2 - login por CPF, sessão persistente, controles de senha e segurança admin.

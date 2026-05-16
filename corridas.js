@@ -7,21 +7,34 @@ const supabaseClient = supabase.createClient(
   { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
 );
 
+
+const MANUAL_LOGOUT_KEY = "sistemaStaffManualLogout";
+async function sairDoSistemaSeguro() {
+  try {
+    sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+    localStorage.removeItem("staffLogado");
+    await supabaseClient.auth.signOut({ scope: "global" });
+  } catch (error) {
+    console.warn("Falha ao encerrar sessão:", error);
+  } finally {
+    localStorage.removeItem("staffLogado");
+    window.location.replace("index.html?logout=1");
+  }
+}
 async function validarSessaoSupabaseObrigatoria() {
   const { data } = await supabaseClient.auth.getUser();
   const user = data && data.user ? data.user : null;
   if (!user) {
     localStorage.removeItem("staffLogado");
-    window.location.href = "index.html";
+    window.location.replace("index.html");
     throw new Error("Sessão expirada.");
   }
   const staffCache = (() => {
     try { return JSON.parse(localStorage.getItem("staffLogado") || "null"); } catch (e) { return null; }
   })();
   if (staffCache && staffCache.auth_user_id && staffCache.auth_user_id !== user.id) {
-    await supabaseClient.auth.signOut();
-    localStorage.removeItem("staffLogado");
-    window.location.href = "index.html";
+    await sairDoSistemaSeguro();
+    window.location.replace("index.html");
     throw new Error("Sessão inválida.");
   }
 }
@@ -43,7 +56,7 @@ const staffLogado = JSON.parse(localStorage.getItem("staffLogado"));
 
 // BLOQUEIA ACESSO SEM LOGIN
 if (!staffLogado || !staffLogado.id) {
-  window.location.href = "index.html";
+  window.location.replace("index.html");
 }
 
 // =========================================================
@@ -65,10 +78,7 @@ function carregarCardStaff() {
 }
 
 botaoSair.addEventListener("click", function () {
-  supabaseClient.auth.signOut().finally(() => {
-    localStorage.removeItem("staffLogado");
-    window.location.href = "index.html";
-  });
+  sairDoSistemaSeguro();
 });
 
 if (staffLogado.is_admin === true || staffLogado.is_admin === "true") {
@@ -336,37 +346,35 @@ async function carregarCorridas() {
         </div>
       `;
 
+    const bannerUrl = obterBannerCorridaUrl(corrida);
+
     return `
-      <article class="card-corrida">
+      <article class="card-corrida ${bannerUrl ? "card-corrida-com-banner" : "card-corrida-sem-banner"}">
 
-        ${obterBannerCorridaUrl(corrida) ? `<img class="corrida-card-banner" src="${escapeHtml(obterBannerCorridaUrl(corrida))}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">` : ""}
+        ${bannerUrl ? `
+          <div class="corrida-banner-wrap">
+            <img class="corrida-card-banner" src="${escapeHtml(bannerUrl)}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">
+          </div>
+        ` : ""}
 
-        <h2>${corrida.nome}</h2>
-
-        <div class="corrida-status-card aberta">
-          <strong>Inscrições abertas</strong>
-          <span>${textoVagas} vagas preenchidas</span>
+        <div class="corrida-card-head">
+          <div>
+            <span class="corrida-eyebrow">Corrida disponível</span>
+            <h2>${corrida.nome}</h2>
+          </div>
+          <div class="corrida-status-card aberta">
+            <strong>Inscrições abertas</strong>
+            <span>${textoVagas} vagas preenchidas</span>
+          </div>
         </div>
 
-        <p><strong>Período:</strong>
-          ${dataFormatada}
-        </p>
-
-        <p><strong>Horário:</strong>
-          ${formatarHorario(corrida.horario)}
-        </p>
-
-        <p><strong>Local:</strong><br>
-          ${formatarTextoComQuebra(corrida.local || "Não informado")}
-        </p>
-
-        <p><strong>Vagas:</strong>
-          ${textoVagas}
-        </p>
-
-        <p><strong>Prazo de inscrição:</strong>
-          ${prazoFormatado}
-        </p>
+        <div class="corrida-resumo-grid">
+          <div class="corrida-resumo-item"><strong>Período</strong><span>${dataFormatada}</span></div>
+          <div class="corrida-resumo-item"><strong>Horário</strong><span>${formatarHorario(corrida.horario)}</span></div>
+          <div class="corrida-resumo-item"><strong>Vagas</strong><span>${textoVagas}</span></div>
+          <div class="corrida-resumo-item"><strong>Prazo</strong><span>${prazoFormatado}</span></div>
+          <div class="corrida-resumo-item corrida-resumo-local"><strong>Local</strong><span>${formatarTextoComQuebra(corrida.local || "Não informado")}</span></div>
+        </div>
 
         ${htmlDias}
 
@@ -625,9 +633,9 @@ async function carregarMinhasInscricoes() {
       const bannerMinhaInscricao = obterBannerCorridaUrl(corrida);
 
       return `
-        <article class="card-minha-inscricao">
+        <article class="card-minha-inscricao ${bannerMinhaInscricao ? "card-minha-com-banner" : "card-minha-sem-banner"}">
 
-          ${bannerMinhaInscricao ? `<img class="corrida-card-banner minha-inscricao-banner" src="${escapeHtml(bannerMinhaInscricao)}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}">` : ""}
+          ${bannerMinhaInscricao ? `<div class="corrida-banner-wrap"><img class="corrida-card-banner minha-inscricao-banner" src="${escapeHtml(bannerMinhaInscricao)}" alt="Banner da corrida ${escapeHtml(corrida.nome || "")}"></div>` : ""}
 
           <div class="conteudo-minha-inscricao">
 
