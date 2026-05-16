@@ -102,6 +102,25 @@ function setStatus(message, type = "info") {
   loginStatus.className = `login-status ${type}`;
 }
 
+
+function obterRedirectSeguro(){
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get("redirect");
+  if (!redirect) return null;
+  try {
+    const decoded = decodeURIComponent(redirect);
+    if (/^https?:\/\//i.test(decoded) || decoded.startsWith("//")) return null;
+    if (!/^[a-z0-9_\-\/.]+\.html(\?.*)?$/i.test(decoded)) return null;
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+}
+
+function destinoAposLogin(staff){
+  return obterRedirectSeguro() || (staff && staff.is_admin ? "admin.html" : "corridas.html");
+}
+
 function salvarStaffLogado(staff) {
   localStorage.setItem("staffLogado", JSON.stringify({
     ...staff,
@@ -184,7 +203,7 @@ async function verificarSessaoExistente() {
     }
 
     const staff = await carregarStaffDaSessao(user.id);
-    window.location.href = staff.is_admin ? "admin.html" : "corridas.html";
+    window.location.href = destinoAposLogin(staff);
   } catch (error) {
     console.warn("Sessão existente não carregada:", error);
   }
@@ -256,7 +275,7 @@ form.addEventListener("submit", async function (event) {
     }
 
     const staff = await carregarStaffDaSessao(user.id);
-    window.location.href = staff.is_admin ? "admin.html" : "corridas.html";
+    window.location.href = destinoAposLogin(staff);
 
   } catch (error) {
     setStatus(error.message, "error");

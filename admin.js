@@ -2507,9 +2507,19 @@ async function carregarDiasCorrida(corridaId) {
         ${formatarMoeda(dia.valor_ajuda_custo)}
       </p>
 
+      <button
+        type="button"
+        class="botao-admin-secundario botao-checkin-dia"
+        data-corrida-id="${corridaId}"
+        data-dia-id="${dia.id}"
+      >
+        <span class="btn-ico">▦</span><span>Gerar QR Check-in PDF</span>
+      </button>
 
     </div>
   `).join("");
+
+  ativarBotoesCheckinDia(container);
 }
 
 // Gestão de dias cadastrados
@@ -5020,3 +5030,215 @@ async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
 
 
 document.addEventListener("DOMContentLoaded", inicializarMascarasMoeda);
+
+
+/* v3.7 - Check-in presencial por QR individual por dia */
+function gerarTokenCheckinLocal() {
+  if (window.crypto && window.crypto.getRandomValues) {
+    const arr = new Uint8Array(24);
+    window.crypto.getRandomValues(arr);
+    return Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+}
+
+function obterBaseUrlSistema() {
+  const basePath = window.location.pathname.replace(/[^/]*$/, "");
+  return `${window.location.origin}${basePath}`;
+}
+
+async function gerarQRCodeDataURLCheckin(url) {
+  await garantirBibliotecaQRCode();
+  return await window.QRCode.toDataURL(url, {
+    errorCorrectionLevel: "M",
+    margin: 1,
+    width: 360
+  });
+}
+
+function ativarBotoesCheckinDia(container) {
+  (container || document).querySelectorAll(".botao-checkin-dia").forEach((btn) => {
+    if (btn.dataset.listenerCheckin === "1") return;
+    btn.dataset.listenerCheckin = "1";
+    btn.addEventListener("click", async () => {
+      const corridaId = btn.dataset.corridaId;
+      const diaId = btn.dataset.diaId;
+      const textoOriginal = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-ico">⏳</span><span>Preparando QR...</span>';
+      try {
+        await gerarPDFCheckinPorDia(corridaId, diaId);
+      } catch (error) {
+        console.error("Erro ao gerar QR de check-in:", error);
+        alert(error.message || "Não foi possível gerar o PDF de check-in.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = textoOriginal;
+      }
+    });
+  });
+}
+
+async function buscarDadosCheckinPorDia(corridaId, diaId) {
+  const { data: corrida, error: erroCorrida } = await supabaseClient
+    .from("corridas")
+    .select("id, nome, local")
+    .eq("id", corridaId)
+    .single();
+  if (erroCorrida || !corrida) throw new Error("Não foi possível carregar a corrida.");
+
+  const { data: dia, error: erroDia } = await supabaseClient
+    .from("corrida_dias")
+    .select("id, corrida_id, nome, tipo, data_dia, horario_inicio, horario_fim")
+    .eq("id", diaId)
+    .single();
+  if (erroDia || !dia) throw new Error("Não foi possível carregar o dia da corrida.");
+
+  const { data: inscricoes, error: erroInscricoes } = await supabaseClient
+    .from("inscricoes")
+    .select("id, corrida_id, staff_id, status, staffs(id, nome_completo, cidade)")
+    .eq("corrida_id", corridaId)
+    .eq("status", "confirmado");
+  if (erroInscricoes) throw new Error("Não foi possível buscar os staffs confirmados.");
+
+  const idsInscricao = (inscricoes || []).map((i) => i.id);
+  let disponibilidades = [];
+  if (idsInscricao.length) {
+    const { data, error } = await supabaseClient
+      .from("inscricao_disponibilidades")
+      .select("inscricao_id, corrida_dia_id, disponivel")
+      .eq("corrida_dia_id", diaId)
+      .in("inscricao_id", idsInscricao);
+    if (error) throw new Error("Não foi possível buscar as disponibilidades do dia.");
+    disponibilidades = data || [];
+  }
+
+  const disponiveis = new Set(disponibilidades.filter((d) => d.disponivel !== false).map((d) => d.inscricao_id));
+  const staffsDoDia = (inscricoes || [])
+    .filter((i) => disponiveis.has(i.id))
+    .map((i) => ({
+      inscricao_id: i.id,
+      staff_id: i.staff_id || (i.staffs && i.staffs.id),
+      nome: (i.staffs && i.staffs.nome_completo) || "Staff",
+      cidade: (i.staffs && i.staffs.cidade) || ""
+    }))
+    .filter((i) => i.staff_id)
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+
+  return { corrida, dia, staffsDoDia };
+}
+
+async function garantirTokensCheckin(corrida, dia, staffsDoDia) {
+  if (!staffsDoDia.length) return [];
+  const { data: tokensExistentes, error: erroTokens } = await supabaseClient
+    .from("checkin_tokens")
+    .select("id, token, staff_id, inscricao_id, corrida_dia_id")
+    .eq("corrida_dia_id", dia.id);
+  if (erroTokens) throw new Error("Não foi possível acessar os tokens. Confira se o SQL do check-in foi executado no Supabase.");
+
+  const mapa = new Map((tokensExistentes || []).map((t) => [String(t.staff_id), t]));
+  const novos = staffsDoDia
+    .filter((s) => !mapa.has(String(s.staff_id)))
+    .map((s) => ({
+      corrida_id: corrida.id,
+      corrida_dia_id: dia.id,
+      inscricao_id: s.inscricao_id,
+      staff_id: s.staff_id,
+      token: gerarTokenCheckinLocal(),
+      ativo: true
+    }));
+
+  if (novos.length) {
+    const { data: criados, error: erroInsert } = await supabaseClient
+      .from("checkin_tokens")
+      .insert(novos)
+      .select("id, token, staff_id, inscricao_id, corrida_dia_id");
+    if (erroInsert) throw new Error("Não foi possível criar os QR Codes. Confira as policies/RLS do Supabase.");
+    (criados || []).forEach((t) => mapa.set(String(t.staff_id), t));
+  }
+
+  return staffsDoDia.map((staff) => ({ ...staff, token: mapa.get(String(staff.staff_id)) })).filter((s) => s.token && s.token.token);
+}
+
+async function gerarPDFCheckinPorDia(corridaId, diaId) {
+  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
+  if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
+
+  const { corrida, dia, staffsDoDia } = await buscarDadosCheckinPorDia(corridaId, diaId);
+  if (!staffsDoDia.length) throw new Error("Não há staffs confirmados e disponíveis para este dia.");
+
+  const staffsComToken = await garantirTokensCheckin(corrida, dia, staffsDoDia);
+  if (!staffsComToken.length) throw new Error("Nenhum QR Code pôde ser preparado para este dia.");
+
+  const baseUrl = obterBaseUrlSistema();
+  const itens = [];
+  for (const staff of staffsComToken) {
+    const url = `${baseUrl}checkin.html?t=${encodeURIComponent(staff.token.token)}`;
+    const qr = await gerarQRCodeDataURLCheckin(url);
+    itens.push({ ...staff, url, qr });
+  }
+
+  const doc = new jsPDFConstructor({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margem = 10;
+  const gap = 5;
+  const cols = 3;
+  const rows = 4;
+  const cardW = (pageW - margem * 2 - gap * (cols - 1)) / cols;
+  const cardH = (pageH - 38 - margem - gap * (rows - 1)) / rows;
+  const qrSize = Math.min(38, cardW - 18, cardH - 30);
+
+  function cabecalho() {
+    doc.setFillColor(17, 24, 39);
+    doc.rect(0, 0, pageW, 28, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(15);
+    doc.text("RCP STAFF · QR CHECK-IN", margem, 11);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.text(`${corrida.nome || "Corrida"} · ${dia.nome || dia.tipo || "Dia"} · ${formatarData(dia.data_dia)}`, margem, 17);
+    doc.text("Cada QR é individual. O staff deve estar logado no próprio celular para confirmar a presença.", margem, 23);
+    doc.setTextColor(0, 0, 0);
+  }
+
+  cabecalho();
+  itens.forEach((item, index) => {
+    if (index > 0 && index % (cols * rows) === 0) {
+      doc.addPage();
+      cabecalho();
+    }
+    const pos = index % (cols * rows);
+    const col = pos % cols;
+    const row = Math.floor(pos / cols);
+    const x = margem + col * (cardW + gap);
+    const y = 34 + row * (cardH + gap);
+
+    doc.setDrawColor(211, 218, 232);
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(x, y, cardW, cardH, 3, 3, "FD");
+
+    doc.setTextColor(17, 24, 39);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    const nomeLinhas = doc.splitTextToSize(item.nome, cardW - 8).slice(0, 2);
+    doc.text(nomeLinhas, x + 4, y + 7);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(75, 85, 99);
+    doc.text(`${dia.tipo || "Período"} · ${formatarData(dia.data_dia)}`, x + 4, y + 18);
+
+    const qrX = x + (cardW - qrSize) / 2;
+    const qrY = y + 22;
+    doc.addImage(item.qr, "PNG", qrX, qrY, qrSize, qrSize);
+
+    doc.setFontSize(6.2);
+    doc.setTextColor(107, 114, 128);
+    doc.text("Abra a câmera e leia seu QR", x + cardW / 2, y + cardH - 5, { align: "center" });
+  });
+
+  const nomeArquivo = `qr-checkin-${(corrida.nome || "corrida").replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-${dia.data_dia || "dia"}.pdf`;
+  doc.save(nomeArquivo);
+}

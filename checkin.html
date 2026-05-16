@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check-in | RCP Staff</title>
+  <link rel="stylesheet" href="style.css?v=37">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="checkin-page">
+  <button class="version-badge" type="button" data-version-summary="v3.7: adiciona check-in presencial por QR individual por dia, PDF em grid e página de validação do staff.">v3.7</button>
+
+  <main class="checkin-shell">
+    <section class="checkin-card" id="checkinCard">
+      <div class="checkin-brand">
+        <div class="checkin-logo-mark">RCP</div>
+        <div>
+          <p class="checkin-eyebrow">RCP Staff</p>
+          <h1>Check-in presencial</h1>
+        </div>
+      </div>
+
+      <div id="checkinStatusIcon" class="checkin-status-icon is-loading" aria-hidden="true"></div>
+      <h2 id="checkinTitle">Validando seu QR Code...</h2>
+      <p id="checkinMessage">Mantenha esta tela aberta enquanto confirmamos sua presença no evento.</p>
+
+      <div id="checkinDetails" class="checkin-details hidden"></div>
+
+      <div class="checkin-actions">
+        <a id="checkinPrimaryAction" class="checkin-primary-action hidden" href="corridas.html">Ver minhas corridas</a>
+        <a class="checkin-secondary-action" href="index.html">Voltar ao login</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="checkin.js?v=37"></script>
+  <script>
+  (function(){
+    function openVersionInfo(){
+      var badge=document.querySelector('.version-badge');
+      if(!badge) return;
+      var text=badge.getAttribute('data-version-summary') || badge.getAttribute('title') || badge.textContent;
+      var old=document.querySelector('.version-popover');
+      if(old){ old.remove(); return; }
+      var box=document.createElement('div');
+      box.className='version-popover';
+      box.innerHTML='<button type="button" class="version-popover-close" aria-label="Fechar">×</button><strong>'+badge.textContent+'</strong><p>'+text+'</p>';
+      document.body.appendChild(box);
+      box.querySelector('.version-popover-close').addEventListener('click', function(e){ e.stopPropagation(); box.remove(); });
+      setTimeout(function(){
+        document.addEventListener('click', function close(ev){
+          if(!box.contains(ev.target) && ev.target!==badge){ box.remove(); document.removeEventListener('click', close); }
+        });
+      },0);
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      var badge=document.querySelector('.version-badge');
+      if(!badge) return;
+      badge.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); openVersionInfo(); });
+      badge.addEventListener('touchend', function(e){ e.preventDefault(); e.stopPropagation(); openVersionInfo(); }, {passive:false});
+    });
+  })();
+  </script>
+</body>
+</html>
