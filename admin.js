@@ -4055,12 +4055,12 @@ function montarSecoesTabelaNumeracao(inscritos) {
 function exportarPDFTabelaNumeracao(corrida, inscritos) {
   const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
   if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
-
   const lista = ordenarInscritosAlfabetico(inscritos || []);
   if (!lista.length) throw new Error("Não há inscritos para gerar a tabela de numeração.");
 
   const doc = new jsPDFConstructor({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
+  const nomeArquivo = `${nomeArquivoSeguro(corrida.nome)}-tabela-numeracao.pdf`;
   doc.setFontSize(18);
   doc.setFont(undefined, "bold");
   doc.text(corrida.nome || "Corrida", pageWidth / 2, 18, { align: "center" });
@@ -4068,33 +4068,30 @@ function exportarPDFTabelaNumeracao(corrida, inscritos) {
   doc.setFont(undefined, "normal");
   doc.text("Tabela de numeração", pageWidth / 2, 26, { align: "center" });
   doc.autoTable({
-    head: [["Nome", "CPF", "Numeração", "Assinatura"]],
-    body: lista.map(inscrito => {
-      const staff = inscrito.staff || {};
-      return [staff.nome_completo || "", staff.cpf || "", obterNumeracaoStaff(staff) || "Não informado", ""];
-    }),
+    head: [["Nome", "Número", "Nome", "Número"]],
+    body: montarLinhasTabelaNumeracao4Colunas(lista),
     startY: 36,
     theme: "grid",
-    styles: { fontSize: 9, cellPadding: 2.5, halign: "center", valign: "middle" },
+    margin: { left: 10, right: 10 },
+    styles: { fontSize: 8.5, cellPadding: 2.2, halign: "center", valign: "middle", overflow: "linebreak" },
     headStyles: { fillColor: [47, 107, 88], textColor: [255,255,255], fontStyle: "bold" },
-    columnStyles: { 0: { cellWidth: 75, halign: "left" }, 1: { cellWidth: 34 }, 2: { cellWidth: 28 }, 3: { cellWidth: 42 } }
+    columnStyles: { 0: { cellWidth: 72, halign: "left" }, 1: { cellWidth: 23 }, 2: { cellWidth: 72, halign: "left" }, 3: { cellWidth: 23 } }
   });
-  doc.save(`${nomeArquivoSeguro(corrida.nome)}-tabela-numeracao.pdf`);
+  doc.save(nomeArquivo);
+  return nomeArquivo;
 }
 
 function exportarExcelTabelaNumeracao(corrida, inscritos) {
   const lista = ordenarInscritosAlfabetico(inscritos || []);
   if (!lista.length) throw new Error("Não há inscritos para gerar a tabela de numeração.");
-  const dados = lista.map(inscrito => {
-    const staff = inscrito.staff || {};
-    return { Nome: staff.nome_completo || "", CPF: staff.cpf || "", "Numeração": obterNumeracaoStaff(staff) || "Não informado", Assinatura: "" };
-  });
-  const worksheet = XLSX.utils.json_to_sheet(dados, { origin: "A4" });
-  XLSX.utils.sheet_add_aoa(worksheet, [[corrida.nome || "Corrida"], ["Tabela de numeração"]], { origin: "A1" });
-  worksheet["!cols"] = [{ wch: 42 }, { wch: 18 }, { wch: 14 }, { wch: 28 }];
+  const dados = montarLinhasTabelaNumeracao4Colunas(lista);
+  const worksheet = XLSX.utils.aoa_to_sheet([[corrida.nome || "Corrida"], ["Tabela de numeração"], [], ["Nome", "Número", "Nome", "Número"], ...dados]);
+  worksheet["!cols"] = [{ wch: 42 }, { wch: 12 }, { wch: 42 }, { wch: 12 }];
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Tabela numeração");
-  XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)}-tabela-numeracao.xlsx`);
+  const nomeArquivo = `${nomeArquivoSeguro(corrida.nome)}-tabela-numeracao.xlsx`;
+  XLSX.writeFile(workbook, nomeArquivo);
+  return nomeArquivo;
 }
 
 async function exportarTabelaNumeracaoTenis(corridaId, formato = "pdf") {
@@ -4216,9 +4213,10 @@ if (logoutBtn) {
   });
 }
 
-/* v178 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
-/* v178 - ajustes reais nos relatórios PDF solicitados */
-/* v178 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
+/* v179 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
+/* v179 - ajustes reais nos relatórios PDF solicitados */
+/* v179 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
+/* v179 - tabela numeracao preenche coluna esquerda inteira antes da direita */
 function obterDataDiaRelatorio(dia) {
   if (!dia || !dia.data_dia) return null;
   const partes = String(dia.data_dia).split("-");

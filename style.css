@@ -6198,7 +6198,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 }
 
 
-/* v178 - seta outline consistente no card de inscritos */
+/* v179 - seta outline consistente no card de inscritos */
 .botao-expandir-inscrito {
   font-size: 0 !important;
   line-height: 0 !important;
@@ -6229,7 +6229,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
   transform: rotate(90deg) !important;
 }
 
-/* v178 - busca admin na edição de cadastro */
+/* v179 - busca admin na edição de cadastro */
 .admin-editar-staff-panel {
   background: #ffffff;
   border: 1px solid rgba(124, 58, 237, 0.18);
