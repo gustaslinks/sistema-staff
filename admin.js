@@ -1355,6 +1355,23 @@ async function carregarInscritosDaCorrida(
     ? Math.max(totalVagasCorrida - resumo.confirmados, 0)
     : 0;
 
+  const diasFiltro = Array.from(
+    new Map(
+      inscricoesComPrioridade
+        .flatMap(inscricao => inscricao.diasDisponiveis || [])
+        .filter(dia => dia && dia.id)
+        .map(dia => [String(dia.id), dia])
+    ).values()
+  ).sort((a, b) => {
+    const dataA = a.data_dia ? new Date(a.data_dia).getTime() : 0;
+    const dataB = b.data_dia ? new Date(b.data_dia).getTime() : 0;
+    return dataA - dataB;
+  });
+
+  const opcoesDiasFiltro = diasFiltro.map(dia => `
+    <option value="${escapeHtml(String(dia.id))}">${escapeHtml(dia.nome || formatarData(dia.data_dia))}</option>
+  `).join("");
+
   areaInscritos.innerHTML = `
     <div class="admin-inscritos-painel" data-corrida-id="${corridaIdNumerico}">
 
@@ -1393,10 +1410,10 @@ async function carregarInscritosDaCorrida(
         </div>
       </div>
 
-      <div class="admin-inscritos-filtros admin-inscritos-filtros-v186">
-        <div class="admin-filtros-topo-v186">
+      <div class="admin-inscritos-filtros admin-inscritos-filtros-v188">
+        <div class="admin-filtros-grid-v188">
           <label class="admin-status-select-wrap">
-            <span>Filtro status</span>
+            <span>Status</span>
             <select class="admin-status-select">
               <option value="todos" selected>Todos</option>
               <option value="pendente">Pendentes</option>
@@ -1407,7 +1424,7 @@ async function carregarInscritosDaCorrida(
           </label>
 
           <label class="admin-busca-wrap-v186">
-            <span>Busca por nome</span>
+            <span>Buscar nome</span>
             <input
               type="search"
               class="admin-busca-inscrito"
@@ -1417,25 +1434,32 @@ async function carregarInscritosDaCorrida(
         </div>
 
         <div class="admin-toggles-tipo" aria-label="Filtrar por tipo de dia">
-          <button type="button" class="admin-toggle-tipo ativo" data-tipo="kit"><span class="btn-ico">📦</span><span>Entrega de kit</span></button>
-          <button type="button" class="admin-toggle-tipo ativo" data-tipo="corrida"><span class="btn-ico">🏁</span><span>Dia da corrida</span></button>
+          <button type="button" class="admin-toggle-tipo ativo" data-tipo="kit"><span class="btn-ico">📦</span><span>Kit</span></button>
+          <button type="button" class="admin-toggle-tipo ativo" data-tipo="corrida"><span class="btn-ico">🏁</span><span>Corrida</span></button>
         </div>
+
+        <label class="admin-dia-filtro-wrap">
+          <span>Dia</span>
+          <select class="admin-dia-select">
+            <option value="todos" selected>Todos os dias</option>
+            ${opcoesDiasFiltro}
+          </select>
+        </label>
 
         <div class="admin-inscritos-contagem-exibidos" aria-live="polite">
           Exibindo 0 de ${inscricoesComPrioridade.length} inscritos
         </div>
-      </div>
 
-      <div class="admin-inscritos-acoes-massa admin-inscritos-acoes-v127 admin-inscritos-acoes-v187">
-        <div class="admin-contador-selecao">
-          <span class="admin-selecao-texto">0 selecionado(s)</span>
-          ${totalVagasCorrida ? `<span>Vagas livres: ${vagasLivres}</span>` : ""}
+        <div class="admin-selecao-clean-row">
+          <label class="admin-selecionar-exibidos">
+            <input type="checkbox" class="checkbox-selecionar-exibidos">
+            <span>Selecionar exibidos</span>
+          </label>
+          <label class="admin-somente-selecionados">
+            <input type="checkbox" class="checkbox-somente-selecionados">
+            <span>Somente selecionados</span>
+          </label>
         </div>
-
-        <label class="admin-selecionar-exibidos">
-          <input type="checkbox" class="checkbox-selecionar-exibidos">
-          <span>Selecionar todos os inscritos</span>
-        </label>
       </div>
 
       <div class="admin-lista-compacta-inscritos">
@@ -1447,9 +1471,15 @@ async function carregarInscritosDaCorrida(
         )).join("")}
       </div>
 
-      <button type="button" class="botao-admin-batch botao-confirmar-selecionados botao-confirmar-selecionados-final">
-        Confirmar selecionados
-      </button>
+      <div class="admin-barra-lote-v188" aria-live="polite">
+        <div class="admin-contador-selecao">
+          <strong class="admin-selecao-texto">0 selecionado(s)</strong>
+          ${totalVagasCorrida ? `<span>Vagas livres: ${vagasLivres}</span>` : ""}
+        </div>
+        <button type="button" class="botao-admin-batch botao-confirmar-selecionados botao-confirmar-selecionados-final">
+          Confirmar selecionados
+        </button>
+      </div>
     </div>
   `;
 
@@ -1475,6 +1505,7 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
         : possuiEntregaKit && possuiDiaCorrida
           ? "kit-e-corrida"
           : "sem-tipo";
+  const diaIdsFiltro = diasDisponiveis.map(dia => String(dia.id)).filter(Boolean).join(",");
   const fotoUrl = staff.foto_url || "";
   const mensagemWhatsappConfirmacao = gerarMensagemConfirmacaoWhatsapp({
     staff,
@@ -1483,8 +1514,8 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
   });
   const linkWhatsappConfirmacao = criarLinkWhatsapp(staff.telefone, mensagemWhatsappConfirmacao);
   const botaoWhatsappConfirmacao = status === "confirmado" && linkWhatsappConfirmacao
-    ? `<a class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-confirmado" href="${escapeHtml(linkWhatsappConfirmacao)}" target="_blank" rel="noopener" title="Enviar WhatsApp de confirmação" aria-label="Enviar WhatsApp de confirmação"><svg class="icone-whatsapp-outline" viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.2 11.8a8.1 8.1 0 0 1-12 7.1L4 20l1.15-4.05A8.1 8.1 0 1 1 20.2 11.8Z"/><path d="M8.95 8.35c.22-.45.42-.48.7-.48h.48c.17 0 .42.05.62.47.22.48.72 1.65.78 1.78.07.15.04.32-.06.5-.12.18-.18.3-.35.48-.15.16-.31.35-.13.64.18.3.8 1.32 1.72 2.02 1.18.9 2.05 1.18 2.38 1.03.32-.14.75-.87.95-1.16.2-.3.4-.25.67-.14.28.1 1.78.82 2.08.97.3.15.5.22.57.35.07.13.07.78-.16 1.43-.23.65-1.36 1.24-1.9 1.29-.52.05-1.2.23-3.9-.86-3.29-1.32-5.35-4.52-5.5-4.72-.15-.2-1.32-1.72-1.32-3.28 0-1.56.82-2.32 1.1-2.64.28-.31.6-.4.8-.4Z"/></svg></a>`
-    : `<button type="button" class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-bloqueado" disabled title="WhatsApp liberado após confirmar" aria-label="WhatsApp liberado após confirmar"><svg class="icone-whatsapp-outline" viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.2 11.8a8.1 8.1 0 0 1-12 7.1L4 20l1.15-4.05A8.1 8.1 0 1 1 20.2 11.8Z"/><path d="M8.95 8.35c.22-.45.42-.48.7-.48h.48c.17 0 .42.05.62.47.22.48.72 1.65.78 1.78.07.15.04.32-.06.5-.12.18-.18.3-.35.48-.15.16-.31.35-.13.64.18.3.8 1.32 1.72 2.02 1.18.9 2.05 1.18 2.38 1.03.32-.14.75-.87.95-1.16.2-.3.4-.25.67-.14.28.1 1.78.82 2.08.97.3.15.5.22.57.35.07.13.07.78-.16 1.43-.23.65-1.36 1.24-1.9 1.29-.52.05-1.2.23-3.9-.86-3.29-1.32-5.35-4.52-5.5-4.72-.15-.2-1.32-1.72-1.32-3.28 0-1.56.82-2.32 1.1-2.64.28-.31.6-.4.8-.4Z"/></svg></button>`;
+    ? `<a class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-confirmado" href="${escapeHtml(linkWhatsappConfirmacao)}" target="_blank" rel="noopener" title="Enviar WhatsApp de confirmação" aria-label="Enviar WhatsApp de confirmação"><svg class="icone-whatsapp-oficial-v188" viewBox="0 0 32 32" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M16 3.4A12.4 12.4 0 0 0 5.5 22.3L4 28l5.9-1.5A12.4 12.4 0 1 0 16 3.4Z" fill="currentColor"/><path d="M22.9 18.9c-.3-.2-2-.9-2.3-1-.3-.1-.5-.2-.8.2-.2.3-.9 1-1.1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.7-1.7-1-.9-1.7-2-1.9-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6 0-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.4 3.7 5.9 5.1.8.4 1.5.6 2 .7.8.3 1.6.2 2.2.1.7-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.3-.3-.6-.4Z" fill="#fff"/></svg></a>`
+    : `<button type="button" class="botao-acao-inscrito botao-whatsapp-inscrito botao-whatsapp-bloqueado" disabled title="WhatsApp liberado após confirmar" aria-label="WhatsApp liberado após confirmar"><svg class="icone-whatsapp-oficial-v188" viewBox="0 0 32 32" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M16 3.4A12.4 12.4 0 0 0 5.5 22.3L4 28l5.9-1.5A12.4 12.4 0 1 0 16 3.4Z" fill="currentColor"/><path d="M22.9 18.9c-.3-.2-2-.9-2.3-1-.3-.1-.5-.2-.8.2-.2.3-.9 1-1.1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.7-1.7-1-.9-1.7-2-1.9-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6 0-.2-.8-1.9-1.1-2.6-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.4 3.7 5.9 5.1.8.4 1.5.6 2 .7.8.3 1.6.2 2.2.1.7-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.3-.3-.6-.4Z" fill="#fff"/></svg></button>`;
 
   return `
     <article
@@ -1496,6 +1527,7 @@ function gerarLinhaInscritoAdmin(inscricao, corridaId, totalDiasCorrida, corrida
       data-tipo-disponibilidade="${tipoDisponibilidadeFiltro}"
       data-tem-kit="${possuiEntregaKit ? "1" : "0"}"
       data-tem-corrida="${possuiDiaCorrida ? "1" : "0"}"
+      data-dia-ids="${escapeHtml(diaIdsFiltro)}"
       data-nome="${escapeHtml(nomeBusca)}"
     >
       <div class="linha-inscrito-principal">
@@ -1609,6 +1641,8 @@ function ativarControlesInscritosAdmin(areaInscritos, corridaId, totalVagasCorri
 
   const busca = areaInscritos.querySelector(".admin-busca-inscrito");
   const statusSelect = areaInscritos.querySelector(".admin-status-select");
+  const diaSelect = areaInscritos.querySelector(".admin-dia-select");
+  const somenteSelecionados = areaInscritos.querySelector(".checkbox-somente-selecionados");
   const togglesTipo = areaInscritos.querySelectorAll(".admin-toggle-tipo");
   const checkboxes = areaInscritos.querySelectorAll(".checkbox-inscrito-batch");
   const botoesExpandir = areaInscritos.querySelectorAll(".botao-expandir-inscrito");
@@ -1621,6 +1655,21 @@ function ativarControlesInscritosAdmin(areaInscritos, corridaId, totalVagasCorri
   if (statusSelect) {
     statusSelect.addEventListener("change", () => {
       limparSelecaoInscritos(areaInscritos);
+      filtrarInscritosAdmin(areaInscritos);
+      atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
+    });
+  }
+
+  if (diaSelect) {
+    diaSelect.addEventListener("change", () => {
+      limparSelecaoInscritos(areaInscritos);
+      filtrarInscritosAdmin(areaInscritos);
+      atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
+    });
+  }
+
+  if (somenteSelecionados) {
+    somenteSelecionados.addEventListener("change", () => {
       filtrarInscritosAdmin(areaInscritos);
       atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
     });
@@ -1650,6 +1699,10 @@ function ativarControlesInscritosAdmin(areaInscritos, corridaId, totalVagasCorri
       }
 
       atualizarContadorSelecao(areaInscritos, totalVagasCorrida);
+      const somenteSelecionadosAtual = areaInscritos.querySelector(".checkbox-somente-selecionados");
+      if (somenteSelecionadosAtual && somenteSelecionadosAtual.checked) {
+        filtrarInscritosAdmin(areaInscritos);
+      }
     });
   });
 
@@ -1723,8 +1776,12 @@ function obterLimiteSelecao(areaInscritos, totalVagasCorrida) {
 function filtrarInscritosAdmin(areaInscritos) {
   const busca = areaInscritos.querySelector(".admin-busca-inscrito");
   const statusSelect = areaInscritos.querySelector(".admin-status-select");
+  const diaSelect = areaInscritos.querySelector(".admin-dia-select");
+  const somenteSelecionados = areaInscritos.querySelector(".checkbox-somente-selecionados");
   const termo = busca ? busca.value.trim().toLowerCase() : "";
   const filtroStatus = statusSelect ? statusSelect.value : "pendente";
+  const filtroDia = diaSelect ? diaSelect.value : "todos";
+  const filtrarSelecionados = !!(somenteSelecionados && somenteSelecionados.checked);
   const tipoKitAtivo = !!areaInscritos.querySelector('.admin-toggle-tipo[data-tipo="kit"].ativo');
   const tipoCorridaAtivo = !!areaInscritos.querySelector('.admin-toggle-tipo[data-tipo="corrida"].ativo');
 
@@ -1737,6 +1794,8 @@ function filtrarInscritosAdmin(areaInscritos) {
     const status = linha.dataset.status || "";
     const temKit = linha.dataset.temKit === "1";
     const temCorrida = linha.dataset.temCorrida === "1";
+    const diaIds = (linha.dataset.diaIds || "").split(",").filter(Boolean);
+    const checkboxLinha = linha.querySelector(".checkbox-inscrito-batch");
 
     const passaBusca = !termo || nome.includes(termo);
     const passaStatus =
@@ -1749,7 +1808,10 @@ function filtrarInscritosAdmin(areaInscritos) {
       (tipoCorridaAtivo && temCorrida) ||
       (tipoKitAtivo && tipoCorridaAtivo && semTipoVinculado);
 
-    const exibido = passaBusca && passaStatus && passaTipo;
+    const passaDia = filtroDia === "todos" || diaIds.includes(String(filtroDia));
+    const passaSelecionados = !filtrarSelecionados || !!(checkboxLinha && checkboxLinha.checked);
+
+    const exibido = passaBusca && passaStatus && passaTipo && passaDia && passaSelecionados;
     linha.classList.toggle("hidden", !exibido);
     if (exibido) totalExibidos += 1;
   });
@@ -1768,6 +1830,11 @@ function atualizarContadorSelecao(areaInscritos, totalVagasCorrida) {
 
   if (texto) {
     texto.textContent = `${selecionados} selecionado(s)`;
+  }
+
+  const barraLote = areaInscritos.querySelector(".admin-barra-lote-v188");
+  if (barraLote) {
+    barraLote.classList.toggle("ativo", selecionados > 0);
   }
 }
 

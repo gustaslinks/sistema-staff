@@ -6827,3 +6827,440 @@ body.pagina-editar-cadastro .header p {
   .corrida-resumo-sutil-v187 .corrida-resumo-duas-colunas{grid-template-columns:1fr 1fr;gap:10px;}
   .corrida-resumo-sutil-v187 .corrida-resumo-duas-colunas > div{padding:13px 14px;}
 }
+
+/* =========================================================
+   AJUSTES V188 - painel de inscritos limpo e intuitivo
+========================================================= */
+.admin-inscritos-painel {
+  background: #ffffff !important;
+  border-radius: 22px !important;
+  padding: 14px !important;
+  border: 1px solid rgba(226, 232, 240, .75) !important;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, .06) !important;
+}
+
+.admin-inscritos-resumo-v127 {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  gap: 8px !important;
+}
+
+.admin-inscritos-resumo-v127 .resumo-card {
+  border: 0 !important;
+  background: #f8fafc !important;
+  box-shadow: none !important;
+  border-radius: 16px !important;
+  padding: 12px 10px !important;
+}
+
+.admin-inscritos-filtros-v188 {
+  margin-top: 14px !important;
+  padding: 14px !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 26px rgba(15, 23, 42, .055) !important;
+  display: grid !important;
+  gap: 12px !important;
+}
+
+.admin-filtros-grid-v188 {
+  display: grid !important;
+  grid-template-columns: minmax(138px, 180px) minmax(0, 1fr) !important;
+  gap: 10px !important;
+  align-items: end !important;
+}
+
+.admin-inscritos-filtros-v188 label {
+  min-width: 0 !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-status-select-wrap,
+.admin-inscritos-filtros-v188 .admin-busca-wrap-v186,
+.admin-dia-filtro-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-status-select-wrap span,
+.admin-inscritos-filtros-v188 .admin-busca-wrap-v186 span,
+.admin-dia-filtro-wrap span {
+  font-size: 10.5px !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .055em !important;
+  color: #64748b !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-status-select,
+.admin-inscritos-filtros-v188 .admin-busca-inscrito,
+.admin-inscritos-filtros-v188 .admin-dia-select {
+  width: 100% !important;
+  min-height: 42px !important;
+  border-radius: 14px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-toggles-tipo {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-toggle-tipo {
+  min-height: 40px !important;
+  border-radius: 14px !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 7px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-toggle-tipo:not(.ativo) {
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+  opacity: .72 !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-toggle-tipo .btn-ico {
+  display: inline-flex !important;
+  line-height: 1 !important;
+  font-size: 16px !important;
+}
+
+.admin-inscritos-filtros-v188 .admin-inscritos-contagem-exibidos {
+  margin: 0 !important;
+  padding-top: 2px !important;
+  font-size: 12.5px !important;
+  font-weight: 900 !important;
+  color: #475569 !important;
+}
+
+.admin-selecao-clean-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  padding-top: 4px !important;
+  border-top: 1px solid #f1f5f9 !important;
+}
+
+.admin-selecionar-exibidos,
+.admin-somente-selecionados {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #334155 !important;
+  font-size: 12.5px !important;
+  font-weight: 900 !important;
+}
+
+.admin-selecionar-exibidos input,
+.admin-somente-selecionados input {
+  width: 18px !important;
+  height: 18px !important;
+  accent-color: #7c3aed !important;
+}
+
+.admin-lista-compacta-inscritos {
+  margin-top: 14px !important;
+  display: grid !important;
+  gap: 9px !important;
+}
+
+.linha-inscrito-admin {
+  border: 0 !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .055) !important;
+  overflow: hidden !important;
+}
+
+.linha-inscrito-admin:hover {
+  box-shadow: 0 12px 30px rgba(15, 23, 42, .075) !important;
+}
+
+.linha-inscrito-principal {
+  grid-template-columns: auto auto minmax(0, 1fr) auto !important;
+  grid-template-areas:
+    "check expand nome tipos"
+    "status status status status"
+    "acoes acoes acoes acoes" !important;
+  padding: 11px 11px 12px !important;
+  row-gap: 7px !important;
+  column-gap: 8px !important;
+}
+
+.linha-inscrito-check span {
+  border-color: #cbd5e1 !important;
+  background: #ffffff !important;
+}
+
+.botao-expandir-inscrito {
+  border: 0 !important;
+  background: #f8fafc !important;
+  color: #64748b !important;
+  box-shadow: none !important;
+}
+
+.linha-inscrito-nome strong {
+  color: #0f172a !important;
+  font-size: 15px !important;
+  letter-spacing: -.015em !important;
+}
+
+.linha-inscrito-nome small {
+  color: #64748b !important;
+  font-size: 12px !important;
+}
+
+.linha-inscrito-icones {
+  gap: 5px !important;
+}
+
+.icone-tipo-dia {
+  width: 25px !important;
+  height: 25px !important;
+  border-radius: 999px !important;
+  background: #f1f5f9 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+}
+
+.icone-tipo-dia.ativo {
+  background: #eef2ff !important;
+}
+
+.admin-status-inscricao {
+  width: fit-content !important;
+  max-width: 100% !important;
+  justify-self: start !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: .01em !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+}
+
+.admin-status-inscricao::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .75;
+}
+
+.admin-status-inscricao.pendente,
+.admin-status-inscricao.inscrito {
+  background: #f8fafc !important;
+  color: #64748b !important;
+}
+
+.admin-status-inscricao.confirmado {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+}
+
+.admin-status-inscricao.lista_espera {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+}
+
+.admin-status-inscricao.cancelado {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+.linha-inscrito-acoes-rapidas {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 7px !important;
+  margin-top: 0 !important;
+  width: 100% !important;
+}
+
+.botao-acao-inscrito,
+.linha-inscrito-acoes .botao-acao-inscrito,
+.botao-whatsapp-inscrito.botao-acao-inscrito {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.botao-confirmar-inscrito.botao-acao-inscrito {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+}
+
+.botao-lista-espera-inscrito.botao-acao-inscrito {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+}
+
+.botao-cancelar-inscrito.botao-acao-inscrito {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+.botao-whatsapp-confirmado.botao-acao-inscrito {
+  background: #22c55e !important;
+  color: #22c55e !important;
+}
+
+.botao-whatsapp-bloqueado.botao-acao-inscrito,
+.botao-whatsapp-bloqueado.botao-acao-inscrito:disabled {
+  background: #f1f5f9 !important;
+  color: #cbd5e1 !important;
+  opacity: 1 !important;
+}
+
+.icone-acao-svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor !important;
+  stroke-width: 3 !important;
+  fill: none !important;
+}
+
+.botao-lista-espera-inscrito .icone-acao-svg circle {
+  fill: none !important;
+}
+
+.icone-whatsapp-oficial-v188 {
+  width: 24px !important;
+  height: 24px !important;
+  display: block !important;
+}
+
+.linha-inscrito-acoes-rapidas .botao-acao-inscrito:disabled:not(.botao-whatsapp-bloqueado) {
+  opacity: .38 !important;
+  filter: grayscale(.2) !important;
+}
+
+.linha-inscrito-detalhes {
+  background: #f8fafc !important;
+  border-top: 1px solid #f1f5f9 !important;
+}
+
+.admin-barra-lote-v188 {
+  position: sticky !important;
+  bottom: 12px !important;
+  z-index: 40 !important;
+  display: none !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 14px !important;
+  padding: 10px !important;
+  border-radius: 18px !important;
+  background: rgba(15, 23, 42, .92) !important;
+  color: #ffffff !important;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, .26) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.admin-barra-lote-v188.ativo {
+  display: grid !important;
+}
+
+.admin-barra-lote-v188 .admin-contador-selecao {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  line-height: 1.15 !important;
+}
+
+.admin-barra-lote-v188 .admin-contador-selecao strong {
+  color: #ffffff !important;
+  font-size: 13px !important;
+}
+
+.admin-barra-lote-v188 .admin-contador-selecao span {
+  color: rgba(255,255,255,.76) !important;
+}
+
+.admin-barra-lote-v188 .botao-confirmar-selecionados-final {
+  width: auto !important;
+  min-height: 42px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 13px !important;
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 520px) {
+  .admin-inscritos-painel {
+    padding: 10px !important;
+    border-radius: 18px !important;
+  }
+
+  .admin-filtros-grid-v188 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-selecao-clean-row {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+
+  .linha-inscrito-acoes-rapidas {
+    gap: 7px !important;
+  }
+
+  .botao-acao-inscrito,
+  .linha-inscrito-acoes .botao-acao-inscrito,
+  .botao-whatsapp-inscrito.botao-acao-inscrito {
+    width: 33px !important;
+    height: 33px !important;
+    min-width: 33px !important;
+    min-height: 33px !important;
+  }
+
+  .admin-barra-lote-v188 {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-barra-lote-v188 .botao-confirmar-selecionados-final {
+    width: 100% !important;
+  }
+}
