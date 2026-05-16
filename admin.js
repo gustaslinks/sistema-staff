@@ -2221,6 +2221,38 @@ function escapeHtml(valor) {
 }
 
 
+
+function parseMoedaBR(valor) {
+  if (valor === null || valor === undefined) return null;
+  const texto = String(valor).trim();
+  if (!texto) return null;
+  const limpo = texto.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+  const numero = Number(limpo);
+  return Number.isFinite(numero) ? numero : null;
+}
+
+function formatarInputMoedaBR(valor) {
+  const numero = parseMoedaBR(valor);
+  if (numero === null) return '';
+  return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function aplicarMascaraMoedaInput(input) {
+  if (!input || input.dataset.moneyReady === '1') return;
+  input.dataset.moneyReady = '1';
+  input.addEventListener('focus', () => {
+    const numero = parseMoedaBR(input.value);
+    input.value = numero === null ? '' : String(numero).replace('.', ',');
+  });
+  input.addEventListener('blur', () => {
+    input.value = formatarInputMoedaBR(input.value);
+  });
+}
+
+function inicializarMascarasMoeda() {
+  document.querySelectorAll('[data-money-input]').forEach(aplicarMascaraMoedaInput);
+}
+
 function adicionarPeriodoCadastro() {
   if (!novoDiaInicio.value) {
     alert("Informe a data inicial do período.");
@@ -2237,7 +2269,7 @@ function adicionarPeriodoCadastro() {
   }
 
   const tipo = novoDiaTipo.value;
-  const ajuda = novoDiaAjuda.value ? Number(novoDiaAjuda.value) : null;
+  const ajuda = parseMoedaBR(novoDiaAjuda.value);
   const horarioInicio = novoDiaHorarioInicio.value || null;
   const horarioFim = novoDiaAteUltimo && novoDiaAteUltimo.checked ? null : (novoDiaHorarioFim.value || null);
 
@@ -2286,7 +2318,7 @@ function atualizarCampoDiaCadastro(index, campo, valor) {
   if (!dia) return;
 
   if (campo === "valor_ajuda_custo") {
-    dia[campo] = valor === "" ? null : Number(valor);
+    dia[campo] = parseMoedaBR(valor);
   } else {
     dia[campo] = valor || null;
   }
@@ -2396,13 +2428,14 @@ function renderizarPreviewDiasCadastro() {
 
             <div class="field">
               <label>Ajuda de custo</label>
-              <input type="number" min="0" step="0.01" value="${dia.valor_ajuda_custo ?? ""}" onchange="atualizarCampoDiaCadastro(${index}, 'valor_ajuda_custo', this.value); renderizarPreviewDiasCadastro();">
+              <input type="text" inputmode="decimal" data-money-input value="${dia.valor_ajuda_custo !== null && dia.valor_ajuda_custo !== undefined && dia.valor_ajuda_custo !== "" ? formatarInputMoedaBR(dia.valor_ajuda_custo) : ""}" onchange="atualizarCampoDiaCadastro(${index}, 'valor_ajuda_custo', this.value); renderizarPreviewDiasCadastro();">
             </div>
           </div>
         </div>
       </div>
     `;
   }).join("");
+  inicializarMascarasMoeda();
 }
 
 function alternarDiaCadastro(index) {
@@ -4984,3 +5017,6 @@ async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
 /* v185 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
 
 /* v185 - lista em branco com 18 linhas em uma única página. */
+
+
+document.addEventListener("DOMContentLoaded", inicializarMascarasMoeda);

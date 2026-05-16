@@ -9085,3 +9085,200 @@ body.pagina-editar-cadastro .header p {
     padding-right: 10px !important;
   }
 }
+
+/* v2.8 - refinamento visual de corridas/admin e segurança por Auth */
+.pagina-corridas {
+  max-width: 1040px !important;
+  padding-left: clamp(14px, 3vw, 24px) !important;
+  padding-right: clamp(14px, 3vw, 24px) !important;
+}
+
+.pagina-corridas .card-staff,
+.pagina-corridas .cabecalho-corridas,
+.pagina-corridas .lista-corridas,
+.pagina-corridas .secao-minhas-inscricoes,
+.pagina-corridas .lista-minhas-inscricoes {
+  width: 100% !important;
+}
+
+.card-corrida,
+.card-minha-inscricao,
+.card-corrida-admin {
+  overflow: hidden !important;
+}
+
+.card-corrida,
+.card-minha-inscricao {
+  padding: clamp(18px, 3vw, 26px) !important;
+}
+
+.corrida-banner-wrap {
+  margin: calc(-1 * clamp(18px, 3vw, 26px)) calc(-1 * clamp(18px, 3vw, 26px)) 24px !important;
+  border-radius: 30px 30px 0 0 !important;
+  overflow: hidden !important;
+}
+
+.corrida-card-banner,
+.card-corrida .corrida-card-banner,
+.card-minha-inscricao .corrida-card-banner,
+.card-minha-inscricao .minha-inscricao-banner {
+  border-radius: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+.card-corrida-admin {
+  padding: clamp(18px, 3vw, 26px) !important;
+}
+
+.card-corrida-admin .corrida-card-banner-admin {
+  width: calc(100% + (2 * clamp(18px, 3vw, 26px))) !important;
+  max-width: none !important;
+  margin: calc(-1 * clamp(18px, 3vw, 26px)) calc(-1 * clamp(18px, 3vw, 26px)) 24px !important;
+  border-radius: 30px 30px 0 0 !important;
+  box-shadow: none !important;
+}
+
+.corrida-card-head {
+  align-items: center !important;
+}
+
+.corrida-status-card.aberta {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  min-height: 92px !important;
+  padding: 18px clamp(18px, 4vw, 28px) !important;
+}
+
+.corrida-status-card.aberta > .status-semaforo-indicador,
+.corrida-status-card.aberta .status-semaforo-indicador,
+.card-corrida-admin .status-semaforo-indicador {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  flex-basis: 42px !important;
+  border-width: 6px !important;
+  align-self: center !important;
+}
+
+.corrida-status-card.aberta .status-semaforo-indicador::after,
+.card-corrida-admin .status-semaforo-indicador::after {
+  inset: -15px !important;
+}
+
+.corrida-status-card.aberta strong {
+  font-size: clamp(20px, 4vw, 30px) !important;
+}
+
+.corrida-status-card.aberta span:not(.status-semaforo-indicador) {
+  font-size: clamp(15px, 2.8vw, 20px) !important;
+}
+
+.card-corrida-admin .corrida-status-card {
+  padding: 18px clamp(18px, 4vw, 28px) !important;
+  border-radius: 28px !important;
+}
+
+.card-corrida-admin .corrida-status-topo-linha {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  width: 100% !important;
+}
+
+.card-corrida-admin .botao-status-compacto {
+  flex: 0 0 48px !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  display: grid !important;
+  place-items: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.card-corrida-admin .botao-status-compacto .status-semaforo-texto {
+  display: none !important;
+}
+
+.disponibilidade-corrida {
+  padding: clamp(18px, 3vw, 24px) !important;
+}
+
+.texto-disponibilidade-info,
+.texto-disponibilidade-alerta {
+  display: grid !important;
+  grid-template-columns: 42px 1fr !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 18px !important;
+}
+
+.texto-disponibilidade-info .aviso-icone,
+.texto-disponibilidade-alerta .aviso-icone {
+  display: grid !important;
+  place-items: center !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 15px !important;
+  font-weight: 900 !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+
+.texto-disponibilidade-info .aviso-icone {
+  background: rgba(37, 99, 235, .10) !important;
+  color: #2563eb !important;
+}
+
+.texto-disponibilidade-alerta .aviso-icone {
+  background: rgba(234, 88, 12, .10) !important;
+  color: #ea580c !important;
+}
+
+.texto-disponibilidade-info strong,
+.texto-disponibilidade-alerta strong {
+  font-size: clamp(17px, 3.2vw, 22px) !important;
+  line-height: 1.3 !important;
+}
+
+.texto-disponibilidade-info span,
+.texto-disponibilidade-alerta span {
+  font-size: clamp(14px, 2.7vw, 17px) !important;
+  line-height: 1.48 !important;
+}
+
+@media (max-width: 760px) {
+  .pagina-corridas {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  .card-corrida,
+  .card-minha-inscricao {
+    border-radius: 28px !important;
+  }
+  .corrida-card-head {
+    gap: 16px !important;
+  }
+  .corrida-status-card.aberta {
+    min-height: 88px !important;
+    padding: 17px 20px !important;
+  }
+  .corrida-status-card.aberta .status-semaforo-indicador,
+  .card-corrida-admin .status-semaforo-indicador {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    flex-basis: 40px !important;
+  }
+}

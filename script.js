@@ -83,6 +83,7 @@ const staffIdEdicao = modoEdicao
 let fotoAtualUrl = '';
 document.body.classList.add(modoEdicao ? 'pagina-editar-cadastro' : 'pagina-cadastro-geral');
 const camposSenhaCadastro = document.getElementById('camposSenhaCadastro');
+const dadosAcessoTitle = document.getElementById('dadosAcessoTitle');
 const tituloAcessoCadastro = document.querySelector('.section-title-acesso');
 if (modoEdicao) {
   if (camposSenhaCadastro) camposSenhaCadastro.classList.add('hidden');
@@ -180,29 +181,38 @@ function configurarToggleSenha(){
 }
 
 function renderizarSegurancaCadastro(staff){
-  if(!modoEdicao || !accountSecurityPanel) return;
+  if(!modoEdicao) return;
 
+  const possuiAuth = !!(staff && staff.auth_user_id);
   const estaEditandoProprioCadastro = staffLogadoEdicao && staff && String(staffLogadoEdicao.id || '') === String(staff.id || '');
 
-  // Usuário comum não deve ver o card administrativo de Segurança e acesso.
-  // A troca da própria senha permanece disponível pela página alterar-senha.html.
+  // v2.8: se já existe vínculo Auth, o bloco "Dados de acesso" deixa de aparecer.
+  // Ele fica reservado para cadastro novo/primeiro acesso.
+  if(dadosAcessoTitle) dadosAcessoTitle.classList.toggle('hidden', possuiAuth);
+  if(camposSenhaCadastro) camposSenhaCadastro.classList.toggle('hidden', possuiAuth);
+
+  if(!accountSecurityPanel) return;
+
+  // Staff comum com Auth vê apenas a troca da própria senha.
+  // Staff sem Auth não vê segurança, pois precisa criar acesso primeiro.
   if(!isAdminEdicao){
-    accountSecurityPanel.classList.add('hidden');
+    const podeTrocarSenha = possuiAuth && estaEditandoProprioCadastro;
+    accountSecurityPanel.classList.toggle('hidden', !podeTrocarSenha);
     if(adminMetaPanel) adminMetaPanel.classList.add('hidden');
-    if(btnAlterarSenha) btnAlterarSenha.classList.add('hidden');
+    if(btnAlterarSenha) btnAlterarSenha.classList.toggle('hidden', !podeTrocarSenha);
     if(btnEnviarResetSenha) btnEnviarResetSenha.classList.add('hidden');
     if(btnExcluirStaff) btnExcluirStaff.classList.add('hidden');
     return;
   }
 
   accountSecurityPanel.classList.remove('hidden');
-  if(btnAlterarSenha) btnAlterarSenha.classList.toggle('hidden', !estaEditandoProprioCadastro);
-  if(btnEnviarResetSenha) btnEnviarResetSenha.classList.toggle('hidden', !(staff && staff.email));
+  if(btnAlterarSenha) btnAlterarSenha.classList.toggle('hidden', !(possuiAuth && estaEditandoProprioCadastro));
+  if(btnEnviarResetSenha) btnEnviarResetSenha.classList.toggle('hidden', !(staff && staff.email && !estaEditandoProprioCadastro));
 
   if(adminMetaPanel){
     adminMetaPanel.classList.remove('hidden');
     if(adminStaffIdInfo) adminStaffIdInfo.textContent = staff && staff.id ? staff.id : '-';
-    if(adminAuthIdInfo) adminAuthIdInfo.textContent = staff && staff.auth_user_id ? staff.auth_user_id : 'Sem vínculo Auth';
+    if(adminAuthIdInfo) adminAuthIdInfo.textContent = possuiAuth ? staff.auth_user_id : 'Sem vínculo Auth';
     if(adminUltimoAcessoInfo) adminUltimoAcessoInfo.textContent = formatarDataHoraBr(staff && staff.ultimo_acesso);
     if(adminIsAdminCheckbox) adminIsAdminCheckbox.checked = !!(staff && (staff.is_admin === true || staff.is_admin === 'true'));
     if(btnExcluirStaff) btnExcluirStaff.classList.toggle('hidden', !staff || !staff.id || estaEditandoProprioCadastro);

@@ -6,13 +6,13 @@
 
   <title>Painel Admin | Sistema Staff</title>
 
-  <link rel="stylesheet" href="style.css?v=25">
+  <link rel="stylesheet" href="style.css?v=28">
   <link rel="stylesheet" href="photo-cropper.css?v=22">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <button class="version-badge" type="button" data-version-summary="v2.7: oculta Segurança e acesso para staff comum; refina alinhamento e ícones flat dos botões de foto.">v2.7</button>
+  <button class="version-badge" type="button" data-version-summary="v2.8: padroniza cards de corrida/admin; ajusta semáforo; máscara R$ em ajuda de custo; organiza cards de senha por Auth.">v2.8</button>
 
   <main class="pagina-admin">
 
@@ -146,7 +146,7 @@
 
             <div class="field">
               <label>Ajuda de custo/Diária</label>
-              <input type="number" id="novo-dia-ajuda" min="0" step="0.01" placeholder="Ex.: 120">
+              <input type="text" id="novo-dia-ajuda" inputmode="decimal" placeholder="R$ 0,00" data-money-input>
             </div>
 
             <div class="field">
@@ -211,10 +211,10 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
-  <script src="qrcode.min.js?v=25"></script>
-  <script src="photo-cropper.js?v=25"></script>
-  <script src="admin.js?v=25"></script>
-  <script src="floating-tools.js?v=25"></script>
+  <script src="qrcode.min.js?v=28"></script>
+  <script src="photo-cropper.js?v=28"></script>
+  <script src="admin.js?v=28"></script>
+  <script src="floating-tools.js?v=28"></script>
 
 <script>
 (function(){
