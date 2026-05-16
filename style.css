@@ -7496,3 +7496,129 @@ body.pagina-editar-cadastro .header p {
     align-items: center !important;
   }
 }
+
+/* v190 - barra única de ocupação e ajustes finos painel inscritos */
+.corrida-progresso-segmentado {
+  margin-top: 8px;
+}
+
+.corrida-progresso-segmentado-topo strong {
+  font-size: 13px;
+  color: #334155;
+}
+
+.corrida-progresso-segmentado-trilho {
+  display: flex;
+  width: 100%;
+  height: 13px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f1f5f9;
+  border: 1px solid rgba(226, 232, 240, .9);
+}
+
+.corrida-progresso-segmentado-trilho .segmento {
+  display: block;
+  min-width: 0;
+  height: 100%;
+  transition: width .25s ease;
+}
+
+.segmentado-confirmados { background: #22c55e; }
+.segmentado-pendentes { background: #60a5fa; }
+.segmentado-livres { background: #e5e7eb; }
+
+.corrida-progresso-segmentado-legenda {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  margin-top: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.corrida-progresso-segmentado-legenda span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.legenda-cor {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.legenda-cor.confirmados { background: #22c55e; }
+.legenda-cor.pendentes { background: #60a5fa; }
+.legenda-cor.livres { background: #e5e7eb; border: 1px solid #cbd5e1; }
+
+.card-corrida-admin .admin-inscritos-painel {
+  gap: 10px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 {
+  margin: 6px 0 10px !important;
+  gap: 6px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card {
+  min-height: 58px !important;
+  padding: 7px 4px !important;
+  border-radius: 13px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card strong {
+  font-size: 21px !important;
+  margin-bottom: 4px !important;
+}
+
+.card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card span {
+  font-size: 8.3px !important;
+}
+
+.card-corrida-admin .admin-inscritos-filtros-v188 {
+  margin: 0 0 8px !important;
+}
+
+.card-corrida-admin .admin-tag-exibindo,
+.card-corrida-admin .admin-inscritos-filtros-v188 .admin-inscritos-contagem-exibidos {
+  font-size: 12px !important;
+  padding: 7px 11px !important;
+  margin-top: 2px !important;
+}
+
+.botao-whatsapp-confirmado.botao-acao-inscrito,
+.card-corrida-admin .botao-whatsapp-confirmado.botao-acao-inscrito {
+  background: #ecfdf5 !important;
+  color: #22c55e !important;
+}
+
+.botao-whatsapp-confirmado .icone-whatsapp-oficial-v188 path:first-child {
+  fill: currentColor !important;
+}
+
+@media (max-width: 520px) {
+  .card-corrida-admin .admin-inscritos-painel {
+    padding: 10px 0 110px !important;
+  }
+  .card-corrida-admin .admin-inscritos-resumo-v127 {
+    margin-top: 4px !important;
+    margin-bottom: 8px !important;
+  }
+  .card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card {
+    min-height: 54px !important;
+    padding: 6px 3px !important;
+  }
+  .card-corrida-admin .admin-inscritos-resumo-v127 .resumo-card strong {
+    font-size: 20px !important;
+  }
+  .corrida-progresso-segmentado-legenda {
+    gap: 5px 8px;
+    font-size: 10px;
+  }
+}

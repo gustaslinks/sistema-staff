@@ -687,7 +687,12 @@ async function carregarCorridasAdmin() {
   listaCorridasAdmin.innerHTML = corridas.map(corrida => {
     const totalInscritos = contarInscritosValidos(inscricoes || [], corrida.id);
     const confirmadosCorrida = contarInscritosPorStatus(inscricoes || [], corrida.id, "confirmado");
+    const pendentesCorrida = contarInscritosPorStatus(inscricoes || [], corrida.id, "pendente");
     const vagasTotal = Number(corrida.vagas_total || 0);
+    const vagasLivresBarra = Math.max(vagasTotal - confirmadosCorrida - pendentesCorrida, 0);
+    const percentualConfirmadosSegmento = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
+    const percentualPendentesSegmento = calcularPercentualPreenchimento(pendentesCorrida, vagasTotal);
+    const percentualLivresSegmento = Math.max(0, 100 - percentualConfirmadosSegmento - percentualPendentesSegmento);
     const percentualInscritos = calcularPercentualPreenchimento(totalInscritos, vagasTotal);
     const percentualConfirmados = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
     const classeProgressoInscritos = obterClasseProgressoVagas(percentualInscritos);
@@ -744,6 +749,23 @@ async function carregarCorridasAdmin() {
               </div>
               <div class="corrida-progresso-trilho">
                 <div class="corrida-progresso-barra corrida-progresso-confirmados-barra ${classeProgressoConfirmados}" style="width: ${percentualConfirmados}%;"></div>
+              </div>
+            </div>
+
+            <div class="corrida-progresso-segmentado" aria-label="Ocupação das vagas por status">
+              <div class="corrida-progresso-topo corrida-progresso-segmentado-topo">
+                <span class="corrida-progresso-rotulo">Ocupação das vagas</span>
+                <strong>${confirmadosCorrida + pendentesCorrida} de ${vagasTotal}</strong>
+              </div>
+              <div class="corrida-progresso-segmentado-trilho">
+                <span class="segmento segmentado-confirmados" style="width: ${percentualConfirmadosSegmento}%;" title="${confirmadosCorrida} confirmado(s)"></span>
+                <span class="segmento segmentado-pendentes" style="width: ${percentualPendentesSegmento}%;" title="${pendentesCorrida} pendente(s)"></span>
+                <span class="segmento segmentado-livres" style="width: ${percentualLivresSegmento}%;" title="${vagasLivresBarra} vaga(s) livre(s)"></span>
+              </div>
+              <div class="corrida-progresso-segmentado-legenda">
+                <span><i class="legenda-cor confirmados"></i>${confirmadosCorrida} confirmados</span>
+                <span><i class="legenda-cor pendentes"></i>${pendentesCorrida} pendentes</span>
+                <span><i class="legenda-cor livres"></i>${vagasLivresBarra} livres</span>
               </div>
             </div>
           </div>
@@ -1446,7 +1468,7 @@ async function carregarInscritosDaCorrida(
           </select>
         </label>
 
-        <div class="admin-inscritos-contagem-exibidos" aria-live="polite">
+        <div class="admin-inscritos-contagem-exibidos admin-tag-exibindo" aria-live="polite">
           Exibindo 0 de ${inscricoesComPrioridade.length} inscritos
         </div>
 
@@ -1870,7 +1892,14 @@ async function atualizarResumoCorridaCard(corridaId) {
   const confirmadosCorrida = (inscricoes || []).filter(inscricao => {
     return normalizarStatusInscricao(inscricao.status) === "confirmado";
   }).length;
+  const pendentesCorrida = (inscricoes || []).filter(inscricao => {
+    return normalizarStatusInscricao(inscricao.status) === "pendente";
+  }).length;
   const vagasTotal = Number(corrida.vagas_total || 0);
+  const vagasLivresBarra = Math.max(vagasTotal - confirmadosCorrida - pendentesCorrida, 0);
+  const percentualConfirmadosSegmento = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
+  const percentualPendentesSegmento = calcularPercentualPreenchimento(pendentesCorrida, vagasTotal);
+  const percentualLivresSegmento = Math.max(0, 100 - percentualConfirmadosSegmento - percentualPendentesSegmento);
   const percentualInscritos = calcularPercentualPreenchimento(totalInscritos, vagasTotal);
   const percentualConfirmados = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
   const classeProgressoInscritos = obterClasseProgressoVagas(percentualInscritos);
@@ -1900,6 +1929,25 @@ async function atualizarResumoCorridaCard(corridaId) {
     barraConfirmadosEl.style.width = `${percentualConfirmados}%`;
     barraConfirmadosEl.classList.remove("baixo", "medio", "alto", "completo", "confirmados-verde");
     barraConfirmadosEl.classList.add(classeProgressoConfirmados);
+  }
+
+  const segConfirmados = card.querySelector(".segmentado-confirmados");
+  const segPendentes = card.querySelector(".segmentado-pendentes");
+  const segLivres = card.querySelector(".segmentado-livres");
+  if (segConfirmados) segConfirmados.style.width = `${percentualConfirmadosSegmento}%`;
+  if (segPendentes) segPendentes.style.width = `${percentualPendentesSegmento}%`;
+  if (segLivres) segLivres.style.width = `${percentualLivresSegmento}%`;
+
+  const segTopo = card.querySelector(".corrida-progresso-segmentado-topo strong");
+  if (segTopo) segTopo.textContent = `${confirmadosCorrida + pendentesCorrida} de ${vagasTotal}`;
+
+  const legenda = card.querySelector(".corrida-progresso-segmentado-legenda");
+  if (legenda) {
+    legenda.innerHTML = `
+      <span><i class="legenda-cor confirmados"></i>${confirmadosCorrida} confirmados</span>
+      <span><i class="legenda-cor pendentes"></i>${pendentesCorrida} pendentes</span>
+      <span><i class="legenda-cor livres"></i>${vagasLivresBarra} livres</span>
+    `;
   }
 }
 
