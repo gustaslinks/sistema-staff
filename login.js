@@ -69,6 +69,15 @@ function isEmailLogin(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
+function pareceEmail(value) {
+  return /[a-zA-Z@]/.test(String(value || ""));
+}
+
+function pareceCpf(value) {
+  const valor = String(value || "").trim();
+  return !!valor && !pareceEmail(valor);
+}
+
 function setStatus(message, type = "info") {
   if (!loginStatus) return;
   loginStatus.textContent = message || "";
@@ -180,8 +189,9 @@ function configurarToggleSenha() {
 
 if (loginCpf) {
   loginCpf.addEventListener("input", () => {
-    if (!loginCpf.value.includes("@")) {
-      loginCpf.value = maskCPF(loginCpf.value);
+    const valor = loginCpf.value;
+    if (pareceCpf(valor)) {
+      loginCpf.value = maskCPF(valor);
     }
     setStatus("");
   });
@@ -242,11 +252,16 @@ if (forgotPasswordBtn) {
     forgotPasswordBtn.disabled = true;
     setStatus("");
     try {
-      const email = await resolverEmailLogin(loginCpf.value);
+      const loginInformado = String(loginCpf.value || "").trim();
+      if (!loginInformado) {
+        throw new Error("Digite seu CPF ou e-mail para receber o link de redefinição de senha.");
+      }
+
+      const email = await resolverEmailLogin(loginInformado);
       const redirectTo = window.location.origin + window.location.pathname.replace(/index\.html?$/i, "") + "alterar-senha.html";
       const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
       if (error) throw error;
-      setStatus("Se o envio de e-mail estiver configurado no Supabase, você receberá um link para redefinir a senha.", "success");
+      setStatus("Pronto. Se o cadastro estiver ativo, enviaremos um link para redefinir sua senha no e-mail cadastrado.", "success");
     } catch (error) {
       setStatus(error.message, "error");
     } finally {
