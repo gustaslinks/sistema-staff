@@ -6,6 +6,26 @@ const supabaseClient = supabase.createClient(
   SUPABASE_ANON_KEY
 );
 
+async function validarSessaoSupabaseObrigatoria() {
+  const { data } = await supabaseClient.auth.getUser();
+  const user = data && data.user ? data.user : null;
+  if (!user) {
+    localStorage.removeItem("staffLogado");
+    window.location.href = "index.html";
+    throw new Error("Sessão expirada.");
+  }
+  const staffCache = (() => {
+    try { return JSON.parse(localStorage.getItem("staffLogado") || "null"); } catch (e) { return null; }
+  })();
+  if (staffCache && staffCache.auth_user_id && staffCache.auth_user_id !== user.id) {
+    await supabaseClient.auth.signOut();
+    localStorage.removeItem("staffLogado");
+    window.location.href = "index.html";
+    throw new Error("Sessão inválida.");
+  }
+}
+validarSessaoSupabaseObrigatoria().catch(console.warn);
+
 // ELEMENTOS DA PÁGINA
 const listaCorridas = document.getElementById("lista-corridas");
 const listaMinhasInscricoes = document.getElementById("lista-minhas-inscricoes");
@@ -44,8 +64,10 @@ function carregarCardStaff() {
 }
 
 botaoSair.addEventListener("click", function () {
-  localStorage.removeItem("staffLogado");
-  window.location.href = "index.html";
+  supabaseClient.auth.signOut().finally(() => {
+    localStorage.removeItem("staffLogado");
+    window.location.href = "index.html";
+  });
 });
 
 if (staffLogado.is_admin === true || staffLogado.is_admin === "true") {

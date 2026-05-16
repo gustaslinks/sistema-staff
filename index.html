@@ -4,29 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Staff</title>
-  <link rel="stylesheet" href="style.css?v=195">
+  <link rel="stylesheet" href="style.css?v=200">
 </head>
 <body class="login-page">
-  <div class="version-badge">v195</div>
+  <div class="version-badge">v200</div>
   <div class="container">
     <div class="login-card">
       <h1>Área do Staff</h1>
-      <p class="subtitle">Entre utilizando CPF e data de nascimento.</p>
+      <p class="subtitle">Entre com seu e-mail e senha cadastrados.</p>
 
       <form id="loginForm" novalidate>
         <div class="field">
-          <label for="cpf">CPF</label>
-          <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" required>
+          <label for="loginEmail">E-mail</label>
+          <input type="email" id="loginEmail" placeholder="seuemail@email.com" autocomplete="email" required>
         </div>
 
         <div class="field">
-          <label for="nascimento">Data de nascimento</label>
-          <input type="text" id="nascimento" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric" required>
-        </div>
-
-        <div class="field hidden" id="adminPasswordField">
-          <label for="adminPassword">Senha Admin</label>
-          <input type="password" id="adminPassword" placeholder="Digite sua senha">
+          <label for="loginPassword">Senha</label>
+          <input type="password" id="loginPassword" placeholder="Digite sua senha" autocomplete="current-password" required>
         </div>
 
         <button type="submit" id="loginBtn">Entrar</button>
@@ -37,6 +32,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="login.js?v=195"></script>
+  <script src="login.js?v=200"></script>
 </body>
 </html>

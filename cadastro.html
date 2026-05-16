@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Staffs</title>
-  <link rel="stylesheet" href="style.css?v=195" />
-  <link rel="stylesheet" href="photo-cropper.css?v=195" />
+  <link rel="stylesheet" href="style.css?v=200" />
+  <link rel="stylesheet" href="photo-cropper.css?v=200" />
 </head>
 <body>
-  <div class="version-badge">v195</div>
+  <div class="version-badge">v200</div>
   <div class="container">
     <section id="card-staff-cadastro" class="card-staff card-staff-cadastro hidden">
       <div class="foto-staff-wrapper">
@@ -199,6 +199,24 @@
         <div class="error">Informe quem te indicou. Caso ninguém tenha indicado, digite "Não tive indicação".</div>
       </div>
 
+
+      <div class="section-title section-title-acesso">Dados de acesso</div>
+
+      <div class="grid grid-acesso" id="camposSenhaCadastro">
+        <div class="field" id="fieldSenha">
+          <label for="senha">Criar senha</label>
+          <input id="senha" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" />
+          <div class="helper">Essa senha será usada para entrar no sistema junto com seu e-mail.</div>
+          <div class="error">Digite uma senha com pelo menos 6 caracteres.</div>
+        </div>
+
+        <div class="field" id="fieldSenhaConfirmacao">
+          <label for="senhaConfirmacao">Confirmar senha</label>
+          <input id="senhaConfirmacao" type="password" placeholder="Repita a senha" autocomplete="new-password" minlength="6" />
+          <div class="error">A confirmação precisa ser igual à senha.</div>
+        </div>
+      </div>
+
       <div class="section-title">Chave PIX</div>
 
       <div class="pix-options">
@@ -246,8 +264,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="photo-cropper.js?v=195"></script>
-  <script src="script.js?v=195"></script>
-  <script src="floating-tools.js?v=195"></script>
+  <script src="photo-cropper.js?v=200"></script>
+  <script src="script.js?v=200"></script>
+  <script src="floating-tools.js?v=200"></script>
 </body>
 </html>
