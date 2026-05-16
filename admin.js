@@ -750,9 +750,11 @@ async function carregarCorridasAdmin() {
         ` : ""}
 
         <div class="corrida-resumo-sutil">
-          <div><strong>Período</strong><span>${formatarPeriodoCorrida(corrida)}</span></div>
-          <div><strong>Vagas</strong><span>${vagasTotal > 0 ? vagasTotal : "Não informadas"}</span></div>
-          <div><strong>Prazo</strong><span>${corrida.prazo_inscricao ? formatarData(corrida.prazo_inscricao) : "Não informado"}</span></div>
+          <div class="resumo-periodo"><strong>Período</strong><span>${formatarPeriodoCorrida(corrida)}</span></div>
+          <div class="corrida-resumo-grid-duplo">
+            <div><strong>Vagas</strong><span>${vagasTotal > 0 ? vagasTotal : "Não informadas"}</span></div>
+            <div><strong>Prazo</strong><span>${corrida.prazo_inscricao ? formatarData(corrida.prazo_inscricao) : "Não informado"}</span></div>
+          </div>
         </div>
 
         <div class="gerenciar-dias">
@@ -1415,8 +1417,8 @@ async function carregarInscritosDaCorrida(
         </div>
 
         <div class="admin-toggles-tipo" aria-label="Filtrar por tipo de dia">
-          <button type="button" class="admin-toggle-tipo ativo" data-tipo="kit">Entrega de kit</button>
-          <button type="button" class="admin-toggle-tipo ativo" data-tipo="corrida">Dia da corrida</button>
+          <button type="button" class="admin-toggle-tipo ativo" data-tipo="kit">📦 Entrega de kit</button>
+          <button type="button" class="admin-toggle-tipo ativo" data-tipo="corrida">🏁 Dia da corrida</button>
         </div>
       </div>
 
@@ -1425,20 +1427,16 @@ async function carregarInscritosDaCorrida(
       </div>
 
       <div class="admin-inscritos-acoes-massa admin-inscritos-acoes-v127">
-        <label class="admin-selecionar-exibidos">
-          <input type="checkbox" class="checkbox-selecionar-exibidos">
-          <span>Selecionar todos os inscritos</span>
-        </label>
-
         <div class="admin-contador-selecao">
           <span class="admin-selecao-texto">0 selecionado(s)</span>
           ${totalVagasCorrida ? `<span>Vagas livres: ${vagasLivres}</span>` : ""}
         </div>
-
-        <button type="button" class="botao-admin-batch botao-confirmar-selecionados">
-          Confirmar selecionados
-        </button>
       </div>
+
+      <label class="admin-selecionar-exibidos admin-selecionar-exibidos-full">
+        <input type="checkbox" class="checkbox-selecionar-exibidos">
+        <span>Selecionar todos os inscritos</span>
+      </label>
 
       <div class="admin-lista-compacta-inscritos">
         ${inscricoesComPrioridade.map(inscricao => gerarLinhaInscritoAdmin(
@@ -1448,6 +1446,10 @@ async function carregarInscritosDaCorrida(
           corridaAtual
         )).join("")}
       </div>
+
+      <button type="button" class="botao-admin-batch botao-confirmar-selecionados">
+        Confirmar selecionados
+      </button>
     </div>
   `;
 
