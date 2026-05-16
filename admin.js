@@ -4222,10 +4222,10 @@ if (logoutBtn) {
   });
 }
 
-/* v182 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
-/* v182 - ajustes reais nos relatórios PDF solicitados */
-/* v182 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
-/* v182 - tabela numeracao preenche coluna esquerda inteira antes da direita */
+/* v183 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
+/* v183 - ajustes reais nos relatórios PDF solicitados */
+/* v183 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
+/* v183 - tabela numeracao preenche coluna esquerda inteira antes da direita */
 function obterDataDiaRelatorio(dia) {
   if (!dia || !dia.data_dia) return null;
   const partes = String(dia.data_dia).split("-");
@@ -4649,7 +4649,7 @@ function exportarPDFRelatorioEmBranco(corrida) {
   const alturaCabecalho = 8;
   // Mantém a lista em branco em uma única página.
   // A versão anterior deixava a tabela passar alguns pixels e o autoTable criava uma 2ª página só com cabeçalho.
-  const linhas = 11;
+  const linhas = 18;
   const alturaLinha = Math.floor(((pageHeight - startY - bottomMargin - alturaCabecalho) / linhas) * 10) / 10;
   const body = Array.from({ length: linhas }, () => headers.map(() => ""));
 
@@ -4674,8 +4674,8 @@ function exportarPDFRelatorioEmBranco(corrida) {
     pageBreak: "avoid",
     rowPageBreak: "avoid",
     showHead: "firstPage",
-    styles: { fontSize: 8, cellPadding: 1.2, minCellHeight: alturaLinha, halign: "center", valign: "middle", overflow: "linebreak", lineWidth: 0.15 },
-    headStyles: { fillColor: [47, 107, 88], textColor: [255, 255, 255], fontStyle: "bold", halign: "center", valign: "middle", minCellHeight: alturaCabecalho, cellPadding: 1.1 },
+    styles: { fontSize: 7.6, cellPadding: 0.8, minCellHeight: alturaLinha, halign: "center", valign: "middle", overflow: "linebreak", lineWidth: 0.12 },
+    headStyles: { fillColor: [47, 107, 88], textColor: [255, 255, 255], fontStyle: "bold", halign: "center", valign: "middle", minCellHeight: alturaCabecalho, cellPadding: 0.8 },
     columnStyles
   });
 
@@ -4793,4 +4793,6 @@ async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
   return nomeArquivo;
 }
 
-/* v182 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
+/* v183 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
+
+/* v183 - lista em branco com 18 linhas em uma única página. */
