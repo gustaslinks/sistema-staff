@@ -1,15 +1,41 @@
 const SUPABASE_URL = "https://klpxoffkajijjktxztmc.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_O_MlVkyfreG125LVia6nag_1GL5bUli";
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 
 const form = document.getElementById("loginForm");
-const loginEmail = document.getElementById("loginEmail");
+const loginCpf = document.getElementById("loginCpf");
 const loginPassword = document.getElementById("loginPassword");
 const loginBtn = document.getElementById("loginBtn");
+const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+const loginStatus = document.getElementById("loginStatus");
 
-function normalizarEmail(value) {
-  return String(value || "").trim().toLowerCase();
+function onlyNumbers(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function maskCPF(value) {
+  value = onlyNumbers(value).slice(0, 11);
+  value = value.replace(/(\d{3})(\d)/, "$1.$2");
+  value = value.replace(/(\d{3})(\d)/, "$1.$2");
+  value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  return value;
+}
+
+function normalizarCpf(value) {
+  return maskCPF(value);
+}
+
+function setStatus(message, type = "info") {
+  if (!loginStatus) return;
+  loginStatus.textContent = message || "";
+  loginStatus.className = `login-status ${type}`;
 }
 
 function salvarStaffLogado(staff) {
@@ -17,6 +43,39 @@ function salvarStaffLogado(staff) {
     ...staff,
     is_admin: staff.is_admin === true || staff.is_admin === "true" || staff.is_admin === 1 || staff.is_admin === "1"
   }));
+}
+
+async function buscarEmailPorCpf(cpfValue) {
+  const cpfFormatado = normalizarCpf(cpfValue);
+  if (!cpfFormatado || onlyNumbers(cpfFormatado).length !== 11) {
+    throw new Error("Digite um CPF válido.");
+  }
+
+  const { data, error } = await supabaseClient.rpc("get_login_email_by_cpf", {
+    cpf_input: cpfFormatado
+  });
+
+  if (error) {
+    console.error("Erro ao buscar e-mail por CPF:", error);
+    throw new Error("Não foi possível localizar o CPF. Verifique se o SQL da v2.1 foi executado.");
+  }
+
+  if (!data) {
+    throw new Error("CPF não encontrado ou sem e-mail vinculado.");
+  }
+
+  return String(data).trim().toLowerCase();
+}
+
+async function atualizarUltimoAcesso(userId) {
+  try {
+    await supabaseClient
+      .from("staffs")
+      .update({ ultimo_acesso: new Date().toISOString() })
+      .eq("auth_user_id", userId);
+  } catch (error) {
+    console.warn("Não foi possível atualizar último acesso:", error);
+  }
 }
 
 async function carregarStaffDaSessao(userId) {
@@ -33,8 +92,10 @@ async function carregarStaffDaSessao(userId) {
     throw new Error("Login realizado, mas este usuário ainda não está vinculado a um cadastro de staff. Vincule o auth_user_id no Supabase.");
   }
 
-  salvarStaffLogado(data);
-  return data;
+  await atualizarUltimoAcesso(userId);
+  const staffAtualizado = { ...data, ultimo_acesso: new Date().toISOString() };
+  salvarStaffLogado(staffAtualizado);
+  return staffAtualizado;
 }
 
 async function verificarSessaoExistente() {
@@ -50,19 +111,43 @@ async function verificarSessaoExistente() {
   }
 }
 
+function configurarToggleSenha() {
+  document.querySelectorAll("[data-toggle-password]").forEach((btn) => {
+    const targetId = btn.getAttribute("data-toggle-password");
+    const input = document.getElementById(targetId);
+    if (!input) return;
+    btn.addEventListener("click", () => {
+      const visivel = input.type === "text";
+      input.type = visivel ? "password" : "text";
+      btn.setAttribute("aria-label", visivel ? "Mostrar senha" : "Ocultar senha");
+      btn.textContent = visivel ? "👁️" : "🙈";
+    });
+  });
+}
+
+if (loginCpf) {
+  loginCpf.addEventListener("input", () => {
+    loginCpf.value = maskCPF(loginCpf.value);
+    setStatus("");
+  });
+}
+
 form.addEventListener("submit", async function (event) {
   event.preventDefault();
 
   loginBtn.disabled = true;
   loginBtn.textContent = "Entrando...";
+  setStatus("");
 
   try {
-    const email = normalizarEmail(loginEmail.value);
+    const cpf = loginCpf.value;
     const password = loginPassword.value;
 
-    if (!email || !password) {
-      throw new Error("Digite e-mail e senha.");
+    if (!cpf || !password) {
+      throw new Error("Digite CPF e senha.");
     }
+
+    const email = await buscarEmailPorCpf(cpf);
 
     const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
       email,
@@ -70,7 +155,7 @@ form.addEventListener("submit", async function (event) {
     });
 
     if (authError) {
-      throw new Error("E-mail ou senha incorretos.");
+      throw new Error("CPF ou senha incorretos.");
     }
 
     const user = authData && authData.user;
@@ -82,11 +167,30 @@ form.addEventListener("submit", async function (event) {
     window.location.href = staff.is_admin ? "admin.html" : "corridas.html";
 
   } catch (error) {
-    alert(error.message);
+    setStatus(error.message, "error");
   } finally {
     loginBtn.disabled = false;
     loginBtn.textContent = "Entrar";
   }
 });
 
+if (forgotPasswordBtn) {
+  forgotPasswordBtn.addEventListener("click", async () => {
+    forgotPasswordBtn.disabled = true;
+    setStatus("");
+    try {
+      const email = await buscarEmailPorCpf(loginCpf.value);
+      const redirectTo = window.location.origin + window.location.pathname.replace(/index\.html?$/i, "") + "alterar-senha.html";
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
+      if (error) throw error;
+      setStatus("Se o envio de e-mail estiver configurado no Supabase, você receberá um link para redefinir a senha.", "success");
+    } catch (error) {
+      setStatus(error.message, "error");
+    } finally {
+      forgotPasswordBtn.disabled = false;
+    }
+  });
+}
+
+configurarToggleSenha();
 verificarSessaoExistente();

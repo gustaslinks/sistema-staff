@@ -4,27 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Staff</title>
-  <link rel="stylesheet" href="style.css?v=200">
+  <link rel="stylesheet" href="style.css?v=21">
 </head>
 <body class="login-page">
-  <div class="version-badge">v200</div>
+  <div class="version-badge">v2.1</div>
   <div class="container">
     <div class="login-card">
       <h1>Área do Staff</h1>
-      <p class="subtitle">Entre com seu e-mail e senha cadastrados.</p>
+      <p class="subtitle">Entre com seu CPF e senha cadastrados.</p>
 
       <form id="loginForm" novalidate>
         <div class="field">
-          <label for="loginEmail">E-mail</label>
-          <input type="email" id="loginEmail" placeholder="seuemail@email.com" autocomplete="email" required>
+          <label for="loginCpf">CPF</label>
+          <input type="text" id="loginCpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" autocomplete="username" required>
         </div>
 
         <div class="field">
           <label for="loginPassword">Senha</label>
-          <input type="password" id="loginPassword" placeholder="Digite sua senha" autocomplete="current-password" required>
+          <div class="password-wrapper">
+            <input type="password" id="loginPassword" placeholder="Digite sua senha" autocomplete="current-password" required>
+            <button class="password-toggle" type="button" data-toggle-password="loginPassword" aria-label="Mostrar senha">👁️</button>
+          </div>
         </div>
 
+        <div id="loginStatus" class="login-status" aria-live="polite"></div>
+
         <button type="submit" id="loginBtn">Entrar</button>
+        <button type="button" id="forgotPasswordBtn" class="forgot-password-btn">Esqueci minha senha</button>
       </form>
 
       <a class="cadastro-link" href="cadastro.html">Ainda não tenho cadastro</a>
@@ -32,6 +38,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="login.js?v=200"></script>
+  <script src="login.js?v=21"></script>
 </body>
 </html>

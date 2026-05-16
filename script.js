@@ -6,7 +6,9 @@ const SUPABASE_URL = "https://klpxoffkajijjktxztmc.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_O_MlVkyfreG125LVia6nag_1GL5bUli";
 // NÃO use service_role, direct connection string ou senha do banco.
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
 
 const nome = document.getElementById('nome');
 const cpf = document.getElementById('cpf');
@@ -108,6 +110,142 @@ const adminEditarStaffPanel = document.getElementById('adminEditarStaffPanel');
 const adminBuscaCpfStaff = document.getElementById('adminBuscaCpfStaff');
 const adminBtnBuscarStaff = document.getElementById('adminBtnBuscarStaff');
 const adminBuscaStaffStatus = document.getElementById('adminBuscaStaffStatus');
+const accountSecurityPanel = document.getElementById('accountSecurityPanel');
+const adminMetaPanel = document.getElementById('adminMetaPanel');
+const adminStaffIdInfo = document.getElementById('adminStaffIdInfo');
+const adminAuthIdInfo = document.getElementById('adminAuthIdInfo');
+const adminUltimoAcessoInfo = document.getElementById('adminUltimoAcessoInfo');
+const adminIsAdminCheckbox = document.getElementById('adminIsAdminCheckbox');
+const novaSenha = document.getElementById('novaSenha');
+const novaSenhaConfirmacao = document.getElementById('novaSenhaConfirmacao');
+const btnAlterarSenha = document.getElementById('btnAlterarSenha');
+const btnEnviarResetSenha = document.getElementById('btnEnviarResetSenha');
+const btnExcluirStaff = document.getElementById('btnExcluirStaff');
+const securityStatus = document.getElementById('securityStatus');
+
+
+function formatarDataHoraBr(value){
+  if(!value) return 'Nunca acessou ou não registrado';
+  const data = new Date(value);
+  if(Number.isNaN(data.getTime())) return value;
+  return data.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+}
+
+function setSecurityStatus(message, type='info'){
+  if(!securityStatus) return;
+  securityStatus.textContent = message || '';
+  securityStatus.className = `login-status ${type}`;
+}
+
+function configurarToggleSenha(){
+  document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
+    const targetId = btn.getAttribute('data-toggle-password');
+    const input = document.getElementById(targetId);
+    if(!input || btn.dataset.toggleOk === '1') return;
+    btn.dataset.toggleOk = '1';
+    btn.addEventListener('click', () => {
+      const visivel = input.type === 'text';
+      input.type = visivel ? 'password' : 'text';
+      btn.textContent = visivel ? '👁️' : '🙈';
+      btn.setAttribute('aria-label', visivel ? 'Mostrar senha' : 'Ocultar senha');
+    });
+  });
+}
+
+function renderizarSegurancaCadastro(staff){
+  if(!modoEdicao || !accountSecurityPanel) return;
+  accountSecurityPanel.classList.remove('hidden');
+
+  const estaEditandoProprioCadastro = staffLogadoEdicao && staff && String(staffLogadoEdicao.id || '') === String(staff.id || '');
+  if(btnAlterarSenha) btnAlterarSenha.classList.toggle('hidden', !estaEditandoProprioCadastro);
+  if(btnEnviarResetSenha) btnEnviarResetSenha.classList.toggle('hidden', !(isAdminEdicao && staff && staff.email));
+
+  if(isAdminEdicao && adminMetaPanel){
+    adminMetaPanel.classList.remove('hidden');
+    if(adminStaffIdInfo) adminStaffIdInfo.textContent = staff && staff.id ? staff.id : '-';
+    if(adminAuthIdInfo) adminAuthIdInfo.textContent = staff && staff.auth_user_id ? staff.auth_user_id : 'Sem vínculo Auth';
+    if(adminUltimoAcessoInfo) adminUltimoAcessoInfo.textContent = formatarDataHoraBr(staff && staff.ultimo_acesso);
+    if(adminIsAdminCheckbox) adminIsAdminCheckbox.checked = !!(staff && (staff.is_admin === true || staff.is_admin === 'true'));
+    if(btnExcluirStaff) btnExcluirStaff.classList.toggle('hidden', !staff || !staff.id || estaEditandoProprioCadastro);
+  }
+}
+
+async function alterarSenhaUsuarioLogado(){
+  if(!novaSenha || !novaSenhaConfirmacao) return;
+  const senha1 = novaSenha.value || '';
+  const senha2 = novaSenhaConfirmacao.value || '';
+  if(senha1.length < 6){ setSecurityStatus('A nova senha precisa ter pelo menos 6 caracteres.', 'error'); return; }
+  if(senha1 !== senha2){ setSecurityStatus('A confirmação da nova senha não confere.', 'error'); return; }
+  if(btnAlterarSenha) btnAlterarSenha.disabled = true;
+  setSecurityStatus('Alterando senha...', 'info');
+  try{
+    const { error } = await supabaseClient.auth.updateUser({ password: senha1 });
+    if(error) throw error;
+    novaSenha.value = '';
+    novaSenhaConfirmacao.value = '';
+    setSecurityStatus('Senha alterada com sucesso.', 'success');
+  }catch(error){
+    console.error(error);
+    setSecurityStatus('Erro ao alterar senha: ' + error.message, 'error');
+  }finally{
+    if(btnAlterarSenha) btnAlterarSenha.disabled = false;
+  }
+}
+
+async function enviarResetSenhaStaff(){
+  if(!isAdminEdicao || !staffAtualEdicao || !staffAtualEdicao.email) return;
+  if(btnEnviarResetSenha) btnEnviarResetSenha.disabled = true;
+  setSecurityStatus('Solicitando reset de senha...', 'info');
+  try{
+    const redirectTo = window.location.origin + window.location.pathname.replace(/cadastro\.html?$/i, '') + 'alterar-senha.html';
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(staffAtualEdicao.email, { redirectTo });
+    if(error) throw error;
+    setSecurityStatus('Reset solicitado. O envio depende da configuração de e-mail/SMTP do Supabase.', 'success');
+  }catch(error){
+    console.error(error);
+    setSecurityStatus('Erro ao solicitar reset: ' + error.message, 'error');
+  }finally{
+    if(btnEnviarResetSenha) btnEnviarResetSenha.disabled = false;
+  }
+}
+
+async function excluirStaffAtual(){
+  if(!isAdminEdicao || !staffAtualEdicao || !staffAtualEdicao.id) return;
+  const nomeStaff = staffAtualEdicao.nome_completo || 'este staff';
+  const confirmar = confirm(`Excluir o cadastro de ${nomeStaff}?\n\nIsso remove inscrições e disponibilidades vinculadas. O usuário Auth pode precisar ser removido manualmente no Supabase Authentication.`);
+  if(!confirmar) return;
+  if(btnExcluirStaff) btnExcluirStaff.disabled = true;
+  setSecurityStatus('Excluindo cadastro...', 'info');
+  try{
+    const staffId = staffAtualEdicao.id;
+    const { data: inscricoes, error: erroInscricoes } = await supabaseClient
+      .from('inscricoes')
+      .select('id')
+      .eq('staff_id', staffId);
+    if(erroInscricoes) throw erroInscricoes;
+    const inscricaoIds = (inscricoes || []).map(i => i.id);
+    if(inscricaoIds.length){
+      const delDisp = await supabaseClient.from('inscricao_disponibilidades').delete().in('inscricao_id', inscricaoIds);
+      if(delDisp.error) throw delDisp.error;
+      const delIns = await supabaseClient.from('inscricoes').delete().eq('staff_id', staffId);
+      if(delIns.error) throw delIns.error;
+    }
+    const delStaff = await supabaseClient.from('staffs').delete().eq('id', staffId);
+    if(delStaff.error) throw delStaff.error;
+    alert('Cadastro excluído. Se houver usuário Auth vinculado, remova manualmente em Authentication > Users ou implemente a Edge Function de exclusão completa.');
+    window.location.href = 'admin.html';
+  }catch(error){
+    console.error(error);
+    setSecurityStatus('Erro ao excluir: ' + error.message, 'error');
+  }finally{
+    if(btnExcluirStaff) btnExcluirStaff.disabled = false;
+  }
+}
+
+configurarToggleSenha();
+if(btnAlterarSenha) btnAlterarSenha.addEventListener('click', alterarSenhaUsuarioLogado);
+if(btnEnviarResetSenha) btnEnviarResetSenha.addEventListener('click', enviarResetSenhaStaff);
+if(btnExcluirStaff) btnExcluirStaff.addEventListener('click', excluirStaffAtual);
 
 function renderizarCardLogadoCadastro(){
   if(!cardStaffCadastro) return;
@@ -618,6 +756,7 @@ function preencherFormularioComStaff(data){
     }
   }
 
+  renderizarSegurancaCadastro(data);
   updatePixPreviews();
   refreshSubmitState();
   liberarBotaoEdicao();
@@ -856,6 +995,9 @@ form.addEventListener('submit',async function(event){
     if(pixTipo==='outro') chavePixFinal=pixOutro.value;
 
     const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,numero_calcado: calcado ? (calcado.value ? Number(calcado.value) : null) : null,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value || null,foto_url:fotoUrlFinal};
+    if (isAdminEdicao && adminIsAdminCheckbox) {
+      dadosCadastro.is_admin = adminIsAdminCheckbox.checked;
+    }
     let cadastroSalvo = null;
 
     if (isModoAtualizacao()) {
@@ -866,6 +1008,7 @@ form.addEventListener('submit',async function(event){
       if (staffIdInput) staffIdInput.value = cadastroSalvo.id || '';
       if (staffCpfOriginalInput) staffCpfOriginalInput.value = cadastroSalvo.cpf || '';
       if (staffNascimentoOriginalInput) staffNascimentoOriginalInput.value = cadastroSalvo.data_nascimento || '';
+      renderizarSegurancaCadastro(cadastroSalvo);
     } else {
       if (!senhaValida() || !senhaConfirmacaoValida()) {
         throw new Error('Crie uma senha com pelo menos 6 caracteres e confirme a senha corretamente.');
@@ -1035,4 +1178,4 @@ updatePixPreviews();
 refreshSubmitState();
 
 
-// v185 - correção: detecção robusta de admin e busca por CPF também disponível para admin logado.
+// v2.1 - login por CPF, sessão persistente, controles de senha e segurança admin.

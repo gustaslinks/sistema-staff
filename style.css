@@ -7706,7 +7706,7 @@ body.pagina-editar-cadastro .header p {
 }
 
 
-/* v200 - ajuste real do semáforo dentro do box de inscrições */
+/* v2.1 - ajuste real do semáforo dentro do box de inscrições */
 .corrida-status-topo-linha{
   display:flex !important;
   align-items:center !important;
@@ -7907,4 +7907,111 @@ body.pagina-editar-cadastro .header p {
   background: #eef2ff;
   border-color: #2563eb;
   color: #1d4ed8;
+}
+
+/* v2.1 - segurança, senha e controles admin */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 48px !important;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  background: rgba(15, 23, 42, 0.15);
+}
+
+.login-status {
+  min-height: 20px;
+  margin: 8px 0 12px;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.login-status.error { color: #b91c1c; }
+.login-status.success { color: #047857; }
+.login-status.info { color: #475569; }
+
+.forgot-password-btn,
+.security-action-btn {
+  width: 100%;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.security-action-btn.secondary {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.account-security-panel {
+  margin: 24px 0;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.admin-meta-panel {
+  margin-bottom: 18px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.admin-meta-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.92rem;
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+
+.admin-checkbox-inline {
+  margin-top: 10px;
+}
+
+.danger-delete-btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 16px;
+  color: #fff;
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.danger-delete-btn:hover {
+  filter: brightness(0.96);
 }

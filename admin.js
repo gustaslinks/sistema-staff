@@ -3,7 +3,8 @@ const SUPABASE_ANON_KEY = "sb_publishable_O_MlVkyfreG125LVia6nag_1GL5bUli";
 
 const supabaseClient = supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_ANON_KEY
+  SUPABASE_ANON_KEY,
+  { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
 );
 
 async function validarSessaoSupabaseObrigatoria() {

@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Staffs</title>
-  <link rel="stylesheet" href="style.css?v=200" />
-  <link rel="stylesheet" href="photo-cropper.css?v=200" />
+  <link rel="stylesheet" href="style.css?v=21" />
+  <link rel="stylesheet" href="photo-cropper.css?v=21" />
 </head>
 <body>
-  <div class="version-badge">v200</div>
+  <div class="version-badge">v2.1</div>
   <div class="container">
     <section id="card-staff-cadastro" class="card-staff card-staff-cadastro hidden">
       <div class="foto-staff-wrapper">
@@ -205,17 +205,58 @@
       <div class="grid grid-acesso" id="camposSenhaCadastro">
         <div class="field" id="fieldSenha">
           <label for="senha">Criar senha</label>
-          <input id="senha" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" />
+          <div class="password-wrapper">
+            <input id="senha" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" />
+            <button class="password-toggle" type="button" data-toggle-password="senha" aria-label="Mostrar senha">👁️</button>
+          </div>
           <div class="helper">Essa senha será usada para entrar no sistema junto com seu e-mail.</div>
           <div class="error">Digite uma senha com pelo menos 6 caracteres.</div>
         </div>
 
         <div class="field" id="fieldSenhaConfirmacao">
           <label for="senhaConfirmacao">Confirmar senha</label>
-          <input id="senhaConfirmacao" type="password" placeholder="Repita a senha" autocomplete="new-password" minlength="6" />
+          <div class="password-wrapper">
+            <input id="senhaConfirmacao" type="password" placeholder="Repita a senha" autocomplete="new-password" minlength="6" />
+            <button class="password-toggle" type="button" data-toggle-password="senhaConfirmacao" aria-label="Mostrar senha">👁️</button>
+          </div>
           <div class="error">A confirmação precisa ser igual à senha.</div>
         </div>
       </div>
+
+      <section id="accountSecurityPanel" class="account-security-panel hidden">
+        <div class="section-title">Segurança e acesso</div>
+        <div id="adminMetaPanel" class="admin-meta-panel hidden">
+          <div class="admin-meta-row"><strong>ID do cadastro:</strong> <span id="adminStaffIdInfo">-</span></div>
+          <div class="admin-meta-row"><strong>ID Auth:</strong> <span id="adminAuthIdInfo">-</span></div>
+          <div class="admin-meta-row"><strong>Último acesso:</strong> <span id="adminUltimoAcessoInfo">-</span></div>
+          <label class="checkbox admin-checkbox-inline"><input id="adminIsAdminCheckbox" type="checkbox" /> Tornar este usuário administrador</label>
+        </div>
+
+        <div id="changePasswordPanel" class="change-password-panel">
+          <p class="helper">Altere a senha do usuário atualmente logado. Administrador não consegue ver a senha de outros usuários.</p>
+          <div class="grid grid-acesso">
+            <div class="field">
+              <label for="novaSenha">Nova senha</label>
+              <div class="password-wrapper">
+                <input id="novaSenha" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" />
+                <button class="password-toggle" type="button" data-toggle-password="novaSenha" aria-label="Mostrar senha">👁️</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="novaSenhaConfirmacao">Confirmar nova senha</label>
+              <div class="password-wrapper">
+                <input id="novaSenhaConfirmacao" type="password" placeholder="Repita a nova senha" autocomplete="new-password" minlength="6" />
+                <button class="password-toggle" type="button" data-toggle-password="novaSenhaConfirmacao" aria-label="Mostrar senha">👁️</button>
+              </div>
+            </div>
+          </div>
+          <button id="btnAlterarSenha" class="security-action-btn" type="button">Alterar minha senha</button>
+          <button id="btnEnviarResetSenha" class="security-action-btn secondary hidden" type="button">Enviar reset de senha para este staff</button>
+          <div id="securityStatus" class="login-status" aria-live="polite"></div>
+        </div>
+
+        <button id="btnExcluirStaff" class="danger-delete-btn hidden" type="button">Excluir cadastro deste staff</button>
+      </section>
 
       <div class="section-title">Chave PIX</div>
 
@@ -264,8 +305,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="photo-cropper.js?v=200"></script>
-  <script src="script.js?v=200"></script>
-  <script src="floating-tools.js?v=200"></script>
+  <script src="photo-cropper.js?v=21"></script>
+  <script src="script.js?v=21"></script>
+  <script src="floating-tools.js?v=21"></script>
 </body>
 </html>
