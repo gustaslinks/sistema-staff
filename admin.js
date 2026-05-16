@@ -4067,10 +4067,16 @@ function exportarPDFTabelaNumeracao(corrida, inscritos) {
   doc.setFontSize(12);
   doc.setFont(undefined, "normal");
   doc.text("Tabela de numeração", pageWidth / 2, 26, { align: "center" });
+  const startY = 36;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margemInferior = 14;
+  const alturaLinhaEstimativa = 7.1;
+  const maxLinhasPorColuna = Math.max(1, Math.floor((pageHeight - startY - margemInferior) / alturaLinhaEstimativa));
+
   doc.autoTable({
     head: [["Nome", "Número", "Nome", "Número"]],
-    body: montarLinhasTabelaNumeracao4Colunas(lista),
-    startY: 36,
+    body: montarLinhasTabelaNumeracao4Colunas(lista, maxLinhasPorColuna),
+    startY,
     theme: "grid",
     margin: { left: 10, right: 10 },
     styles: { fontSize: 8.5, cellPadding: 2.2, halign: "center", valign: "middle", overflow: "linebreak" },
@@ -4084,7 +4090,7 @@ function exportarPDFTabelaNumeracao(corrida, inscritos) {
 function exportarExcelTabelaNumeracao(corrida, inscritos) {
   const lista = ordenarInscritosAlfabetico(inscritos || []);
   if (!lista.length) throw new Error("Não há inscritos para gerar a tabela de numeração.");
-  const dados = montarLinhasTabelaNumeracao4Colunas(lista);
+  const dados = montarLinhasTabelaNumeracao4Colunas(lista, 40);
   const worksheet = XLSX.utils.aoa_to_sheet([[corrida.nome || "Corrida"], ["Tabela de numeração"], [], ["Nome", "Número", "Nome", "Número"], ...dados]);
   worksheet["!cols"] = [{ wch: 42 }, { wch: 12 }, { wch: 42 }, { wch: 12 }];
   const workbook = XLSX.utils.book_new();
@@ -4213,10 +4219,10 @@ if (logoutBtn) {
   });
 }
 
-/* v179 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
-/* v179 - ajustes reais nos relatórios PDF solicitados */
-/* v179 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
-/* v179 - tabela numeracao preenche coluna esquerda inteira antes da direita */
+/* v180 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
+/* v180 - ajustes reais nos relatórios PDF solicitados */
+/* v180 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
+/* v180 - tabela numeracao preenche coluna esquerda inteira antes da direita */
 function obterDataDiaRelatorio(dia) {
   if (!dia || !dia.data_dia) return null;
   const partes = String(dia.data_dia).split("-");
@@ -4516,23 +4522,29 @@ function exportarExcelResumoTenis(corrida, inscritos) {
   return nomeArquivo;
 }
 
-function montarLinhasTabelaNumeracao4Colunas(inscritos) {
+function montarLinhasTabelaNumeracao4Colunas(inscritos, maxLinhasPorColuna = 28) {
   const lista = ordenarInscritosAlfabetico(inscritos || []);
-  const metade = Math.ceil(lista.length / 2);
-  const colunaEsquerda = lista.slice(0, metade);
-  const colunaDireita = lista.slice(metade);
+  const limiteColuna = Math.max(1, Number(maxLinhasPorColuna) || 28);
   const linhas = [];
 
-  for (let i = 0; i < metade; i++) {
-    const staffA = colunaEsquerda[i] ? (colunaEsquerda[i].staff || {}) : null;
-    const staffB = colunaDireita[i] ? (colunaDireita[i].staff || {}) : null;
+  // Preenchimento em fluxo de página: primeiro ocupa a coluna esquerda até o limite
+  // físico da página. Só depois continua na coluna direita.
+  for (let inicioBloco = 0; inicioBloco < lista.length; inicioBloco += limiteColuna * 2) {
+    const colunaEsquerda = lista.slice(inicioBloco, inicioBloco + limiteColuna);
+    const colunaDireita = lista.slice(inicioBloco + limiteColuna, inicioBloco + limiteColuna * 2);
+    const totalLinhasBloco = Math.max(colunaEsquerda.length, colunaDireita.length);
 
-    linhas.push([
-      staffA ? (staffA.nome_completo || "") : "",
-      staffA ? (obterNumeracaoStaff(staffA) || "Não informado") : "",
-      staffB ? (staffB.nome_completo || "") : "",
-      staffB ? (obterNumeracaoStaff(staffB) || "Não informado") : ""
-    ]);
+    for (let i = 0; i < totalLinhasBloco; i++) {
+      const staffA = colunaEsquerda[i] ? (colunaEsquerda[i].staff || {}) : null;
+      const staffB = colunaDireita[i] ? (colunaDireita[i].staff || {}) : null;
+
+      linhas.push([
+        staffA ? (staffA.nome_completo || "") : "",
+        staffA ? (obterNumeracaoStaff(staffA) || "Não informado") : "",
+        staffB ? (staffB.nome_completo || "") : "",
+        staffB ? (obterNumeracaoStaff(staffB) || "Não informado") : ""
+      ]);
+    }
   }
 
   return linhas;
@@ -4553,10 +4565,16 @@ function exportarPDFTabelaNumeracao(corrida, inscritos) {
   doc.setFontSize(12);
   doc.setFont(undefined, "normal");
   doc.text("Tabela de numeração", pageWidth / 2, 26, { align: "center" });
+  const startY = 36;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margemInferior = 14;
+  const alturaLinhaEstimativa = 7.1;
+  const maxLinhasPorColuna = Math.max(1, Math.floor((pageHeight - startY - margemInferior) / alturaLinhaEstimativa));
+
   doc.autoTable({
     head: [["Nome", "Número", "Nome", "Número"]],
-    body: montarLinhasTabelaNumeracao4Colunas(lista),
-    startY: 36,
+    body: montarLinhasTabelaNumeracao4Colunas(lista, maxLinhasPorColuna),
+    startY,
     theme: "grid",
     margin: { left: 10, right: 10 },
     styles: { fontSize: 8.5, cellPadding: 2.2, halign: "center", valign: "middle", overflow: "linebreak" },
@@ -4570,7 +4588,7 @@ function exportarPDFTabelaNumeracao(corrida, inscritos) {
 function exportarExcelTabelaNumeracao(corrida, inscritos) {
   const lista = ordenarInscritosAlfabetico(inscritos || []);
   if (!lista.length) throw new Error("Não há inscritos para gerar a tabela de numeração.");
-  const dados = montarLinhasTabelaNumeracao4Colunas(lista);
+  const dados = montarLinhasTabelaNumeracao4Colunas(lista, 40);
   const worksheet = XLSX.utils.aoa_to_sheet([[corrida.nome || "Corrida"], ["Tabela de numeração"], [], ["Nome", "Número", "Nome", "Número"], ...dados]);
   worksheet["!cols"] = [{ wch: 42 }, { wch: 12 }, { wch: 42 }, { wch: 12 }];
   const workbook = XLSX.utils.book_new();
@@ -4691,3 +4709,5 @@ async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
   doc.save(nomeArquivo);
   return nomeArquivo;
 }
+
+/* v180 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
