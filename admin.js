@@ -4222,10 +4222,10 @@ if (logoutBtn) {
   });
 }
 
-/* v181 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
-/* v181 - ajustes reais nos relatórios PDF solicitados */
-/* v181 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
-/* v181 - tabela numeracao preenche coluna esquerda inteira antes da direita */
+/* v182 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
+/* v182 - ajustes reais nos relatórios PDF solicitados */
+/* v182 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
+/* v182 - tabela numeracao preenche coluna esquerda inteira antes da direita */
 function obterDataDiaRelatorio(dia) {
   if (!dia || !dia.data_dia) return null;
   const partes = String(dia.data_dia).split("-");
@@ -4645,9 +4645,12 @@ function exportarPDFRelatorioEmBranco(corrida) {
   const startY = 31;
   const marginLeft = 8;
   const marginRight = 8;
-  const bottomMargin = 9;
-  const linhas = 12;
-  const alturaLinha = Math.max(9, (pageHeight - startY - bottomMargin - 9) / linhas);
+  const bottomMargin = 12;
+  const alturaCabecalho = 8;
+  // Mantém a lista em branco em uma única página.
+  // A versão anterior deixava a tabela passar alguns pixels e o autoTable criava uma 2ª página só com cabeçalho.
+  const linhas = 11;
+  const alturaLinha = Math.floor(((pageHeight - startY - bottomMargin - alturaCabecalho) / linhas) * 10) / 10;
   const body = Array.from({ length: linhas }, () => headers.map(() => ""));
 
   doc.setFontSize(18);
@@ -4668,10 +4671,18 @@ function exportarPDFRelatorioEmBranco(corrida) {
     theme: "grid",
     margin: { left: marginLeft, right: marginRight, bottom: bottomMargin },
     tableWidth: "wrap",
-    styles: { fontSize: 8, cellPadding: 1.5, minCellHeight: alturaLinha, halign: "center", valign: "middle", overflow: "linebreak", lineWidth: 0.15 },
-    headStyles: { fillColor: [47, 107, 88], textColor: [255, 255, 255], fontStyle: "bold", halign: "center", valign: "middle", minCellHeight: 9 },
+    pageBreak: "avoid",
+    rowPageBreak: "avoid",
+    showHead: "firstPage",
+    styles: { fontSize: 8, cellPadding: 1.2, minCellHeight: alturaLinha, halign: "center", valign: "middle", overflow: "linebreak", lineWidth: 0.15 },
+    headStyles: { fillColor: [47, 107, 88], textColor: [255, 255, 255], fontStyle: "bold", halign: "center", valign: "middle", minCellHeight: alturaCabecalho, cellPadding: 1.1 },
     columnStyles
   });
+
+  // Defesa extra: se alguma versão do autoTable ainda criar página vazia/cabeçalho residual, remove as páginas excedentes.
+  while (doc.getNumberOfPages && doc.getNumberOfPages() > 1) {
+    doc.deletePage(doc.getNumberOfPages());
+  }
 
   doc.save(nomeArquivo);
   return nomeArquivo;
@@ -4782,4 +4793,4 @@ async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
   return nomeArquivo;
 }
 
-/* v181 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
+/* v182 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */

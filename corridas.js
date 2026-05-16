@@ -737,4 +737,4 @@ function formatarStatusInscricao(status) {
 carregarCardStaff();
 carregarCorridas();
 carregarMinhasInscricoes();
-// v181 - leitura de minhas disponibilidades corrigida usando corrida_dia_id.
+// v182 - leitura de minhas disponibilidades corrigida usando corrida_dia_id.
