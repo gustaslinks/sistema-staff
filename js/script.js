@@ -16,8 +16,6 @@ const rg = document.getElementById('rg');
 const nascimento = document.getElementById('nascimento');
 const telefone = document.getElementById('telefone');
 const email = document.getElementById('email');
-const senha = document.getElementById('senha');
-const senhaConfirmacao = document.getElementById('senhaConfirmacao');
 const cidade = document.getElementById('cidade');
 const calcado = document.getElementById('calcado');
 const indicado = document.getElementById('indicado');
@@ -52,48 +50,10 @@ const staffIdEdicao = modoEdicao
   : null;
 let fotoAtualUrl = '';
 document.body.classList.add(modoEdicao ? 'pagina-editar-cadastro' : 'pagina-cadastro-geral');
-const camposSenhaCadastro = document.getElementById('camposSenhaCadastro');
-const tituloAcessoCadastro = document.querySelector('.section-title-acesso');
-if (modoEdicao) {
-  if (camposSenhaCadastro) camposSenhaCadastro.classList.add('hidden');
-  if (tituloAcessoCadastro) tituloAcessoCadastro.classList.add('hidden');
-}
 let staffAtualEdicao = null;
 let modoEdicaoAdminCpfAtivo = false;
 function isModoAtualizacao(){
   return modoEdicao || modoEdicaoAdminCpfAtivo;
-}
-
-function senhaObrigatoria(){
-  return !isModoAtualizacao();
-}
-
-function senhaValida(){
-  if(!senha) return true;
-  if(!senhaObrigatoria() && !senha.value) return true;
-  return senha.value.length >= 6;
-}
-
-function senhaConfirmacaoValida(){
-  if(!senhaConfirmacao || !senha) return true;
-  if(!senhaObrigatoria() && !senha.value && !senhaConfirmacao.value) return true;
-  return senhaConfirmacao.value === senha.value && senhaConfirmacao.value.length >= 6;
-}
-
-async function getUsuarioAtual(){
-  const { data } = await supabaseClient.auth.getUser();
-  return data && data.user ? data.user : null;
-}
-
-async function validarSessaoEdicao(){
-  if(!modoEdicao) return;
-  const user = await getUsuarioAtual();
-  if(!user){
-    await supabaseClient.auth.signOut();
-    localStorage.removeItem('staffLogado');
-    window.location.href = 'index.html';
-    throw new Error('Sessão expirada. Faça login novamente.');
-  }
 }
 
 const cardStaffCadastro = document.getElementById('card-staff-cadastro');
@@ -156,8 +116,7 @@ if(botaoCorridasCadastro){
 }
 
 if(botaoSairCadastro){
-  botaoSairCadastro.addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
+  botaoSairCadastro.addEventListener('click', () => {
     localStorage.removeItem('staffLogado');
     window.location.href = 'index.html';
   });
@@ -278,8 +237,6 @@ function getValidationState(showAll=false){
     fieldNascimento:isAtLeast16(nascimento.value),
     fieldTelefone:isValidPhone(telefone.value),
     fieldEmail:isValidEmail(email.value),
-    fieldSenha:senhaValida(),
-    fieldSenhaConfirmacao:senhaConfirmacaoValida(),
     fieldCidade:cidade.value.trim().length>=2,
     fieldCalcado: calcado ? calcado.value !== "" : true,
     fieldIndicado:indicado.value.trim().length>=2,
@@ -344,8 +301,6 @@ indicado.addEventListener('blur',()=>{cleanTextField(indicado,true);markTouched(
 observacoes.addEventListener('input',()=>{observacoes.value=observacoes.value.replace(/^\s+/,'').replace(/\s{3,}/g,' ');markTouched('fieldObservacoes');refreshSubmitState();});
 if (calcado) calcado.addEventListener('change',()=>{markTouched('fieldCalcado');refreshSubmitState();});
 observacoes.addEventListener('blur',()=>{observacoes.value=removeExtraSpaces(observacoes.value);markTouched('fieldObservacoes');refreshSubmitState();});
-if (senha) senha.addEventListener('input',()=>{markTouched('fieldSenha');markTouched('fieldSenhaConfirmacao');refreshSubmitState();});
-if (senhaConfirmacao) senhaConfirmacao.addEventListener('input',()=>{markTouched('fieldSenhaConfirmacao');refreshSubmitState();});
 
 cpf.addEventListener('input',()=>{cpf.value=maskCPF(cpf.value);markTouched('fieldCpf');updatePixPreviews();refreshSubmitState();});
 cpf.addEventListener('blur', async () => {
@@ -829,7 +784,7 @@ form.addEventListener('submit',async function(event){
 
   try{
     if(SUPABASE_URL==='COLE_AQUI_PROJECT_URL' || SUPABASE_ANON_KEY==='COLE_AQUI_PUBLISHABLE_KEY'){
-      throw new Error('Configure a Project URL e a Publishable Key do Supabase no arquivo script.js.');
+      throw new Error('Configure a Project URL e a Publishable Key do Supabase no arquivo js/script.js.');
     }
 
     const cpfLimpo=onlyNumbers(cpf.value);
@@ -867,30 +822,6 @@ form.addEventListener('submit',async function(event){
       if (staffCpfOriginalInput) staffCpfOriginalInput.value = cadastroSalvo.cpf || '';
       if (staffNascimentoOriginalInput) staffNascimentoOriginalInput.value = cadastroSalvo.data_nascimento || '';
     } else {
-      if (!senhaValida() || !senhaConfirmacaoValida()) {
-        throw new Error('Crie uma senha com pelo menos 6 caracteres e confirme a senha corretamente.');
-      }
-
-      const authCadastro = await supabaseClient.auth.signUp({
-        email: email.value,
-        password: senha.value
-      });
-
-      if (authCadastro.error) {
-        const msg = authCadastro.error.message || '';
-        if (msg.toLowerCase().includes('already')) {
-          throw new Error('Este e-mail já possui usuário de acesso. Faça login ou use outro e-mail.');
-        }
-        throw authCadastro.error;
-      }
-
-      const usuarioAuth = authCadastro.data && authCadastro.data.user;
-      if (!usuarioAuth || !usuarioAuth.id) {
-        throw new Error('Usuário de acesso criado, mas não foi possível identificar o ID do Auth. Verifique as configurações de confirmação de e-mail no Supabase.');
-      }
-
-      dadosCadastro.auth_user_id = usuarioAuth.id;
-
       const inserirCadastro = await supabaseClient
         .from('staffs')
         .insert([dadosCadastro])
@@ -985,7 +916,6 @@ function selecionarPixPorValor(staff){
 
 async function iniciarModoEdicao(){
   if(!modoEdicao) return;
-  await validarSessaoEdicao();
   if(!staffIdEdicao){
     window.location.href = 'index.html';
     return;

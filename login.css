@@ -125,3 +125,51 @@ color:#4b5563;
 font-size:14px;
 margin-bottom:4px;
 }
+
+
+.cadastro-link{
+  display:block;
+  width:100%;
+  margin-top:14px;
+  padding:15px;
+  border-radius:14px;
+  border:1px solid #d1d5db;
+  background:#f9fafb;
+  color:#1f2937;
+  text-align:center;
+  text-decoration:none;
+  font-size:15px;
+  font-weight:bold;
+}
+
+.cadastro-link:hover{
+  background:#eef2ff;
+  border-color:#2563eb;
+  color:#1d4ed8;
+}
+
+/* v138 - polimento login */
+body{background:radial-gradient(circle at top left,rgba(37,99,235,.13),transparent 34%),linear-gradient(180deg,#f7f8fc 0%,#eef2f8 48%,#f8fafc 100%)!important;}
+.login-card{border:1px solid rgba(148,163,184,.22)!important;box-shadow:0 24px 60px rgba(15,23,42,.13)!important;border-radius:28px!important;}
+.login-card h1{letter-spacing:-.04em!important;color:#111827!important;}
+.login-card input{background:#f8fafc!important;border:1px solid #dbe3ef!important;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+.login-card input:focus{outline:none!important;border-color:#6366f1!important;box-shadow:0 0 0 4px rgba(99,102,241,.12)!important;background:#fff!important;}
+#loginBtn,button[type="submit"]{background:linear-gradient(135deg,#2563eb,#4f46e5)!important;box-shadow:0 16px 32px rgba(37,99,235,.24)!important;border:0!important;}
+.cadastro-link{border-radius:16px!important;background:linear-gradient(135deg,#eef2ff,#e0f2fe)!important;color:#1e3a8a!important;font-weight:800!important;text-decoration:none!important;}
+
+.version-badge {
+  position: fixed;
+  top: 8px;
+  right: 10px;
+  z-index: 9999;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, .18);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}

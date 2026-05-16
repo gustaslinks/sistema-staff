@@ -6,11 +6,12 @@
 
   <title>Corridas disponíveis | Sistema Staff</title>
 
-  <link rel="stylesheet" href="style.css?v=109">
+  <link rel="stylesheet" href="style.css?v=200">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <div class="version-badge">v200</div>
 
   <main class="pagina-corridas">
 
@@ -26,12 +27,16 @@
         <p id="email-staff"></p>
       </div>
 
-<div class="acoes-staff">
-  <button id="botao-admin" class="botao-admin hidden">
+<div class="acoes-staff admin-card-acoes-logado">
+  <button id="botao-admin" class="admin-card-acao admin-card-acao-corridas hidden" type="button">
     Painel Admin
   </button>
 
-  <button id="botao-sair" class="botao-sair">
+  <button id="botao-editar-cadastro" class="admin-card-acao admin-card-acao-perfil" type="button">
+    Editar cadastro
+  </button>
+
+  <button id="botao-sair" class="admin-card-acao admin-card-acao-sair logout-btn" type="button">
     Sair
   </button>
 </div>
@@ -59,6 +64,7 @@
 
   </main>
 
-  <script src="corridas.js?v=109"></script>
+  <script src="corridas.js?v=200"></script>
+  <script src="floating-tools.js?v=200"></script>
 </body>
 </html>

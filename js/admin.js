@@ -6,26 +6,6 @@ const supabaseClient = supabase.createClient(
   SUPABASE_ANON_KEY
 );
 
-async function validarSessaoSupabaseObrigatoria() {
-  const { data } = await supabaseClient.auth.getUser();
-  const user = data && data.user ? data.user : null;
-  if (!user) {
-    localStorage.removeItem("staffLogado");
-    window.location.href = "index.html";
-    throw new Error("Sessão expirada.");
-  }
-  const staffCache = (() => {
-    try { return JSON.parse(localStorage.getItem("staffLogado") || "null"); } catch (e) { return null; }
-  })();
-  if (staffCache && staffCache.auth_user_id && staffCache.auth_user_id !== user.id) {
-    await supabaseClient.auth.signOut();
-    localStorage.removeItem("staffLogado");
-    window.location.href = "index.html";
-    throw new Error("Sessão inválida.");
-  }
-}
-validarSessaoSupabaseObrigatoria().catch(console.warn);
-
 // ELEMENTOS
 const novaCorridaBtn = document.getElementById("nova-corrida-btn");
 const formNovaCorrida = document.getElementById("form-nova-corrida");
@@ -73,10 +53,8 @@ let staffLogado = null;
 try {
   staffLogado = staffLogadoRaw ? JSON.parse(staffLogadoRaw) : null;
 } catch (error) {
-  supabaseClient.auth.signOut().finally(() => {
-    localStorage.removeItem("staffLogado");
-    window.location.href = "index.html";
-  });
+  localStorage.removeItem("staffLogado");
+  window.location.href = "index.html";
 }
 
 const isAdmin =
@@ -2986,7 +2964,7 @@ function gerarMensagemPagamentoWhatsapp({ staff, corrida, dias, valorTotal, tipo
 
 function garantirBibliotecaQRCode() {
   if (window.QRCode && window.QRCode.toDataURL) return Promise.resolve();
-  return Promise.reject(new Error("Biblioteca de QR Code não carregada. Confira se o arquivo qrcode.min.js está carregado no projeto."));
+  return Promise.reject(new Error("Biblioteca de QR Code não carregada. Confira se o arquivo js/vendor/qrcode.min.js está carregado no projeto."));
 }
 
 async function gerarQRCodeDataURLPix(payload) {

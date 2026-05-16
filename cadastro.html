@@ -1,18 +1,65 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Staffs</title>
-  <link rel="stylesheet" href="style.css?v=109" />
+  <link rel="stylesheet" href="style.css?v=200" />
+  <link rel="stylesheet" href="photo-cropper.css?v=200" />
 </head>
 <body>
+  <div class="version-badge">v200</div>
   <div class="container">
+    <section id="card-staff-cadastro" class="card-staff card-staff-cadastro hidden">
+      <div class="foto-staff-wrapper">
+        <img id="foto-staff-cadastro" class="foto-staff" src="" alt="Foto do staff">
+      </div>
+
+      <div class="dados-staff">
+        <p class="label-card">Você está logado como</p>
+        <h2 id="nome-staff-cadastro"></h2>
+        <p id="cidade-staff-cadastro"></p>
+        <p id="email-staff-cadastro"></p>
+      </div>
+
+      <div class="admin-card-acoes-logado">
+        <button id="botao-admin-cadastro" class="admin-card-acao admin-card-acao-corridas hidden" type="button">
+          Painel Admin
+        </button>
+
+        <button id="botao-corridas-cadastro" class="admin-card-acao admin-card-acao-perfil" type="button">
+          Corridas
+        </button>
+
+        <button id="botao-sair-cadastro" class="admin-card-acao admin-card-acao-sair logout-btn" type="button">
+          Sair
+        </button>
+      </div>
+    </section>
+
     <div class="header">
       <h1>Cadastro Geral de Staffs</h1>
       <p>Realize seu cadastro apenas uma vez para participar das próximas corridas e eventos. Seus dados ficarão salvos para futuras convocações.</p>
     </div>
+
+    <section id="adminEditarStaffPanel" class="admin-editar-staff-panel hidden">
+      <div class="admin-editar-staff-header">
+        <div>
+          <strong>Editar cadastro de outro staff</strong>
+          <span>Busque pelo CPF para carregar o cadastro nesta mesma tela.</span>
+        </div>
+      </div>
+      <div class="admin-editar-staff-busca">
+        <input id="adminBuscaCpfStaff" type="text" placeholder="CPF do staff" maxlength="14" inputmode="numeric" autocomplete="off" />
+        <button id="adminBtnBuscarStaff" type="button">Buscar</button>
+      </div>
+      <div id="adminBuscaStaffStatus" class="admin-editar-staff-status"></div>
+    </section>
+
 <form class="form-area" id="staffForm" novalidate>
+    <input type="hidden" id="staffId" value="" />
+    <input type="hidden" id="staffCpfOriginal" value="" />
+    <input type="hidden" id="staffNascimentoOriginal" value="" />
 
   <div class="section-title">Dados pessoais</div>
 
@@ -124,6 +171,26 @@
           <input id="cidade" type="text" placeholder="Sua cidade" autocomplete="address-level2" required />
           <div class="error">Digite sua cidade, sem espaços no começo ou no final.</div>
         </div>
+
+        <div class="field" id="fieldCalcado">
+          <label for="calcado">Número do calçado</label>
+          <select id="calcado" required>
+            <option value="">Selecione</option>
+            <option value="34">34</option>
+            <option value="35">35</option>
+            <option value="36">36</option>
+            <option value="37">37</option>
+            <option value="38">38</option>
+            <option value="39">39</option>
+            <option value="40">40</option>
+            <option value="41">41</option>
+            <option value="42">42</option>
+            <option value="43">43</option>
+            <option value="44">44</option>
+            <option value="45">45</option>
+          </select>
+          <div class="error">Selecione o número do calçado.</div>
+        </div>
       </div>
 
       <div class="field" id="fieldIndicado">
@@ -132,7 +199,25 @@
         <div class="error">Informe quem te indicou. Caso ninguém tenha indicado, digite "Não tive indicação".</div>
       </div>
 
-      <div clasection-titleitle">Chave PIX</div>
+
+      <div class="section-title section-title-acesso">Dados de acesso</div>
+
+      <div class="grid grid-acesso" id="camposSenhaCadastro">
+        <div class="field" id="fieldSenha">
+          <label for="senha">Criar senha</label>
+          <input id="senha" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" />
+          <div class="helper">Essa senha será usada para entrar no sistema junto com seu e-mail.</div>
+          <div class="error">Digite uma senha com pelo menos 6 caracteres.</div>
+        </div>
+
+        <div class="field" id="fieldSenhaConfirmacao">
+          <label for="senhaConfirmacao">Confirmar senha</label>
+          <input id="senhaConfirmacao" type="password" placeholder="Repita a senha" autocomplete="new-password" minlength="6" />
+          <div class="error">A confirmação precisa ser igual à senha.</div>
+        </div>
+      </div>
+
+      <div class="section-title">Chave PIX</div>
 
       <div class="pix-options">
         <label class="pix-card"><input type="radio" name="pixTipo" value="cpf" checked /><div><strong>CPF</strong><span id="pixCpfPreview">Usar o CPF deste cadastro</span></div></label>
@@ -151,27 +236,36 @@
       <div class="section-title">Foto para cadastro</div>
 
       <div class="field" id="fieldFoto">
-        <label for="foto">Foto</label>
-        <input id="foto" type="file" accept="image/png, image/jpeg" required />
-        <div class="error">Envie uma foto JPG ou PNG.</div>
-        <div class="file-preview" id="fotoPreview"><img id="fotoPreviewImg" src="" alt="Prévia da foto" /><div><strong>Foto selecionada</strong><br /><span id="fotoPreviewText"></span></div></div>
+        <label for="foto">Foto de rosto <span class="label-obrigatorio">obrigatória</span></label>
+        <div class="foto-input-actions">
+          <label class="foto-input-btn foto-input-btn-galeria" for="foto"><span class="foto-input-ico" aria-hidden="true">🖼️</span><span>Escolher da galeria</span></label>
+          <label class="foto-input-btn foto-input-btn-camera" for="fotoCamera"><span class="foto-input-ico" aria-hidden="true">📷</span><span>Tirar foto</span></label>
+        </div>
+        <input id="foto" class="foto-input-hidden" type="file" accept="image/png, image/jpeg" required />
+        <input id="fotoCamera" class="foto-input-hidden" type="file" accept="image/png, image/jpeg" capture="user" />
+        <div class="helper helper-foto">Envie uma foto real, atual e legível. No celular, você pode escolher uma imagem da galeria ou tirar uma foto nova. Depois, ajuste com pinça ou arrastando a foto no recorte.</div>
+        <div class="error">Envie uma foto JPG ou PNG com rosto legível.</div>
+        <div class="file-preview file-preview-foto" id="fotoPreview"><img id="fotoPreviewImg" src="" alt="Prévia da foto" /><div><strong>Foto selecionada</strong><br /><span id="fotoPreviewText"></span><br><small>Prévia em recorte quadrado centralizado para o cadastro.</small></div></div>
       </div>
 
       <div class="field" id="fieldObservacoes" style="margin-top: 25px;">
         <label for="observacoes">Observações</label>
-        <textarea id="observacoes" rows="4" placeholder="Alguma informação importante? Caso não tenha, digite: Sem observações" required></textarea>
-        <div class="error">Preencha este campo. Caso não tenha observações, digite "Sem observações".</div>
+        <textarea id="observacoes" rows="4" placeholder="Alguma informação importante? Campo opcional."></textarea>
+        <div class="helper">Campo opcional. Use apenas se houver alguma informação importante.</div>
       </div>
 
       <div class="checkbox" id="fieldTermos"><input id="termos" type="checkbox" required /><label for="termos">Declaro que as informações fornecidas são verdadeiras e autorizo o uso dos meus dados para cadastro e convocação em eventos.</label></div>
 
       <button class="submit-btn" id="submitBtn" type="submit">Finalizar cadastro</button>
+      <button class="back-corridas-btn hidden" id="btnVoltarCorridas" type="button">Voltar para corridas</button>
       <div class="success-message" id="successMessage">Cadastro enviado com sucesso. Os dados foram salvos no Supabase.</div>
       <div class="footer-text">Sistema de cadastro de staffs • Versão integrada ao Supabase</div>
     </form>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js"></script>
+  <script src="photo-cropper.js?v=200"></script>
+  <script src="script.js?v=200"></script>
+  <script src="floating-tools.js?v=200"></script>
 </body>
 </html>

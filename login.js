@@ -4,51 +4,51 @@ const SUPABASE_ANON_KEY = "sb_publishable_O_MlVkyfreG125LVia6nag_1GL5bUli";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const form = document.getElementById("loginForm");
-const cpf = document.getElementById("cpf");
-const nascimento = document.getElementById("nascimento");
+const loginEmail = document.getElementById("loginEmail");
+const loginPassword = document.getElementById("loginPassword");
 const loginBtn = document.getElementById("loginBtn");
 
-const adminPasswordField = document.getElementById("adminPasswordField");
-const adminPassword = document.getElementById("adminPassword");
-
-function onlyNumbers(value) {
-  return value.replace(/\D/g, "");
+function normalizarEmail(value) {
+  return String(value || "").trim().toLowerCase();
 }
 
-function maskCPF(value) {
-  value = onlyNumbers(value).slice(0, 11);
-  value = value.replace(/(\d{3})(\d)/, "$1.$2");
-  value = value.replace(/(\d{3})(\d)/, "$1.$2");
-  value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  return value;
+function salvarStaffLogado(staff) {
+  localStorage.setItem("staffLogado", JSON.stringify({
+    ...staff,
+    is_admin: staff.is_admin === true || staff.is_admin === "true" || staff.is_admin === 1 || staff.is_admin === "1"
+  }));
 }
 
-function maskDate(value) {
-  value = onlyNumbers(value).slice(0, 8);
-  value = value.replace(/(\d{2})(\d)/, "$1/$2");
-  value = value.replace(/(\d{2})(\d)/, "$1/$2");
-  return value;
+async function carregarStaffDaSessao(userId) {
+  const { data, error } = await supabaseClient
+    .from("staffs")
+    .select("*")
+    .eq("auth_user_id", userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) {
+    await supabaseClient.auth.signOut();
+    localStorage.removeItem("staffLogado");
+    throw new Error("Login realizado, mas este usuário ainda não está vinculado a um cadastro de staff. Vincule o auth_user_id no Supabase.");
+  }
+
+  salvarStaffLogado(data);
+  return data;
 }
 
-function dateToSupabase(value) {
-  const numbers = onlyNumbers(value);
+async function verificarSessaoExistente() {
+  const { data } = await supabaseClient.auth.getSession();
+  const user = data && data.session && data.session.user;
+  if (!user) return;
 
-  if (numbers.length !== 8) return "";
-
-  const dia = numbers.slice(0, 2);
-  const mes = numbers.slice(2, 4);
-  const ano = numbers.slice(4, 8);
-
-  return ano + "-" + mes + "-" + dia;
+  try {
+    const staff = await carregarStaffDaSessao(user.id);
+    window.location.href = staff.is_admin ? "admin.html" : "corridas.html";
+  } catch (error) {
+    console.warn("Sessão existente não carregada:", error);
+  }
 }
-
-cpf.addEventListener("input", function () {
-  cpf.value = maskCPF(cpf.value);
-});
-
-nascimento.addEventListener("input", function () {
-  nascimento.value = maskDate(nascimento.value);
-});
 
 form.addEventListener("submit", async function (event) {
   event.preventDefault();
@@ -57,63 +57,29 @@ form.addEventListener("submit", async function (event) {
   loginBtn.textContent = "Entrando...";
 
   try {
+    const email = normalizarEmail(loginEmail.value);
+    const password = loginPassword.value;
 
-    const dataNascimento = dateToSupabase(nascimento.value);
-
-    if (!dataNascimento) {
-      throw new Error("Digite a data no formato dd/mm/aaaa.");
+    if (!email || !password) {
+      throw new Error("Digite e-mail e senha.");
     }
 
-    const { data, error } = await supabaseClient
-      .from("staffs")
-      .select("*")
-      .eq("cpf", cpf.value)
-      .eq("data_nascimento", dataNascimento)
-      .single();
+    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
 
-    if (error || !data) {
-      alert("CPF não encontrado. Faça seu cadastro para continuar.");
-      window.location.href = "cadastro.html";
-      return;
+    if (authError) {
+      throw new Error("E-mail ou senha incorretos.");
     }
 
-    if (data.is_admin) {
-
-      adminPasswordField.classList.remove("hidden");
-
-      if (!adminPassword.value) {
-        throw new Error("Digite a senha de administrador.");
-      }
-
-      if (adminPassword.value !== data.admin_password) {
-        throw new Error("Senha de administrador incorreta.");
-      }
-
-      localStorage.setItem("staffLogado", JSON.stringify({
-        id: data.id,
-        nome_completo: data.nome_completo,
-        cpf: data.cpf,
-        email: data.email,
-        cidade: data.cidade,
-        foto_url: data.foto_url,
-        is_admin: data.is_admin
-      }));
-
-      window.location.href = "admin.html";
-      return;
+    const user = authData && authData.user;
+    if (!user) {
+      throw new Error("Não foi possível iniciar a sessão.");
     }
 
-    localStorage.setItem("staffLogado", JSON.stringify({
-      id: data.id,
-      nome_completo: data.nome_completo,
-      cpf: data.cpf,
-      email: data.email,
-      cidade: data.cidade,
-      foto_url: data.foto_url,
-      is_admin: data.is_admin
-    }));
-
-    window.location.href = "corridas.html";
+    const staff = await carregarStaffDaSessao(user.id);
+    window.location.href = staff.is_admin ? "admin.html" : "corridas.html";
 
   } catch (error) {
     alert(error.message);
@@ -122,3 +88,5 @@ form.addEventListener("submit", async function (event) {
     loginBtn.textContent = "Entrar";
   }
 });
+
+verificarSessaoExistente();
