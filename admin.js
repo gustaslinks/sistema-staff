@@ -579,12 +579,13 @@ function obterClasseProgressoVagas(percentual) {
 
 function corridaPossuiPatrocinioTenis(corrida) {
   if (!corrida) return false;
-  const valores = [
-    corrida.possui_patrocinio_tenis,
-    corrida.posui_patrocinio_tenis,
-    corrida.possui_patrocinador_tenis
-  ];
-  return valores.some(valor => valor === true || valor === "true" || valor === 1 || valor === "1");
+
+  return (
+    corrida.possui_patrocinio_tenis === true ||
+    corrida.possui_patrocinio_tenis === "true" ||
+    corrida.possui_patrocinador_tenis === true ||
+    corrida.possui_patrocinador_tenis === "true"
+  );
 }
 
 
@@ -3038,7 +3039,8 @@ async function buscarDadosExportacao(corridaId) {
           cidade,
           email,
           foto_url,
-          chave_pix
+          chave_pix,
+          numero_calcado
         )
       `)
       .eq("corrida_id", corridaId)
@@ -3582,21 +3584,23 @@ function ativarBotoesRelatoriosAdmin() {
           botaoAcao.textContent = "Gerando...";
           definirFeedbackRelatorio(wrapper, "Gerando arquivo...", "info");
 
+          let nomeArquivoGerado = "";
+
           if (relatorio === "lista-geral") {
-            await exportarInscritosCorrida(corridaId, { formato, filtro: "1" });
+            nomeArquivoGerado = await exportarInscritosCorrida(corridaId, { formato, filtro: "1" });
           } else if (relatorio === "por-tipo") {
-            await exportarInscritosCorrida(corridaId, { formato, filtro: "2" });
+            nomeArquivoGerado = await exportarInscritosCorrida(corridaId, { formato, filtro: "2" });
           } else if (relatorio === "por-dia") {
-            await exportarInscritosCorrida(corridaId, { formato, filtro: "3" });
+            nomeArquivoGerado = await exportarInscritosCorrida(corridaId, { formato, filtro: "3" });
           } else if (relatorio === "pagamento-pix") {
-            await exportarRelatorioPagamentoPix(corridaId, formato);
+            nomeArquivoGerado = await exportarRelatorioPagamentoPix(corridaId, formato);
           } else if (relatorio === "resumo-tenis") {
-            await exportarInscritosCorrida(corridaId, { formato, filtro: "4" });
+            nomeArquivoGerado = await exportarInscritosCorrida(corridaId, { formato, filtro: "4" });
           } else if (relatorio === "tabela-numeracao") {
-            await exportarTabelaNumeracaoTenis(corridaId, formato);
+            nomeArquivoGerado = await exportarTabelaNumeracaoTenis(corridaId, formato);
           }
 
-          definirFeedbackRelatorio(wrapper, "Arquivo gerado. Você pode clicar em outro relatório na sequência.", "sucesso");
+          definirFeedbackRelatorio(wrapper, nomeArquivoGerado ? `Arquivo gerado: ${nomeArquivoGerado}` : "Arquivo gerado.", "sucesso");
         } catch (error) {
           console.error("Erro ao gerar relatório:", error);
           definirFeedbackRelatorio(wrapper, error.message || "Erro ao gerar relatório.", "erro");
@@ -3610,7 +3614,7 @@ function ativarBotoesRelatoriosAdmin() {
 }
 
 async function buscarInscricoesExportacaoComFallback(corridaId) {
-  const colunasStaff = "id, nome_completo, cpf, rg, telefone, cidade, email, foto_url, chave_pix, numero_calcado";
+  const colunasStaff = "id, nome_completo, cpf, rg, telefone, cidade, email, foto_url, chave_pix";
   const consultaComRelacao = await supabaseClient
     .from("inscricoes")
     .select(`
@@ -4152,330 +4156,6 @@ async function exportarInscritosCorrida(corridaId, opcoes) {
   }
 }
 
-
-// v173 - ajustes reais nos relatórios PDF/Excel: período, tênis condicional, numeração e Pix compacto
-function obterNumeracaoStaff(staff) {
-  const valor = staff ? (staff.numero_calcado ?? staff.calcado ?? staff.numeracao ?? "") : "";
-  if (valor === null || valor === undefined || valor === "") return "";
-  return String(valor);
-}
-
-function formatarDataCurtaRelatorio(valor) {
-  if (!valor) return "Não informado";
-  const partes = String(valor).split("-");
-  if (partes.length < 3) return formatarData(valor);
-  return `${partes[2]}/${partes[1]}`;
-}
-
-function obterDiaSemanaCurtoRelatorio(valor) {
-  if (!valor) return "";
-  const data = new Date(`${valor}T12:00:00`);
-  if (Number.isNaN(data.getTime())) return "";
-  const nome = data.toLocaleDateString("pt-BR", { weekday: "long" });
-  return nome.charAt(0).toUpperCase() + nome.slice(1);
-}
-
-function formatarPeriodoDiasRelatorio(titulo, dias) {
-  const lista = removerDiasDuplicados(dias || []).filter(d => d && d.data_dia).sort((a,b) => String(a.data_dia).localeCompare(String(b.data_dia)));
-  if (!lista.length) return titulo || "Inscritos";
-  if (lista.length === 1) {
-    const dia = lista[0];
-    return `${titulo} - ${obterDiaSemanaCurtoRelatorio(dia.data_dia)}, dia ${formatarDataCurtaRelatorio(dia.data_dia)}`;
-  }
-  const primeiro = lista[0];
-  const ultimo = lista[lista.length - 1];
-  return `${titulo} - De ${obterDiaSemanaCurtoRelatorio(primeiro.data_dia)}, ${formatarDataCurtaRelatorio(primeiro.data_dia)} a ${obterDiaSemanaCurtoRelatorio(ultimo.data_dia)}, ${formatarDataCurtaRelatorio(ultimo.data_dia)}`;
-}
-
-function montarSecoesExportacao(dadosExportacao, filtro) {
-  const inscritos = dadosExportacao.inscritos || [];
-  const diasCorrida = dadosExportacao.diasCorrida || [];
-
-  if (filtro === "2") {
-    const grupos = [
-      { titulo: "Entrega Kit", predicate: d => ehTipoEntregaKit(d.tipo || d.nome) },
-      { titulo: "Corrida", predicate: d => ehTipoDiaCorrida(d.tipo || d.nome) }
-    ];
-    return grupos.map(grupo => {
-      const diasGrupo = diasCorrida.filter(grupo.predicate);
-      const lista = inscritos.filter(inscrito => inscrito.diasDisponiveis.some(grupo.predicate));
-      return {
-        titulo: grupo.titulo,
-        subtitulo: formatarPeriodoDiasRelatorio(grupo.titulo, diasGrupo),
-        inscritos: ordenarInscritosAlfabetico(lista)
-      };
-    }).filter(secao => secao.inscritos.length > 0);
-  }
-
-  if (filtro === "3") {
-    return diasCorrida.map(dia => ({
-      titulo: dia.nome || "Dia da corrida",
-      subtitulo: `${dia.nome || "Dia da corrida"} - ${obterDiaSemanaCurtoRelatorio(dia.data_dia)}, dia ${formatarDataCurtaRelatorio(dia.data_dia)}`,
-      inscritos: ordenarInscritosAlfabetico(
-        inscritos.filter(inscrito => inscrito.diasDisponiveis.some(d => d.id === dia.id))
-      )
-    }));
-  }
-
-  return [{
-    titulo: "Todos os inscritos",
-    subtitulo: `Todos os inscritos - ${formatarPeriodoCorrida(dadosExportacao.corrida)}`,
-    inscritos: ordenarInscritosAlfabetico(inscritos)
-  }];
-}
-
-function montarLinhasExportacao(inscritos, incluirPrioridade = false, incluirNumeracao = true) {
-  return inscritos.map(inscrito => {
-    const staff = inscrito.staff || {};
-    const dias = removerDiasDuplicados(inscrito.diasDisponiveis || []).map(dia => dia.nome).join("; ");
-    const linha = {
-      Nome: staff.nome_completo || "",
-      CPF: staff.cpf || "",
-      RG: staff.rg || "",
-      "Celular/Whatsapp": staff.telefone || "",
-      "Chave PIX": staff.chave_pix || "",
-      "Dias disponíveis": dias
-    };
-    if (incluirNumeracao) linha["Numeração"] = obterNumeracaoStaff(staff);
-    if (incluirPrioridade) linha.Prioridade = inscrito.prioridade.texto;
-    linha.Assinatura = "";
-    return linha;
-  });
-}
-
-function exportarExcelCorrida(corrida, secoes, filtro) {
-  const workbook = XLSX.utils.book_new();
-  const incluirPrioridade = false;
-  const incluirNumeracao = corridaPossuiPatrocinioTenis(corrida);
-  secoes.forEach((secao, index) => {
-    const dados = montarLinhasExportacao(secao.inscritos, incluirPrioridade, incluirNumeracao);
-    const headers = ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", ...(incluirNumeracao ? ["Numeração"] : []), "Dias disponíveis", ...(incluirPrioridade ? ["Prioridade"] : []), "Assinatura"];
-    const worksheet = XLSX.utils.json_to_sheet(dados, { header: headers, origin: "A5" });
-    const ultimaColuna = headers.length - 1;
-    XLSX.utils.sheet_add_aoa(worksheet, [[corrida.nome || "Corrida"], [secao.subtitulo || secao.titulo || "Inscritos"]], { origin: "A1" });
-    worksheet["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: ultimaColuna } },
-      { s: { r: 1, c: 0 }, e: { r: 1, c: ultimaColuna } }
-    ];
-    worksheet["!cols"] = headers.map(header => ({ wch: ({ Nome: 40, CPF: 18, RG: 16, "Celular/Whatsapp": 22, "Chave PIX": 30, "Numeração": 14, "Dias disponíveis": 42, Assinatura: 24, Prioridade: 20 }[header] || 20) }));
-    const nomeAba = (secao.titulo || `Lista ${index + 1}`).replace(/[\\/?*\[\]:]/g, " ").slice(0, 31) || `Lista ${index + 1}`;
-    XLSX.utils.book_append_sheet(workbook, worksheet, nomeAba);
-  });
-  XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)}-${filtro === "2" ? "por-tipo" : filtro === "3" ? "por-data" : "lista-geral"}.xlsx`);
-}
-
-function exportarPDFCorrida(corrida, secoes, filtro) {
-  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
-  if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
-  const doc = new jsPDFConstructor({ orientation: "landscape", unit: "mm", format: "a4" });
-  const incluirPrioridade = false;
-  const incluirNumeracao = corridaPossuiPatrocinioTenis(corrida);
-  const headers = ["Nome", "CPF", "RG", "Celular/Whatsapp", "Chave PIX", ...(incluirNumeracao ? ["Numeração"] : []), ...(incluirPrioridade ? ["Prioridade"] : []), "Assinatura"];
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const columnStyles = incluirNumeracao
-    ? { 0: { cellWidth: 54, halign: "left" }, 1: { cellWidth: 28 }, 2: { cellWidth: 24 }, 3: { cellWidth: 32 }, 4: { cellWidth: 48 }, 5: { cellWidth: 24 }, 6: { cellWidth: 38 } }
-    : { 0: { cellWidth: 60, halign: "left" }, 1: { cellWidth: 30 }, 2: { cellWidth: 26 }, 3: { cellWidth: 34 }, 4: { cellWidth: 58 }, 5: { cellWidth: 40 } };
-  const larguraTabela = Object.values(columnStyles).reduce((acc, cfg) => acc + Number(cfg.cellWidth || 0), 0);
-  const margemHorizontal = Math.max(8, (pageWidth - larguraTabela) / 2);
-
-  secoes.forEach((secao, index) => {
-    if (index > 0) doc.addPage();
-    doc.setFontSize(18);
-    doc.setFont(undefined, "bold");
-    doc.text(corrida.nome || "Corrida", pageWidth / 2, 15, { align: "center" });
-    doc.setFontSize(10.5);
-    doc.setFont(undefined, "normal");
-    doc.text(secao.subtitulo || secao.titulo || "Inscritos", pageWidth / 2, 22, { align: "center" });
-    const body = secao.inscritos.map(inscrito => {
-      const staff = inscrito.staff || {};
-      const base = [staff.nome_completo || "", staff.cpf || "", staff.rg || "", staff.telefone || "", staff.chave_pix || ""];
-      if (incluirNumeracao) base.push(obterNumeracaoStaff(staff) || "");
-      if (incluirPrioridade) base.push(inscrito.prioridade.texto || "");
-      base.push("");
-      return base;
-    });
-    doc.autoTable({
-      head: [headers], body, startY: 29, theme: "grid", margin: { left: margemHorizontal, right: margemHorizontal }, tableWidth: "wrap",
-      styles: { fontSize: 8, cellPadding: 2, minCellHeight: 8, halign: "center", valign: "middle", overflow: "linebreak" },
-      headStyles: { fillColor: [47, 107, 88], textColor: [255,255,255], fontStyle: "bold", halign: "center", valign: "middle" },
-      columnStyles,
-      didDrawPage: function () {
-        const pageHeight = doc.internal.pageSize.getHeight();
-        doc.setFontSize(8);
-        doc.text(`Página ${doc.internal.getCurrentPageInfo().pageNumber}`, pageWidth - 12, pageHeight - 6, { align: "right" });
-      }
-    });
-  });
-  doc.save(`${nomeArquivoSeguro(corrida.nome)}-${filtro === "2" ? "por-tipo" : filtro === "3" ? "por-data" : "lista-geral"}.pdf`);
-}
-
-function agruparTenisPorNumeracao(inscritos) {
-  const mapa = {};
-  (inscritos || []).forEach(inscrito => {
-    const numero = obterNumeracaoStaff(inscrito.staff || {}) || "Não informado";
-    mapa[numero] = (mapa[numero] || 0) + 1;
-  });
-  return Object.entries(mapa).map(([numero, quantidade]) => ({ numero, quantidade })).sort((a,b) => {
-    const na = Number(a.numero), nb = Number(b.numero);
-    if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
-    return a.numero.localeCompare(b.numero, "pt-BR");
-  });
-}
-
-function exportarPDFResumoTenis(corrida, inscritos) {
-  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
-  if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
-  const resumo = agruparTenisPorNumeracao(inscritos);
-  if (!resumo.length) throw new Error("Não há inscritos para gerar o relatório de tênis.");
-  const doc = new jsPDFConstructor({ orientation: "portrait", unit: "mm", format: "a4" });
-  const pageWidth = doc.internal.pageSize.getWidth();
-  doc.setFontSize(18); doc.setFont(undefined, "bold"); doc.text(corrida.nome || "Corrida", pageWidth / 2, 18, { align: "center" });
-  doc.setFontSize(12); doc.setFont(undefined, "normal"); doc.text("Resumo de tênis por numeração", pageWidth / 2, 26, { align: "center" });
-  doc.autoTable({ head: [["Numeração", "Quantidade de pares"]], body: resumo.map(item => [item.numero, item.quantidade]), startY: 36, theme: "grid", margin: { left: 45, right: 45 }, styles: { fontSize: 11, cellPadding: 3, halign: "center", valign: "middle" }, headStyles: { fillColor: [79,70,229], textColor: [255,255,255], fontStyle: "bold" }, columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 70 } } });
-  const total = resumo.reduce((acc, item) => acc + Number(item.quantidade || 0), 0);
-  const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 50;
-  doc.setFont(undefined, "bold"); doc.text(`Total de pares: ${total}`, pageWidth / 2, finalY, { align: "center" });
-  doc.save(`${nomeArquivoSeguro(corrida.nome)}-resumo-tenis.pdf`);
-}
-
-function exportarExcelResumoTenis(corrida, inscritos) {
-  const resumo = agruparTenisPorNumeracao(inscritos);
-  if (!resumo.length) throw new Error("Não há inscritos para gerar o relatório de tênis.");
-  const dados = resumo.map(item => ({ "Numeração": item.numero, "Quantidade de pares": item.quantidade }));
-  const worksheet = XLSX.utils.json_to_sheet(dados, { origin: "A4" });
-  XLSX.utils.sheet_add_aoa(worksheet, [[corrida.nome || "Corrida"], ["Resumo de tênis por numeração"]], { origin: "A1" });
-  worksheet["!cols"] = [{ wch: 18 }, { wch: 24 }];
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Resumo tênis");
-  XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)}-resumo-tenis.xlsx`);
-}
-
-function montarSecoesTabelaNumeracao(inscritos) {
-  const confirmados = (inscritos || []).filter(inscrito => normalizarStatusInscricao(inscrito.status) === "confirmado");
-  return [{ titulo: "Tabela de numeração", inscritos: ordenarInscritosAlfabetico(confirmados.length ? confirmados : inscritos) }];
-}
-
-function exportarPDFTabelaNumeracao(corrida, inscritos) {
-  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
-  if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
-  const lista = ordenarInscritosAlfabetico(inscritos || []);
-  if (!lista.length) throw new Error("Não há inscritos para gerar a tabela de numeração.");
-  const doc = new jsPDFConstructor({ orientation: "portrait", unit: "mm", format: "a4" });
-  const pageWidth = doc.internal.pageSize.getWidth();
-  doc.setFontSize(18); doc.setFont(undefined, "bold"); doc.text(corrida.nome || "Corrida", pageWidth / 2, 18, { align: "center" });
-  doc.setFontSize(12); doc.setFont(undefined, "normal"); doc.text("Tabela de numeração", pageWidth / 2, 26, { align: "center" });
-  const linhas = [];
-  for (let i = 0; i < lista.length; i += 2) {
-    const a = lista[i] || {}; const b = lista[i + 1] || {};
-    const staffA = a.staff || {}; const staffB = b.staff || {};
-    linhas.push([staffA.nome_completo || "", obterNumeracaoStaff(staffA) || "Não informado", staffB.nome_completo || "", staffB.nome_completo ? (obterNumeracaoStaff(staffB) || "Não informado") : ""]);
-  }
-  doc.autoTable({ head: [["Nome", "Número", "Nome", "Número"]], body: linhas, startY: 36, theme: "grid", margin: { left: 10, right: 10 }, styles: { fontSize: 9, cellPadding: 2.4, halign: "center", valign: "middle" }, headStyles: { fillColor: [47,107,88], textColor: [255,255,255], fontStyle: "bold" }, columnStyles: { 0: { cellWidth: 70, halign: "left" }, 1: { cellWidth: 25 }, 2: { cellWidth: 70, halign: "left" }, 3: { cellWidth: 25 } } });
-  doc.save(`${nomeArquivoSeguro(corrida.nome)}-tabela-numeracao.pdf`);
-}
-
-function exportarExcelTabelaNumeracao(corrida, inscritos) {
-  const lista = ordenarInscritosAlfabetico(inscritos || []);
-  if (!lista.length) throw new Error("Não há inscritos para gerar a tabela de numeração.");
-  const dados = lista.map(inscrito => { const staff = inscrito.staff || {}; return { Nome: staff.nome_completo || "", Número: obterNumeracaoStaff(staff) || "Não informado" }; });
-  const worksheet = XLSX.utils.json_to_sheet(dados, { origin: "A4" });
-  XLSX.utils.sheet_add_aoa(worksheet, [[corrida.nome || "Corrida"], ["Tabela de numeração"]], { origin: "A1" });
-  worksheet["!cols"] = [{ wch: 42 }, { wch: 14 }];
-  const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Tabela numeração");
-  XLSX.writeFile(workbook, `${nomeArquivoSeguro(corrida.nome)}-tabela-numeracao.xlsx`);
-}
-
-async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
-  const dadosExportacao = await buscarDadosExportacao(corridaId);
-  const pagamentos = montarPagamentosPix(dadosExportacao);
-  if (!pagamentos.length) throw new Error("Não há staffs confirmados para gerar pagamento Pix.");
-  if (formato === "excel") { exportarExcelPagamentosPix(dadosExportacao.corrida, pagamentos); return; }
-  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
-  if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
-  const doc = new jsPDFConstructor({ orientation: "portrait", unit: "mm", format: "a4" });
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  let y = 17;
-  doc.setFontSize(16); doc.setFont(undefined, "bold"); doc.text("Relatório de Pagamento Pix", pageWidth / 2, y, { align: "center" });
-  y += 7; doc.setFontSize(10); doc.setFont(undefined, "normal"); doc.text(dadosExportacao.corrida.nome || "Corrida", pageWidth / 2, y, { align: "center" });
-  y += 8;
-  for (let index = 0; index < pagamentos.length; index++) {
-    const pagamento = pagamentos[index]; const staff = pagamento.staff || {}; const alturaBloco = 48;
-    if (y + alturaBloco > pageHeight - 10) { doc.addPage(); y = 14; }
-    const x = 10, largura = pageWidth - 20;
-    const qrDataUrl = await gerarQRCodeDataURLPix(pagamento.payloadPix);
-    const diasTexto = pagamento.dias.length ? pagamento.dias.map(dia => `${dia.nome || dia.tipo || "Dia"}`).join("; ") : "Nenhum dia encontrado";
-    doc.setDrawColor(226,232,240); doc.setFillColor(248,250,252); doc.roundedRect(x, y, largura, alturaBloco, 3, 3, "FD");
-    doc.setTextColor(0,0,0); doc.setFontSize(10.5); doc.setFont(undefined, "bold"); doc.text(staff.nome_completo || "Nome não informado", x + 4, y + 7);
-    doc.setFontSize(7.5); doc.setFont(undefined, "normal");
-    doc.text(`CPF: ${staff.cpf || "Não informado"}`, x + 4, y + 13);
-    doc.text(`Pix: ${pagamento.tipoPix || "Pix"}: ${staff.chave_pix || "Não informada"}`, x + 4, y + 18, { maxWidth: 105 });
-    doc.text(`Dias: ${diasTexto}`, x + 4, y + 26, { maxWidth: 105 });
-    doc.setFontSize(10.5); doc.setFont(undefined, "bold"); doc.text(`Total: ${formatarMoeda(pagamento.valorTotal)}`, x + 4, y + 36);
-    doc.setFontSize(7.5); doc.setFont(undefined, "normal"); doc.text("Pago: (   ) Sim    (   ) Não", x + 4, y + 43);
-    if (pagamento.linkWhatsappPagamento) { doc.setTextColor(22,101,52); doc.setFont(undefined, "bold"); doc.textWithLink("Enviar WhatsApp", x + 72, y + 43, { url: pagamento.linkWhatsappPagamento }); doc.setTextColor(0,0,0); }
-    if (qrDataUrl) { doc.addImage(qrDataUrl, "PNG", x + largura - 38, y + 7, 31, 31); doc.setFontSize(6.5); doc.text("Pix QR Code", x + largura - 22.5, y + 42, { align: "center" }); }
-    y += alturaBloco + 4;
-  }
-  doc.save(`${nomeArquivoSeguro(dadosExportacao.corrida.nome)}-pagamentos-pix.pdf`);
-}
-
-async function obterNomeArquivoRelatorio(corridaId, relatorio, formato) {
-  let nomeCorrida = "corrida";
-  try {
-    const { data } = await supabaseClient.from("corridas").select("nome").eq("id", Number(corridaId)).single();
-    if (data && data.nome) nomeCorrida = data.nome;
-  } catch (_) {}
-  const base = nomeArquivoSeguro(nomeCorrida);
-  const ext = formato === "excel" ? "xlsx" : "pdf";
-  const sufixos = { "lista-geral": "lista-geral", "por-tipo": "por-tipo", "por-dia": "por-data", "pagamento-pix": "pagamentos-pix", "resumo-tenis": "resumo-tenis", "tabela-numeracao": "tabela-numeracao" };
-  return `${base}-${sufixos[relatorio] || "relatorio"}.${ext}`;
-}
-
-function ativarBotoesRelatoriosAdmin() {
-  document.querySelectorAll(".relatorios-admin").forEach(wrapper => {
-    const corridaId = Number(wrapper.dataset.corridaId);
-    const toggle = wrapper.querySelector(".botao-relatorios-toggle");
-    const painel = wrapper.querySelector(".relatorios-painel");
-    if (toggle && painel) {
-      toggle.addEventListener("click", () => {
-        const estaAberto = !painel.classList.contains("hidden");
-        painel.classList.toggle("hidden", estaAberto);
-        toggle.setAttribute("aria-expanded", String(!estaAberto));
-      });
-    }
-    wrapper.querySelectorAll(".relatorio-formato-opcao").forEach(botaoFormato => {
-      botaoFormato.addEventListener("click", () => {
-        const formato = botaoFormato.dataset.formato === "excel" ? "excel" : "pdf";
-        wrapper.dataset.formato = formato;
-        wrapper.querySelectorAll(".relatorio-formato-opcao").forEach(btn => btn.classList.toggle("ativo", btn.dataset.formato === formato));
-        definirFeedbackRelatorio(wrapper, "");
-      });
-    });
-    wrapper.querySelectorAll(".relatorio-acao").forEach(botaoAcao => {
-      botaoAcao.addEventListener("click", async () => {
-        const relatorio = botaoAcao.dataset.relatorio;
-        const formato = obterFormatoRelatorio(wrapper);
-        const textoOriginal = botaoAcao.textContent;
-        try {
-          botaoAcao.disabled = true; botaoAcao.textContent = "Gerando..."; definirFeedbackRelatorio(wrapper, "Gerando arquivo...", "info");
-          if (relatorio === "lista-geral") await exportarInscritosCorrida(corridaId, { formato, filtro: "1" });
-          else if (relatorio === "por-tipo") await exportarInscritosCorrida(corridaId, { formato, filtro: "2" });
-          else if (relatorio === "por-dia") await exportarInscritosCorrida(corridaId, { formato, filtro: "3" });
-          else if (relatorio === "pagamento-pix") await exportarRelatorioPagamentoPix(corridaId, formato);
-          else if (relatorio === "resumo-tenis") await exportarInscritosCorrida(corridaId, { formato, filtro: "4" });
-          else if (relatorio === "tabela-numeracao") await exportarTabelaNumeracaoTenis(corridaId, formato);
-          const nomeArquivo = await obterNomeArquivoRelatorio(corridaId, relatorio, formato);
-          definirFeedbackRelatorio(wrapper, `Arquivo gerado: ${nomeArquivo}`, "sucesso");
-        } catch (error) {
-          console.error("Erro ao gerar relatório:", error);
-          definirFeedbackRelatorio(wrapper, error.message || "Erro ao gerar relatório.", "erro");
-        } finally { botaoAcao.disabled = false; botaoAcao.textContent = textoOriginal; }
-      });
-    });
-  });
-}
-
 function limparCamposNovoDia() {
   if (novoDiaTipo) novoDiaTipo.value = "Entrega de kit";
   if (novoDiaAjuda) novoDiaAjuda.value = "";
@@ -4551,4 +4231,474 @@ if (logoutBtn) {
     localStorage.removeItem("staffLogado");
     window.location.href = "index.html";
   });
+}
+
+/* v175 - ajustes reais nos relatórios PDF solicitados */
+function obterDataDiaRelatorio(dia) {
+  if (!dia || !dia.data_dia) return null;
+  const partes = String(dia.data_dia).split("-");
+  if (partes.length >= 3) {
+    return new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+  }
+  const data = new Date(dia.data_dia);
+  return Number.isNaN(data.getTime()) ? null : data;
+}
+
+function formatarDataCurtaRelatorio(dataDia) {
+  const data = dataDia instanceof Date ? dataDia : obterDataDiaRelatorio({ data_dia: dataDia });
+  if (!data) return "";
+  return data.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+}
+
+function formatarDiaSemanaRelatorio(dataDia) {
+  const data = dataDia instanceof Date ? dataDia : obterDataDiaRelatorio({ data_dia: dataDia });
+  if (!data) return "";
+  const texto = data.toLocaleDateString("pt-BR", { weekday: "long" });
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+function montarPeriodoDiasRelatorio(dias, prefixoSingular = "") {
+  const lista = (dias || [])
+    .filter(dia => dia && dia.data_dia)
+    .sort((a, b) => String(a.data_dia).localeCompare(String(b.data_dia)));
+
+  if (!lista.length) return "";
+
+  const primeiro = lista[0];
+  const ultimo = lista[lista.length - 1];
+  const dataPrimeiro = obterDataDiaRelatorio(primeiro);
+  const dataUltimo = obterDataDiaRelatorio(ultimo);
+
+  if (lista.length === 1) {
+    const diaSemana = formatarDiaSemanaRelatorio(dataPrimeiro);
+    const data = formatarDataCurtaRelatorio(dataPrimeiro);
+    return `${prefixoSingular || "Dia"}: ${diaSemana}, ${data}`;
+  }
+
+  return `De ${formatarDiaSemanaRelatorio(dataPrimeiro)}, ${formatarDataCurtaRelatorio(dataPrimeiro)} a ${formatarDiaSemanaRelatorio(dataUltimo)}, ${formatarDataCurtaRelatorio(dataUltimo)}`;
+}
+
+function montarSubtituloSecaoRelatorio(secao, dadosExportacao, filtro) {
+  const diasCorrida = dadosExportacao && dadosExportacao.diasCorrida ? dadosExportacao.diasCorrida : [];
+  const titulo = secao && secao.titulo ? secao.titulo : "";
+
+  if (filtro === "2") {
+    const ehEntrega = /entrega/i.test(titulo);
+    const diasFiltrados = diasCorrida.filter(dia => ehEntrega ? ehTipoEntregaKit(dia.tipo || dia.nome) : ehTipoDiaCorrida(dia.tipo || dia.nome));
+    return `${titulo} - ${montarPeriodoDiasRelatorio(diasFiltrados, titulo)}`;
+  }
+
+  if (filtro === "3") {
+    return titulo;
+  }
+
+  return `Todos os inscritos - ${montarPeriodoDiasRelatorio(diasCorrida, "Dia")}`;
+}
+
+function montarSecoesExportacao(dadosExportacao, filtro) {
+  const inscritos = dadosExportacao.inscritos || [];
+  const diasCorrida = dadosExportacao.diasCorrida || [];
+
+  if (filtro === "2") {
+    const grupos = {
+      "Entrega Kit": inscritos.filter(inscrito =>
+        inscrito.diasDisponiveis.some(d => ehTipoEntregaKit(d.tipo || d.nome))
+      ),
+      "Corrida": inscritos.filter(inscrito =>
+        inscrito.diasDisponiveis.some(d => ehTipoDiaCorrida(d.tipo || d.nome))
+      )
+    };
+
+    return Object.entries(grupos)
+      .filter(([, lista]) => lista.length > 0)
+      .map(([titulo, lista]) => ({
+        titulo,
+        subtitulo: montarSubtituloSecaoRelatorio({ titulo }, dadosExportacao, filtro),
+        inscritos: ordenarInscritosAlfabetico(lista)
+      }));
+  }
+
+  if (filtro === "3") {
+    return diasCorrida.map(dia => ({
+      titulo: `${dia.nome} - ${formatarData(dia.data_dia)}`,
+      subtitulo: `${dia.nome} - ${formatarDiaSemanaRelatorio(dia.data_dia)}, ${formatarDataCurtaRelatorio(dia.data_dia)}`,
+      inscritos: ordenarInscritosAlfabetico(
+        inscritos.filter(inscrito =>
+          inscrito.diasDisponiveis.some(d => d.id === dia.id)
+        )
+      )
+    }));
+  }
+
+  return [{
+    titulo: "Todos os inscritos",
+    subtitulo: montarSubtituloSecaoRelatorio({ titulo: "Todos os inscritos" }, dadosExportacao, filtro),
+    inscritos: ordenarInscritosAlfabetico(inscritos)
+  }];
+}
+
+function obterNumeracaoStaff(staff) {
+  if (!staff) return "";
+  const valor = staff.numero_calcado ?? staff.calcado ?? staff.numeroCalcado ?? staff.numeracao ?? "";
+  return valor === null || valor === undefined || String(valor).trim() === "" ? "" : String(valor).trim();
+}
+
+function montarLinhasExportacao(inscritos, incluirPrioridade = false, incluirNumeracao = true) {
+  return inscritos.map(inscrito => {
+    const staff = inscrito.staff || {};
+    const dias = removerDiasDuplicados(inscrito.diasDisponiveis || [])
+      .map(dia => dia.nome)
+      .join("; ");
+
+    const linha = {
+      Nome: staff.nome_completo || "",
+      CPF: staff.cpf || "",
+      RG: staff.rg || "",
+      "Celular/Whatsapp": staff.telefone || "",
+      "Chave PIX": staff.chave_pix || ""
+    };
+
+    if (incluirNumeracao) linha["Numeração"] = obterNumeracaoStaff(staff);
+    linha["Dias disponíveis"] = dias;
+
+    if (incluirPrioridade) linha.Prioridade = inscrito.prioridade.texto;
+    linha.Assinatura = "";
+    return linha;
+  });
+}
+
+function exportarPDFCorrida(corrida, secoes, filtro) {
+  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
+  if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
+
+  const doc = new jsPDFConstructor({ orientation: "landscape", unit: "mm", format: "a4" });
+  const incluirPrioridade = false;
+  const incluirNumeracao = corridaPossuiPatrocinioTenis(corrida);
+  const headers = [
+    "Nome",
+    "CPF",
+    "RG",
+    "Celular/Whatsapp",
+    "Chave PIX",
+    ...(incluirNumeracao ? ["Numeração"] : []),
+    ...(incluirPrioridade ? ["Prioridade"] : []),
+    "Assinatura"
+  ];
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const larguraTabela = incluirNumeracao ? 246 : 224;
+  const margemHorizontal = Math.max(8, (pageWidth - larguraTabela) / 2);
+  const nomeArquivo = `${nomeArquivoSeguro(corrida.nome)}-${filtro === "2" ? "por-tipo" : filtro === "3" ? "por-data" : "lista-geral"}.pdf`;
+
+  secoes.forEach((secao, index) => {
+    if (index > 0) doc.addPage();
+    doc.setFontSize(18);
+    doc.setFont(undefined, "bold");
+    doc.text(corrida.nome || "Corrida", pageWidth / 2, 15, { align: "center" });
+    doc.setFontSize(10.5);
+    doc.setFont(undefined, "normal");
+    const subtitulo = secao.subtitulo || secao.titulo || "Inscritos";
+    doc.text(subtitulo, pageWidth / 2, 22, { align: "center" });
+
+    const body = secao.inscritos.map(inscrito => {
+      const staff = inscrito.staff || {};
+      const base = [
+        staff.nome_completo || "",
+        staff.cpf || "",
+        staff.rg || "",
+        staff.telefone || "",
+        staff.chave_pix || ""
+      ];
+      if (incluirNumeracao) base.push(obterNumeracaoStaff(staff) || "");
+      if (incluirPrioridade) base.push(inscrito.prioridade.texto || "");
+      base.push("");
+      return base;
+    });
+
+    const columnStyles = incluirNumeracao
+      ? { 0: { cellWidth: 54, halign: "left" }, 1: { cellWidth: 28 }, 2: { cellWidth: 22 }, 3: { cellWidth: 32 }, 4: { cellWidth: 52 }, 5: { cellWidth: 24 }, 6: { cellWidth: 34 } }
+      : { 0: { cellWidth: 58, halign: "left" }, 1: { cellWidth: 30 }, 2: { cellWidth: 24 }, 3: { cellWidth: 34 }, 4: { cellWidth: 56 }, 5: { cellWidth: 34 } };
+
+    doc.autoTable({
+      head: [headers],
+      body,
+      startY: 29,
+      theme: "grid",
+      margin: { left: margemHorizontal, right: margemHorizontal },
+      tableWidth: "wrap",
+      styles: { fontSize: 8, cellPadding: 2, minCellHeight: 8, halign: "center", valign: "middle", overflow: "linebreak" },
+      headStyles: { fillColor: [47, 107, 88], textColor: [255, 255, 255], fontStyle: "bold", halign: "center", valign: "middle" },
+      columnStyles,
+      didDrawPage: function () {
+        const pageHeight = doc.internal.pageSize.getHeight();
+        doc.setFontSize(8);
+        doc.text(`Página ${doc.internal.getCurrentPageInfo().pageNumber}`, pageWidth - 12, pageHeight - 6, { align: "right" });
+      }
+    });
+  });
+
+  doc.save(nomeArquivo);
+  return nomeArquivo;
+}
+
+function exportarExcelCorrida(corrida, secoes, filtro) {
+  const workbook = XLSX.utils.book_new();
+  const incluirPrioridade = false;
+  const incluirNumeracao = corridaPossuiPatrocinioTenis(corrida);
+  const nomeArquivo = `${nomeArquivoSeguro(corrida.nome)}-${filtro === "2" ? "por-tipo" : filtro === "3" ? "por-data" : "lista-geral"}.xlsx`;
+
+  secoes.forEach((secao, index) => {
+    const dados = montarLinhasExportacao(secao.inscritos, incluirPrioridade, incluirNumeracao);
+    const headers = [
+      "Nome",
+      "CPF",
+      "RG",
+      "Celular/Whatsapp",
+      "Chave PIX",
+      ...(incluirNumeracao ? ["Numeração"] : []),
+      "Dias disponíveis",
+      ...(incluirPrioridade ? ["Prioridade"] : []),
+      "Assinatura"
+    ];
+    const worksheet = XLSX.utils.json_to_sheet(dados, { header: headers, origin: "A4" });
+    const ultimaColuna = headers.length - 1;
+    XLSX.utils.sheet_add_aoa(worksheet, [[corrida.nome], [secao.subtitulo || secao.titulo]], { origin: "A1" });
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: ultimaColuna } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: ultimaColuna } }
+    ];
+    worksheet["!cols"] = headers.map(header => ({ wch: ({ Nome: 40, CPF: 18, RG: 16, "Celular/Whatsapp": 22, "Chave PIX": 28, "Numeração": 12, "Dias disponíveis": 42, Assinatura: 24, Prioridade: 20 }[header] || 20) }));
+    const nomeAba = (secao.titulo || `Lista ${index + 1}`).replace(/[\\/?*\[\]:]/g, " ").slice(0, 31) || `Lista ${index + 1}`;
+    XLSX.utils.book_append_sheet(workbook, worksheet, nomeAba);
+  });
+
+  XLSX.writeFile(workbook, nomeArquivo);
+  return nomeArquivo;
+}
+
+function agruparTenisPorNumeracao(inscritos) {
+  const mapa = new Map();
+  (inscritos || []).forEach(inscrito => {
+    const numero = obterNumeracaoStaff(inscrito.staff) || "Não informado";
+    mapa.set(numero, (mapa.get(numero) || 0) + 1);
+  });
+  return Array.from(mapa.entries())
+    .map(([numero, quantidade]) => ({ numero, quantidade }))
+    .sort((a, b) => String(a.numero).localeCompare(String(b.numero), "pt-BR", { numeric: true }));
+}
+
+function exportarPDFResumoTenis(corrida, inscritos) {
+  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
+  if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
+  const resumo = agruparTenisPorNumeracao(inscritos);
+  if (resumo.length === 0) throw new Error("Não há inscritos para gerar o relatório de tênis.");
+
+  const doc = new jsPDFConstructor({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const nomeArquivo = `${nomeArquivoSeguro(corrida.nome)}-resumo-tenis.pdf`;
+  doc.setFontSize(18);
+  doc.setFont(undefined, "bold");
+  doc.text(corrida.nome || "Corrida", pageWidth / 2, 18, { align: "center" });
+  doc.setFontSize(12);
+  doc.setFont(undefined, "normal");
+  doc.text("Resumo de tênis por numeração", pageWidth / 2, 26, { align: "center" });
+  doc.autoTable({
+    head: [["Numeração", "Quantidade de pares"]],
+    body: resumo.map(item => [item.numero, item.quantidade]),
+    startY: 36,
+    theme: "grid",
+    margin: { left: 45, right: 45 },
+    styles: { fontSize: 11, cellPadding: 3, halign: "center", valign: "middle" },
+    headStyles: { fillColor: [79, 70, 229], textColor: [255,255,255], fontStyle: "bold" },
+    columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 70 } }
+  });
+  const total = resumo.reduce((acc, item) => acc + Number(item.quantidade || 0), 0);
+  const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 50;
+  doc.setFont(undefined, "bold");
+  doc.text(`Total de pares: ${total}`, pageWidth / 2, finalY, { align: "center" });
+  doc.save(nomeArquivo);
+  return nomeArquivo;
+}
+
+function exportarExcelResumoTenis(corrida, inscritos) {
+  const resumo = agruparTenisPorNumeracao(inscritos);
+  if (!resumo.length) throw new Error("Não há inscritos para gerar o relatório de tênis.");
+  const dados = resumo.map(item => ({ "Numeração": item.numero, "Quantidade de pares": item.quantidade }));
+  const worksheet = XLSX.utils.json_to_sheet(dados, { origin: "A4" });
+  XLSX.utils.sheet_add_aoa(worksheet, [[corrida.nome || "Corrida"], ["Resumo de tênis por numeração"]], { origin: "A1" });
+  worksheet["!cols"] = [{ wch: 18 }, { wch: 22 }];
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Resumo tênis");
+  const nomeArquivo = `${nomeArquivoSeguro(corrida.nome)}-resumo-tenis.xlsx`;
+  XLSX.writeFile(workbook, nomeArquivo);
+  return nomeArquivo;
+}
+
+function montarLinhasTabelaNumeracao4Colunas(inscritos) {
+  const lista = ordenarInscritosAlfabetico(inscritos || []);
+  const linhas = [];
+  for (let i = 0; i < lista.length; i += 2) {
+    const staffA = lista[i].staff || {};
+    const staffB = lista[i + 1] ? (lista[i + 1].staff || {}) : null;
+    linhas.push([
+      staffA.nome_completo || "",
+      obterNumeracaoStaff(staffA) || "Não informado",
+      staffB ? (staffB.nome_completo || "") : "",
+      staffB ? (obterNumeracaoStaff(staffB) || "Não informado") : ""
+    ]);
+  }
+  return linhas;
+}
+
+function exportarPDFTabelaNumeracao(corrida, inscritos) {
+  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
+  if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
+  const lista = ordenarInscritosAlfabetico(inscritos || []);
+  if (!lista.length) throw new Error("Não há inscritos para gerar a tabela de numeração.");
+
+  const doc = new jsPDFConstructor({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const nomeArquivo = `${nomeArquivoSeguro(corrida.nome)}-tabela-numeracao.pdf`;
+  doc.setFontSize(18);
+  doc.setFont(undefined, "bold");
+  doc.text(corrida.nome || "Corrida", pageWidth / 2, 18, { align: "center" });
+  doc.setFontSize(12);
+  doc.setFont(undefined, "normal");
+  doc.text("Tabela de numeração", pageWidth / 2, 26, { align: "center" });
+  doc.autoTable({
+    head: [["Nome", "Número", "Nome", "Número"]],
+    body: montarLinhasTabelaNumeracao4Colunas(lista),
+    startY: 36,
+    theme: "grid",
+    margin: { left: 10, right: 10 },
+    styles: { fontSize: 8.5, cellPadding: 2.2, halign: "center", valign: "middle", overflow: "linebreak" },
+    headStyles: { fillColor: [47, 107, 88], textColor: [255,255,255], fontStyle: "bold" },
+    columnStyles: { 0: { cellWidth: 72, halign: "left" }, 1: { cellWidth: 23 }, 2: { cellWidth: 72, halign: "left" }, 3: { cellWidth: 23 } }
+  });
+  doc.save(nomeArquivo);
+  return nomeArquivo;
+}
+
+function exportarExcelTabelaNumeracao(corrida, inscritos) {
+  const lista = ordenarInscritosAlfabetico(inscritos || []);
+  if (!lista.length) throw new Error("Não há inscritos para gerar a tabela de numeração.");
+  const dados = montarLinhasTabelaNumeracao4Colunas(lista);
+  const worksheet = XLSX.utils.aoa_to_sheet([[corrida.nome || "Corrida"], ["Tabela de numeração"], [], ["Nome", "Número", "Nome", "Número"], ...dados]);
+  worksheet["!cols"] = [{ wch: 42 }, { wch: 12 }, { wch: 42 }, { wch: 12 }];
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Tabela numeração");
+  const nomeArquivo = `${nomeArquivoSeguro(corrida.nome)}-tabela-numeracao.xlsx`;
+  XLSX.writeFile(workbook, nomeArquivo);
+  return nomeArquivo;
+}
+
+async function exportarTabelaNumeracaoTenis(corridaId, formato = "pdf") {
+  const dadosExportacao = await buscarDadosExportacao(corridaId);
+  if (!corridaPossuiPatrocinioTenis(dadosExportacao.corrida)) {
+    throw new Error("Esta corrida não está marcada como patrocinada por tênis.");
+  }
+  const secoes = montarSecoesTabelaNumeracao(dadosExportacao.inscritos);
+  const inscritos = secoes[0].inscritos;
+  return formato === "excel"
+    ? exportarExcelTabelaNumeracao(dadosExportacao.corrida, inscritos)
+    : exportarPDFTabelaNumeracao(dadosExportacao.corrida, inscritos);
+}
+
+async function exportarInscritosCorrida(corridaId, opcoes) {
+  const dadosExportacao = await buscarDadosExportacao(corridaId);
+  if (opcoes.filtro === "4") {
+    if (!corridaPossuiPatrocinioTenis(dadosExportacao.corrida)) {
+      throw new Error("Esta corrida não está marcada como patrocinada por tênis.");
+    }
+    return opcoes.formato === "pdf"
+      ? exportarPDFResumoTenis(dadosExportacao.corrida, dadosExportacao.inscritos)
+      : exportarExcelResumoTenis(dadosExportacao.corrida, dadosExportacao.inscritos);
+  }
+  const secoes = montarSecoesExportacao(dadosExportacao, opcoes.filtro);
+  if (secoes.every(secao => secao.inscritos.length === 0)) throw new Error("Não há inscritos para exportar.");
+  return opcoes.formato === "pdf"
+    ? exportarPDFCorrida(dadosExportacao.corrida, secoes, opcoes.filtro)
+    : exportarExcelCorrida(dadosExportacao.corrida, secoes, opcoes.filtro);
+}
+
+function exportarExcelPagamentosPix(corrida, pagamentos) {
+  const dados = pagamentos.map(pagamento => {
+    const staff = pagamento.staff || {};
+    const dias = pagamento.dias.length ? pagamento.dias.map(dia => `${dia.nome || dia.tipo || "Dia"} (${formatarMoeda(dia.valor_ajuda_custo)})`).join("; ") : "";
+    return { Nome: staff.nome_completo || "", CPF: staff.cpf || "", Banco: "", "Tipo Pix": pagamento.tipoPix || "", "Chave Pix": staff.chave_pix || pagamento.chavePixQRCode || "", Cidade: staff.cidade || "", Valor: Number(pagamento.valorTotal || 0), "Código Pix copia e cola": pagamento.payloadPix || "", Dias: dias, Status: "" };
+  });
+  const headers = ["Nome", "CPF", "Banco", "Tipo Pix", "Chave Pix", "Cidade", "Valor", "Código Pix copia e cola", "Dias", "Status"];
+  const worksheet = XLSX.utils.json_to_sheet(dados, { header: headers, origin: "A4" });
+  XLSX.utils.sheet_add_aoa(worksheet, [[corrida.nome || "Corrida"], ["Relatório de Pagamento Pix"]], { origin: "A1" });
+  worksheet["!cols"] = headers.map(header => ({ wch: ({ Nome: 38, CPF: 18, Banco: 18, "Tipo Pix": 14, "Chave Pix": 32, Cidade: 24, Valor: 14, "Código Pix copia e cola": 90, Dias: 44, Status: 14 }[header] || 20) }));
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Pagamentos Pix");
+  const nomeArquivo = `${nomeArquivoSeguro(corrida.nome)}-pagamentos-pix.xlsx`;
+  XLSX.writeFile(workbook, nomeArquivo);
+  return nomeArquivo;
+}
+
+async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
+  const dadosExportacao = await buscarDadosExportacao(corridaId);
+  const pagamentos = montarPagamentosPix(dadosExportacao);
+  if (!pagamentos.length) throw new Error("Não há staffs confirmados para gerar pagamento Pix.");
+  if (formato === "excel") return exportarExcelPagamentosPix(dadosExportacao.corrida, pagamentos);
+
+  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
+  if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
+  const doc = new jsPDFConstructor({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const nomeArquivo = `${nomeArquivoSeguro(dadosExportacao.corrida.nome)}-pagamentos-pix.pdf`;
+  let y = 14;
+  doc.setFontSize(15);
+  doc.setFont(undefined, "bold");
+  doc.text("Relatório de Pagamento Pix", pageWidth / 2, y, { align: "center" });
+  y += 6;
+  doc.setFontSize(10);
+  doc.setFont(undefined, "normal");
+  doc.text(dadosExportacao.corrida.nome || "Corrida", pageWidth / 2, y, { align: "center" });
+  y += 8;
+
+  for (let index = 0; index < pagamentos.length; index++) {
+    const pagamento = pagamentos[index];
+    const staff = pagamento.staff || {};
+    const alturaBloco = 46;
+    if (y + alturaBloco > pageHeight - 8) {
+      doc.addPage();
+      y = 12;
+    }
+    const x = 10;
+    const largura = pageWidth - 20;
+    const qrDataUrl = await gerarQRCodeDataURLPix(pagamento.payloadPix);
+    const diasTexto = pagamento.dias.length ? pagamento.dias.map(dia => dia.nome || dia.tipo || "Dia").join("; ") : "Nenhum dia encontrado";
+    doc.setDrawColor(226, 232, 240);
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(x, y, largura, alturaBloco, 2.5, 2.5, "FD");
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.setFont(undefined, "bold");
+    doc.text(staff.nome_completo || "Nome não informado", x + 4, y + 6);
+    doc.setFontSize(7.5);
+    doc.setFont(undefined, "normal");
+    doc.text(`CPF: ${staff.cpf || "Não informado"}`, x + 4, y + 11);
+    doc.text(`Pix: ${pagamento.tipoPix || ""} - ${staff.chave_pix || "Não informada"}`, x + 4, y + 16, { maxWidth: 112 });
+    doc.text(`Dias: ${diasTexto}`, x + 4, y + 21, { maxWidth: 112 });
+    doc.setFontSize(10);
+    doc.setFont(undefined, "bold");
+    doc.text(`Total: ${formatarMoeda(pagamento.valorTotal)}`, x + 4, y + 28);
+    doc.setFontSize(7.5);
+    doc.setFont(undefined, "normal");
+    doc.text("Pago: (   ) Sim    (   ) Não", x + 4, y + 34);
+    doc.text("Copia e cola:", x + 4, y + 40);
+    doc.text(pagamento.payloadPix || "Código indisponível", x + 26, y + 40, { maxWidth: 115 });
+
+    if (qrDataUrl) {
+      doc.addImage(qrDataUrl, "PNG", x + largura - 36, y + 7, 28, 28);
+      doc.setFontSize(6.5);
+      doc.text("Pix QR Code", x + largura - 22, y + 39, { align: "center" });
+    }
+    y += alturaBloco + 4;
+  }
+  doc.save(nomeArquivo);
+  return nomeArquivo;
 }
