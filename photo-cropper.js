@@ -193,8 +193,14 @@
         state.naturalW = img.naturalWidth;
         state.naturalH = img.naturalHeight;
         state.imgEl.src = state.objectUrl;
-        setupInitialScale();
+
+        // Abre o modal antes de calcular escala.
+        // Quando o backdrop estava display:none, o stage não tinha tamanho real
+        // e banners 16:9 eram iniciados com escala incorreta, cortando laterais/topo.
         state.backdrop.classList.add('is-open');
+        requestAnimationFrame(() => {
+          setupInitialScale();
+        });
       };
       img.onerror = () => {
         cleanup(false);
@@ -205,15 +211,19 @@
 
   function setupInitialScale(){
     const rect = cropRect();
+    // Para banner retangular, a escala mínima precisa preencher o quadro sem cortes
+    // quando a proporção da imagem já é igual à proporção do crop.
     const fitToCrop = Math.max(rect.cropW / state.naturalW, rect.cropH / state.naturalH);
-    state.minScale = fitToCrop;
-    state.scale = fitToCrop;
-    state.zoomRange.min = String(fitToCrop);
-    state.zoomRange.max = String(fitToCrop * 3);
-    state.zoomRange.step = String(Math.max(0.005, fitToCrop / 100));
-    state.zoomRange.value = String(fitToCrop);
+    const safeFit = Math.max(fitToCrop, 0.0001);
+    state.minScale = safeFit;
+    state.scale = safeFit;
+    state.zoomRange.min = String(safeFit);
+    state.zoomRange.max = String(safeFit * 3);
+    state.zoomRange.step = String(Math.max(0.001, safeFit / 100));
+    state.zoomRange.value = String(safeFit);
     state.x = 0;
     state.y = 0;
+    clampPosition();
     applyTransform();
   }
 

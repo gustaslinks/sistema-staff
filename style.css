@@ -7699,3 +7699,54 @@ body.pagina-editar-cadastro .header p {
     min-height: 48px !important;
   }
 }
+
+
+/* v193 - ajuste real do semáforo dentro do box de inscrições */
+.corrida-status-topo-linha{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:16px !important;
+}
+.card-corrida-admin .corrida-status-card,
+.corrida-status-card{
+  display:flex !important;
+  align-items:center !important;
+  min-height:86px !important;
+}
+.card-corrida-admin .corrida-status-card .corrida-status-topo-linha,
+.corrida-status-card .corrida-status-topo-linha{
+  width:100% !important;
+}
+.botao-alterar-status-corrida.botao-status-compacto,
+.botao-status-compacto{
+  position:static !important;
+  flex:0 0 42px !important;
+  width:42px !important;
+  height:42px !important;
+  min-width:42px !important;
+  min-height:42px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin:0 !important;
+  transform:none !important;
+}
+.status-semaforo-indicador{
+  margin:0 auto !important;
+}
+@media (max-width:520px){
+  .card-corrida-admin .corrida-status-card,
+  .corrida-status-card{
+    min-height:82px !important;
+    padding-right:18px !important;
+  }
+  .botao-alterar-status-corrida.botao-status-compacto,
+  .botao-status-compacto{
+    flex-basis:40px !important;
+    width:40px !important;
+    height:40px !important;
+    min-width:40px !important;
+    min-height:40px !important;
+  }
+}

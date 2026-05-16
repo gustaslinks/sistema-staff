@@ -14,3 +14,25 @@
 .photo-cropper-stage.is-banner-crop .photo-cropper-grid{left:0;top:0;width:100%;height:100%;border-radius:18px;box-sizing:border-box;}
 .photo-cropper-stage.is-photo-crop .photo-cropper-frame{border-radius:50%;}
 .photo-cropper-stage.is-photo-crop .photo-cropper-grid{border-radius:50%;}
+
+
+/* v193 - banner 16:9 deve caber inteiro no zoom mínimo */
+.photo-cropper-stage.is-banner-crop{
+  aspect-ratio:16/9 !important;
+  background:#ffffff !important;
+}
+.photo-cropper-stage.is-banner-crop .photo-cropper-frame{
+  left:0 !important;
+  top:0 !important;
+  width:100% !important;
+  height:100% !important;
+  transform:none !important;
+  border-radius:18px !important;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.96) !important;
+}
+.photo-cropper-stage.is-banner-crop .photo-cropper-grid{
+  left:0 !important;
+  top:0 !important;
+  width:100% !important;
+  height:100% !important;
+}
