@@ -8956,3 +8956,62 @@ body.pagina-editar-cadastro .header p {
     padding: 22px 24px !important;
   }
 }
+
+
+/* v2.6 - ajuste PCD e ícones flat dos botões de foto */
+.pcd-card small {
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+}
+
+.foto-input-actions-compact .foto-input-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  text-align: center !important;
+  line-height: 1 !important;
+}
+
+.foto-input-actions-compact .foto-input-btn span:not(.foto-input-ico) {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1 !important;
+}
+
+.foto-input-ico.foto-icon-gallery,
+.foto-input-ico.foto-icon-camera,
+.foto-icon-gallery,
+.foto-icon-camera {
+  width: 22px !important;
+  height: 22px !important;
+  flex: 0 0 22px !important;
+  display: inline-block !important;
+  background: currentColor !important;
+  opacity: .95 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  clip-path: none !important;
+  mask-repeat: no-repeat !important;
+  mask-position: center !important;
+  mask-size: contain !important;
+  -webkit-mask-repeat: no-repeat !important;
+  -webkit-mask-position: center !important;
+  -webkit-mask-size: contain !important;
+}
+
+.foto-icon-gallery {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 4h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm0 2a1 1 0 0 0-1 1v8.1l3.4-3.4a2 2 0 0 1 2.8 0l2.1 2.1 1.3-1.3a2 2 0 0 1 2.8 0L20 16.1V7a1 1 0 0 0-1-1H5Zm3.8 7.1L4 17.9V18h16v-.1l-5-5-2.7 2.7-3.5-2.5ZM17 8a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z'/%3E%3C/svg%3E") !important;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 4h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Zm0 2a1 1 0 0 0-1 1v8.1l3.4-3.4a2 2 0 0 1 2.8 0l2.1 2.1 1.3-1.3a2 2 0 0 1 2.8 0L20 16.1V7a1 1 0 0 0-1-1H5Zm3.8 7.1L4 17.9V18h16v-.1l-5-5-2.7 2.7-3.5-2.5ZM17 8a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z'/%3E%3C/svg%3E") !important;
+}
+
+.foto-icon-camera {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 4h6l1.4 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.6L9 4Zm3 14a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0-2a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z'/%3E%3C/svg%3E") !important;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 4h6l1.4 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.6L9 4Zm3 14a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0-2a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z'/%3E%3C/svg%3E") !important;
+}
+
+.foto-icon-gallery::after,
+.foto-icon-camera::after {
+  display: none !important;
+  content: none !important;
+}
