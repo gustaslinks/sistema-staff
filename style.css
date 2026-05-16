@@ -10004,3 +10004,47 @@ body.body-corridas .card-minha-inscricao h3 {
     border-radius: 24px 24px 0 0 !important;
   }
 }
+
+/* =========================================================
+   v3.3 - ajustes finos
+   - Banner colado ao topo dos cards de corrida
+   - Edição mostra apenas Segurança e acesso
+========================================================= */
+body.body-corridas .card-corrida-com-banner,
+body.body-corridas .card-minha-com-banner,
+body.body-corridas .card-minha-inscricao:has(.corrida-card-banner),
+body.body-corridas .card-minha-inscricao:has(.minha-inscricao-banner) {
+  padding-top: 0 !important;
+  overflow: hidden !important;
+}
+
+body.body-corridas .card-corrida-com-banner .corrida-banner-wrap,
+body.body-corridas .card-minha-com-banner .corrida-banner-wrap,
+body.body-corridas .card-minha-inscricao .corrida-banner-wrap {
+  margin-top: 0 !important;
+  margin-bottom: 22px !important;
+  display: block !important;
+  line-height: 0 !important;
+}
+
+body.body-corridas .card-corrida-com-banner .corrida-card-banner,
+body.body-corridas .card-minha-com-banner .corrida-card-banner,
+body.body-corridas .card-minha-inscricao .corrida-card-banner,
+body.body-corridas .card-minha-inscricao .minha-inscricao-banner {
+  display: block !important;
+  vertical-align: top !important;
+}
+
+.pagina-editar-cadastro #dadosAcessoTitle,
+.pagina-editar-cadastro #camposSenhaCadastro {
+  display: none !important;
+}
+
+@media (max-width: 520px) {
+  body.body-corridas .card-corrida-com-banner .corrida-banner-wrap,
+  body.body-corridas .card-minha-com-banner .corrida-banner-wrap,
+  body.body-corridas .card-minha-inscricao .corrida-banner-wrap {
+    margin-top: 0 !important;
+    margin-bottom: 20px !important;
+  }
+}

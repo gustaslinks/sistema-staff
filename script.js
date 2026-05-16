@@ -147,6 +147,7 @@ const novaSenha = document.getElementById('novaSenha');
 const novaSenhaConfirmacao = document.getElementById('novaSenhaConfirmacao');
 const btnAlterarSenha = document.getElementById('btnAlterarSenha');
 const btnEnviarResetSenha = document.getElementById('btnEnviarResetSenha');
+const changePasswordPanel = document.getElementById('changePasswordPanel');
 const btnExcluirStaff = document.getElementById('btnExcluirStaff');
 const securityStatus = document.getElementById('securityStatus');
 
@@ -186,19 +187,29 @@ function renderizarSegurancaCadastro(staff){
   const possuiAuth = !!(staff && staff.auth_user_id);
   const estaEditandoProprioCadastro = staffLogadoEdicao && staff && String(staffLogadoEdicao.id || '') === String(staff.id || '');
 
-  // v2.8: se já existe vínculo Auth, o bloco "Dados de acesso" deixa de aparecer.
-  // Ele fica reservado para cadastro novo/primeiro acesso.
-  if(dadosAcessoTitle) dadosAcessoTitle.classList.toggle('hidden', possuiAuth);
-  if(camposSenhaCadastro) camposSenhaCadastro.classList.toggle('hidden', possuiAuth);
+  // Em edição, o bloco "Dados de acesso" nunca aparece.
+  // Ele fica reservado exclusivamente para cadastro novo/primeiro acesso.
+  if(dadosAcessoTitle) dadosAcessoTitle.classList.add('hidden');
+  if(camposSenhaCadastro) camposSenhaCadastro.classList.add('hidden');
 
   if(!accountSecurityPanel) return;
 
-  // Staff comum com Auth vê apenas a troca da própria senha.
-  // Staff sem Auth não vê segurança, pois precisa criar acesso primeiro.
+  if(!possuiAuth){
+    accountSecurityPanel.classList.add('hidden');
+    if(adminMetaPanel) adminMetaPanel.classList.add('hidden');
+    if(changePasswordPanel) changePasswordPanel.classList.add('hidden');
+    if(btnAlterarSenha) btnAlterarSenha.classList.add('hidden');
+    if(btnEnviarResetSenha) btnEnviarResetSenha.classList.add('hidden');
+    if(btnExcluirStaff) btnExcluirStaff.classList.add('hidden');
+    return;
+  }
+
+  // Staff comum vê somente a própria troca de senha.
   if(!isAdminEdicao){
     const podeTrocarSenha = possuiAuth && estaEditandoProprioCadastro;
     accountSecurityPanel.classList.toggle('hidden', !podeTrocarSenha);
     if(adminMetaPanel) adminMetaPanel.classList.add('hidden');
+    if(changePasswordPanel) changePasswordPanel.classList.toggle('hidden', !podeTrocarSenha);
     if(btnAlterarSenha) btnAlterarSenha.classList.toggle('hidden', !podeTrocarSenha);
     if(btnEnviarResetSenha) btnEnviarResetSenha.classList.add('hidden');
     if(btnExcluirStaff) btnExcluirStaff.classList.add('hidden');
@@ -206,9 +217,11 @@ function renderizarSegurancaCadastro(staff){
   }
 
   accountSecurityPanel.classList.remove('hidden');
+  if(changePasswordPanel) changePasswordPanel.classList.remove('hidden');
   if(btnAlterarSenha) btnAlterarSenha.classList.toggle('hidden', !(possuiAuth && estaEditandoProprioCadastro));
   if(btnEnviarResetSenha) btnEnviarResetSenha.classList.toggle('hidden', !(staff && staff.email && !estaEditandoProprioCadastro));
 
+  // Admin vê dados técnicos e permissões; staff comum não vê esses campos.
   if(adminMetaPanel){
     adminMetaPanel.classList.remove('hidden');
     if(adminStaffIdInfo) adminStaffIdInfo.textContent = staff && staff.id ? staff.id : '-';
@@ -761,7 +774,7 @@ async function buscarCadastroPorCpf(cpfValor){
 
 function travarCamposLoginStaffComum(){
   const deveTravar = (modoEdicao || modoEdicaoAdminCpfAtivo) && !isAdminEdicao;
-  [cpf, nascimento].forEach((campo) => {
+  [cpf, nascimento, email].forEach((campo) => {
     if (!campo) return;
     campo.disabled = deveTravar;
     campo.classList.toggle('campo-bloqueado-edicao', deveTravar);
@@ -962,6 +975,7 @@ async function atualizarCadastroExistente(dadosCadastro){
   if (!isAdminEdicao) {
     dadosUpdate.cpf = cadastroEncontrado.cpf || dadosCadastro.cpf;
     dadosUpdate.data_nascimento = cadastroEncontrado.data_nascimento || dadosCadastro.data_nascimento;
+    dadosUpdate.email = cadastroEncontrado.email || dadosCadastro.email;
   }
 
   const { data, error } = await supabaseClient
