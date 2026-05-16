@@ -800,6 +800,7 @@ async function carregarCorridasAdmin() {
                   <button type="button" class="relatorio-acao" data-relatorio="lista-geral">Lista geral</button>
                   <button type="button" class="relatorio-acao" data-relatorio="por-tipo">Por tipo/período</button>
                   <button type="button" class="relatorio-acao" data-relatorio="por-dia">Por data</button>
+                  <button type="button" class="relatorio-acao" data-relatorio="em-branco">Em branco</button>
                 </div>
               </div>
 
@@ -3581,6 +3582,8 @@ function ativarBotoesRelatoriosAdmin() {
             nomeArquivoGerado = await exportarInscritosCorrida(corridaId, { formato, filtro: "2" });
           } else if (relatorio === "por-dia") {
             nomeArquivoGerado = await exportarInscritosCorrida(corridaId, { formato, filtro: "3" });
+          } else if (relatorio === "em-branco") {
+            nomeArquivoGerado = await exportarRelatorioEmBranco(corridaId);
           } else if (relatorio === "pagamento-pix") {
             nomeArquivoGerado = await exportarRelatorioPagamentoPix(corridaId, formato);
           } else if (relatorio === "resumo-tenis") {
@@ -4219,10 +4222,10 @@ if (logoutBtn) {
   });
 }
 
-/* v180 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
-/* v180 - ajustes reais nos relatórios PDF solicitados */
-/* v180 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
-/* v180 - tabela numeracao preenche coluna esquerda inteira antes da direita */
+/* v181 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
+/* v181 - ajustes reais nos relatórios PDF solicitados */
+/* v181 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
+/* v181 - tabela numeracao preenche coluna esquerda inteira antes da direita */
 function obterDataDiaRelatorio(dia) {
   if (!dia || !dia.data_dia) return null;
   const partes = String(dia.data_dia).split("-");
@@ -4610,6 +4613,75 @@ async function exportarTabelaNumeracaoTenis(corridaId, formato = "pdf") {
     : exportarPDFTabelaNumeracao(dadosExportacao.corrida, inscritos);
 }
 
+
+function montarSubtituloListaEmBranco(corrida) {
+  const inicio = formatarData(corrida.data_inicio || corrida.data_corrida || "");
+  const fim = formatarData(corrida.data_fim || corrida.data_corrida || "");
+  if (inicio && fim && inicio !== fim) return `Lista em branco - De ${inicio} a ${fim}`;
+  if (inicio) return `Lista em branco - ${inicio}`;
+  return "Lista em branco";
+}
+
+function exportarPDFRelatorioEmBranco(corrida) {
+  const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
+  if (!jsPDFConstructor) throw new Error("Biblioteca de PDF não carregada. Confira sua conexão e tente novamente.");
+
+  const doc = new jsPDFConstructor({ orientation: "landscape", unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const incluirNumeracao = corridaPossuiPatrocinioTenis(corrida);
+  const nomeArquivo = `${nomeArquivoSeguro(corrida.nome)}-lista-em-branco.pdf`;
+
+  const headers = [
+    "Nome",
+    "CPF",
+    "RG",
+    "Celular/Whatsapp",
+    "Chave PIX",
+    ...(incluirNumeracao ? ["Numeração"] : []),
+    "Assinatura"
+  ];
+
+  const startY = 31;
+  const marginLeft = 8;
+  const marginRight = 8;
+  const bottomMargin = 9;
+  const linhas = 12;
+  const alturaLinha = Math.max(9, (pageHeight - startY - bottomMargin - 9) / linhas);
+  const body = Array.from({ length: linhas }, () => headers.map(() => ""));
+
+  doc.setFontSize(18);
+  doc.setFont(undefined, "bold");
+  doc.text(corrida.nome || "Corrida", pageWidth / 2, 16, { align: "center" });
+  doc.setFontSize(11);
+  doc.setFont(undefined, "normal");
+  doc.text(montarSubtituloListaEmBranco(corrida), pageWidth / 2, 23, { align: "center" });
+
+  const columnStyles = incluirNumeracao
+    ? { 0: { cellWidth: 58, halign: "left" }, 1: { cellWidth: 30 }, 2: { cellWidth: 24 }, 3: { cellWidth: 35 }, 4: { cellWidth: 52 }, 5: { cellWidth: 25 }, 6: { cellWidth: 55 } }
+    : { 0: { cellWidth: 62, halign: "left" }, 1: { cellWidth: 32 }, 2: { cellWidth: 26 }, 3: { cellWidth: 38 }, 4: { cellWidth: 58 }, 5: { cellWidth: 62 } };
+
+  doc.autoTable({
+    head: [headers],
+    body,
+    startY,
+    theme: "grid",
+    margin: { left: marginLeft, right: marginRight, bottom: bottomMargin },
+    tableWidth: "wrap",
+    styles: { fontSize: 8, cellPadding: 1.5, minCellHeight: alturaLinha, halign: "center", valign: "middle", overflow: "linebreak", lineWidth: 0.15 },
+    headStyles: { fillColor: [47, 107, 88], textColor: [255, 255, 255], fontStyle: "bold", halign: "center", valign: "middle", minCellHeight: 9 },
+    columnStyles
+  });
+
+  doc.save(nomeArquivo);
+  return nomeArquivo;
+}
+
+async function exportarRelatorioEmBranco(corridaId) {
+  const dadosExportacao = await buscarDadosExportacao(corridaId);
+  return exportarPDFRelatorioEmBranco(dadosExportacao.corrida);
+}
+
 async function exportarInscritosCorrida(corridaId, opcoes) {
   const dadosExportacao = await buscarDadosExportacao(corridaId);
   if (opcoes.filtro === "4") {
@@ -4710,4 +4782,4 @@ async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
   return nomeArquivo;
 }
 
-/* v180 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
+/* v181 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
