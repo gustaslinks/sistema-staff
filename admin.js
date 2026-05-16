@@ -4216,9 +4216,9 @@ if (logoutBtn) {
   });
 }
 
-/* v177 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
-/* v177 - ajustes reais nos relatórios PDF solicitados */
-/* v177 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
+/* v178 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
+/* v178 - ajustes reais nos relatórios PDF solicitados */
+/* v178 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
 function obterDataDiaRelatorio(dia) {
   if (!dia || !dia.data_dia) return null;
   const partes = String(dia.data_dia).split("-");
@@ -4520,17 +4520,23 @@ function exportarExcelResumoTenis(corrida, inscritos) {
 
 function montarLinhasTabelaNumeracao4Colunas(inscritos) {
   const lista = ordenarInscritosAlfabetico(inscritos || []);
+  const metade = Math.ceil(lista.length / 2);
+  const colunaEsquerda = lista.slice(0, metade);
+  const colunaDireita = lista.slice(metade);
   const linhas = [];
-  for (let i = 0; i < lista.length; i += 2) {
-    const staffA = lista[i].staff || {};
-    const staffB = lista[i + 1] ? (lista[i + 1].staff || {}) : null;
+
+  for (let i = 0; i < metade; i++) {
+    const staffA = colunaEsquerda[i] ? (colunaEsquerda[i].staff || {}) : null;
+    const staffB = colunaDireita[i] ? (colunaDireita[i].staff || {}) : null;
+
     linhas.push([
-      staffA.nome_completo || "",
-      obterNumeracaoStaff(staffA) || "Não informado",
+      staffA ? (staffA.nome_completo || "") : "",
+      staffA ? (obterNumeracaoStaff(staffA) || "Não informado") : "",
       staffB ? (staffB.nome_completo || "") : "",
       staffB ? (obterNumeracaoStaff(staffB) || "Não informado") : ""
     ]);
   }
+
   return linhas;
 }
 
