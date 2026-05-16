@@ -27,7 +27,8 @@
     pinchStartDistance: 0,
     pinchStartScale: 1,
     pinchBaseX: 0,
-    pinchBaseY: 0
+    pinchBaseY: 0,
+    options: null
   };
 
   function $(id){ return document.getElementById(id); }
@@ -119,6 +120,23 @@
     backdrop.addEventListener('click', (ev) => { if(ev.target === backdrop) cancel(); });
   }
 
+  function applyOptionsToModal(){
+    const opts = state.options || {};
+    const title = $('photoCropperTitle');
+    const desc = document.querySelector('.photo-cropper-header p');
+    const help = document.querySelector('.photo-cropper-help');
+    const saveBtn = $('photoCropperSave');
+    if(title) title.textContent = opts.title || 'Ajustar imagem';
+    if(desc) desc.textContent = opts.description || '';
+    if(help) help.textContent = opts.help || '';
+    if(saveBtn) saveBtn.textContent = opts.saveText || 'Usar imagem';
+    if(state.stage){
+      state.stage.style.aspectRatio = String(opts.aspectRatio || 1).replace('/', ' / ');
+      state.stage.classList.toggle('is-banner-crop', opts.shape === 'rect');
+      state.stage.classList.toggle('is-photo-crop', opts.shape !== 'rect');
+    }
+  }
+
   function pointerDistance(){
     const pts = Array.from(state.pointers.values());
     if(pts.length < 2) return 0;
@@ -142,11 +160,27 @@
     try{ state.stage.releasePointerCapture(ev.pointerId); }catch(e){}
   }
 
-  function open(file, input){
+  function open(file, input, options){
     ensureModal();
     state.input = input;
     state.file = file;
     state.cropFile = null;
+    state.options = Object.assign({
+      title: 'Ajustar foto de cadastro',
+      description: 'Centralize seu rosto no círculo. Use uma foto real, legível e parecida com seu documento.',
+      help: 'Arraste a imagem para posicionar. No celular, use pinça para aproximar/afastar. O arquivo salvo será quadrado e comprimido para o cadastro.',
+      saveText: 'Usar esta foto',
+      aspectRatio: 1,
+      outputWidth: 700,
+      outputHeight: 700,
+      mimeType: 'image/jpeg',
+      quality: 0.86,
+      filePrefix: 'foto-staff',
+      shape: 'circle',
+      updatePreview: true,
+      setCurrentFile: true
+    }, options || {});
+    applyOptionsToModal();
     state.pointers && state.pointers.clear();
 
     return new Promise((resolve) => {
@@ -170,9 +204,8 @@
   }
 
   function setupInitialScale(){
-    const stageSize = state.stage.clientWidth || 420;
-    const cropSize = stageSize * 0.78;
-    const fitToCrop = Math.max(cropSize / state.naturalW, cropSize / state.naturalH);
+    const rect = cropRect();
+    const fitToCrop = Math.max(rect.cropW / state.naturalW, rect.cropH / state.naturalH);
     state.minScale = fitToCrop;
     state.scale = fitToCrop;
     state.zoomRange.min = String(fitToCrop);
@@ -185,17 +218,20 @@
   }
 
   function cropRect(){
-    const stageSize = state.stage.clientWidth || 420;
-    const cropSize = stageSize * 0.78;
-    return { stageSize, cropSize, left:(stageSize-cropSize)/2, top:(stageSize-cropSize)/2 };
+    const stageW = state.stage.clientWidth || 420;
+    const stageH = state.stage.clientHeight || Math.round(stageW / ((state.options && state.options.aspectRatio) || 1));
+    const inset = state.options && state.options.shape === 'rect' ? 0.08 : 0.11;
+    const cropW = stageW * (1 - inset * 2);
+    const cropH = stageH * (1 - inset * 2);
+    return { stageW, stageH, cropW, cropH, left:(stageW-cropW)/2, top:(stageH-cropH)/2 };
   }
 
   function clampPosition(){
-    const { cropSize } = cropRect();
+    const { cropW, cropH } = cropRect();
     const drawnW = state.naturalW * state.scale;
     const drawnH = state.naturalH * state.scale;
-    const maxX = Math.max(0, (drawnW - cropSize) / 2);
-    const maxY = Math.max(0, (drawnH - cropSize) / 2);
+    const maxX = Math.max(0, (drawnW - cropW) / 2);
+    const maxY = Math.max(0, (drawnH - cropH) / 2);
     state.x = Math.min(maxX, Math.max(-maxX, state.x));
     state.y = Math.min(maxY, Math.max(-maxY, state.y));
   }
@@ -207,35 +243,41 @@
   }
 
   function save(){
-    const outputSize = 700;
-    const { stageSize, cropSize } = cropRect();
+    const opts = state.options || {};
+    const outputW = Number(opts.outputWidth || 700);
+    const outputH = Number(opts.outputHeight || outputW);
+    const { stageW, stageH, cropW, cropH } = cropRect();
     const canvas = document.createElement('canvas');
-    canvas.width = outputSize;
-    canvas.height = outputSize;
+    canvas.width = outputW;
+    canvas.height = outputH;
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,outputSize,outputSize);
+    ctx.fillRect(0,0,outputW,outputH);
 
     const drawnW = state.naturalW * state.scale;
     const drawnH = state.naturalH * state.scale;
-    const imgLeft = stageSize/2 - drawnW/2 + state.x;
-    const imgTop = stageSize/2 - drawnH/2 + state.y;
-    const cropLeft = (stageSize - cropSize) / 2;
-    const cropTop = (stageSize - cropSize) / 2;
+    const imgLeft = stageW/2 - drawnW/2 + state.x;
+    const imgTop = stageH/2 - drawnH/2 + state.y;
+    const cropLeft = (stageW - cropW) / 2;
+    const cropTop = (stageH - cropH) / 2;
 
     const sx = Math.max(0, (cropLeft - imgLeft) / state.scale);
     const sy = Math.max(0, (cropTop - imgTop) / state.scale);
-    const sw = Math.min(state.naturalW - sx, cropSize / state.scale);
-    const sh = Math.min(state.naturalH - sy, cropSize / state.scale);
+    const sw = Math.min(state.naturalW - sx, cropW / state.scale);
+    const sh = Math.min(state.naturalH - sy, cropH / state.scale);
 
-    ctx.drawImage(state.image, sx, sy, sw, sh, 0, 0, outputSize, outputSize);
+    ctx.drawImage(state.image, sx, sy, sw, sh, 0, 0, outputW, outputH);
+    const mimeType = opts.mimeType || 'image/jpeg';
+    const quality = typeof opts.quality === 'number' ? opts.quality : 0.86;
     canvas.toBlob((blob) => {
       if(!blob){ cleanup(false); return; }
-      const safeName = (state.file && state.file.name ? state.file.name.replace(/\.[^.]+$/, '') : 'foto-staff');
-      state.cropFile = new File([blob], `${safeName}-recortada.jpg`, { type:'image/jpeg', lastModified:Date.now() });
-      updatePreview(state.cropFile);
+      const ext = mimeType === 'image/webp' ? 'webp' : 'jpg';
+      const baseName = state.file && state.file.name ? state.file.name.replace(/\.[^.]+$/, '') : (opts.filePrefix || 'imagem');
+      const safeName = `${baseName}-recortada.${ext}`;
+      state.cropFile = new File([blob], safeName, { type:mimeType, lastModified:Date.now() });
+      if(opts.updatePreview !== false) updatePreview(state.cropFile);
       cleanup(true);
-    }, 'image/jpeg', 0.86);
+    }, mimeType, quality);
   }
 
   function updatePreview(file){
@@ -259,8 +301,8 @@
   function cleanup(success){
     state.backdrop && state.backdrop.classList.remove('is-open');
     if(state.objectUrl){ URL.revokeObjectURL(state.objectUrl); state.objectUrl = ''; }
-    if(success && state.cropFile){ window.StaffPhotoCropper.currentFile = state.cropFile; }
-    if(!success){ window.StaffPhotoCropper.currentFile = null; }
+    if(success && state.cropFile && (!state.options || state.options.setCurrentFile !== false)){ window.StaffPhotoCropper.currentFile = state.cropFile; }
+    if(!success && (!state.options || state.options.setCurrentFile !== false)){ window.StaffPhotoCropper.currentFile = null; }
     if(typeof state.resolve === 'function') state.resolve(success ? state.cropFile : null);
     state.resolve = null;
   }

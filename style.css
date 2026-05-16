@@ -6586,3 +6586,173 @@ body.pagina-editar-cadastro .header p {
     margin-top: 12px;
   }
 }
+
+/* =========================================================
+   AJUSTES V186 - BANNER, CARD CORRIDA E INSCRITOS
+========================================================= */
+.form-admin .section-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 40px !important;
+  padding: 12px 14px 12px 46px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, rgba(124,58,237,.10), rgba(14,165,233,.08)) !important;
+  border: 1px solid rgba(124,58,237,.13) !important;
+  color: #312e81 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: .01em !important;
+  position: relative !important;
+}
+
+.form-admin .section-title::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  box-shadow: 0 7px 14px rgba(124,58,237,.20);
+}
+
+.form-admin .section-title::after { display: none !important; }
+
+.field-banner-corrida small { line-height: 1.35; }
+
+.card-corrida-admin {
+  margin-bottom: 34px !important;
+}
+
+.corrida-status-label-destaque {
+  font-size: 15px !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.corrida-status-subtitulo {
+  margin-top: 4px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  opacity: .82;
+}
+
+.corrida-progresso-rotulo {
+  font-size: 12.5px !important;
+  font-weight: 900 !important;
+  color: #334155 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.corrida-progresso-confirmados .corrida-progresso-barra.confirmados-verde,
+.corrida-progresso-confirmados-barra.confirmados-verde {
+  background: #22c55e !important;
+}
+
+.corrida-resumo-sutil {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 13px 0 4px;
+}
+
+.corrida-resumo-sutil > div {
+  padding: 10px 11px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  min-width: 0;
+}
+
+.corrida-resumo-sutil strong,
+.corrida-resumo-sutil span {
+  display: block;
+}
+
+.corrida-resumo-sutil strong {
+  margin-bottom: 4px;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.corrida-resumo-sutil span {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #0f172a;
+}
+
+.admin-inscritos-filtros-v186 {
+  display: grid !important;
+  gap: 11px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.admin-filtros-topo-v186 {
+  display: grid;
+  grid-template-columns: minmax(165px, 220px) minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.admin-busca-wrap-v186 {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-busca-wrap-v186 span,
+.admin-status-select-wrap span {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.admin-inscritos-filtros-v186 .admin-busca-inscrito,
+.admin-inscritos-filtros-v186 .admin-status-select {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 13px;
+}
+
+.admin-inscritos-filtros-v186 .admin-toggles-tipo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.admin-inscritos-contagem-exibidos {
+  margin: 11px 0 0;
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #475569;
+}
+
+.admin-inscritos-acoes-v127 {
+  margin-top: 10px !important;
+}
+
+.admin-lista-compacta-inscritos {
+  margin-top: 14px;
+}
+
+@media (max-width: 700px) {
+  .corrida-resumo-sutil,
+  .admin-filtros-topo-v186 {
+    grid-template-columns: 1fr;
+  }
+
+  .card-corrida-admin {
+    margin-bottom: 28px !important;
+  }
+}

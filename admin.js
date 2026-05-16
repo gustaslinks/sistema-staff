@@ -129,11 +129,38 @@ if (corridaBannerInput) {
 
     try {
       atualizarPreviewBannerCorrida(null);
-      corridaBannerArquivo = await otimizarBannerCorrida(arquivo);
+      let arquivoParaOtimizar = arquivo;
+
+      if (window.StaffPhotoCropper && typeof window.StaffPhotoCropper.open === "function") {
+        const recortado = await window.StaffPhotoCropper.open(arquivo, corridaBannerInput, {
+          title: "Ajustar banner da corrida",
+          description: "Posicione o banner no formato horizontal 16:9. Use pinça ou a barra de zoom para enquadrar a imagem.",
+          help: "Arraste a imagem para posicionar. No celular, use pinça para aproximar/afastar. O arquivo salvo será horizontal e otimizado para o card da corrida.",
+          saveText: "Usar este banner",
+          aspectRatio: 16 / 9,
+          outputWidth: 1200,
+          outputHeight: 675,
+          mimeType: "image/webp",
+          quality: 0.86,
+          filePrefix: "banner-corrida",
+          shape: "rect",
+          updatePreview: false,
+          setCurrentFile: false
+        });
+
+        if (!recortado) {
+          corridaBannerInput.value = "";
+          return;
+        }
+
+        arquivoParaOtimizar = recortado;
+      }
+
+      corridaBannerArquivo = await otimizarBannerCorrida(arquivoParaOtimizar);
       corridaBannerRemovido = false;
       const urlPreview = URL.createObjectURL(corridaBannerArquivo);
       const tamanhoMb = (corridaBannerArquivo.size / (1024 * 1024)).toFixed(2).replace(".", ",");
-      atualizarPreviewBannerCorrida(urlPreview, `Novo banner otimizado • ${tamanhoMb} MB`);
+      atualizarPreviewBannerCorrida(urlPreview, `Novo banner recortado e otimizado • ${tamanhoMb} MB`);
     } catch (erro) {
       console.error("Erro ao otimizar banner:", erro);
       alert("Não foi possível otimizar o banner. Tente outra imagem em JPG, PNG ou WebP.");
@@ -664,7 +691,7 @@ async function carregarCorridasAdmin() {
     const percentualInscritos = calcularPercentualPreenchimento(totalInscritos, vagasTotal);
     const percentualConfirmados = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
     const classeProgressoInscritos = obterClasseProgressoVagas(percentualInscritos);
-    const classeProgressoConfirmados = obterClasseProgressoVagas(percentualConfirmados);
+    const classeProgressoConfirmados = "confirmados-verde";
     const textoInscritos = formatarResumoVagas(totalInscritos, vagasTotal, "inscrito(s)");
     const textoConfirmados = formatarResumoVagas(confirmadosCorrida, vagasTotal, "confirmado(s)");
 
@@ -679,9 +706,8 @@ async function carregarCorridasAdmin() {
         <div class="corrida-status-card ${corrida.status}">
           <div class="corrida-status-topo-linha">
             <div>
-              <strong class="corrida-status-label">${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
-              <span class="corrida-vagas-texto corrida-inscritos-texto">Inscritos: ${textoInscritos}</span>
-              <span class="corrida-vagas-texto corrida-confirmados-texto">Confirmados: ${textoConfirmados}</span>
+              <strong class="corrida-status-label corrida-status-label-destaque">${corrida.status === "aberta" ? "Inscrições abertas" : "Inscrições encerradas"}</strong>
+              <span class="corrida-status-subtitulo">${corrida.status === "aberta" ? "Cadastro liberado para staffs" : "Cadastro bloqueado para novas inscrições"}</span>
             </div>
 
             <button
@@ -703,7 +729,7 @@ async function carregarCorridasAdmin() {
           <div class="corrida-progressos-fora-card" aria-label="Resumo de preenchimento da corrida">
             <div class="corrida-progresso-vagas corrida-progresso-inscritos" aria-label="Inscritos em relação às vagas">
               <div class="corrida-progresso-topo">
-                <span>Inscritos</span>
+                <span class="corrida-progresso-rotulo corrida-inscritos-texto">Inscritos: ${textoInscritos}</span>
                 <strong class="corrida-progresso-percentual corrida-progresso-inscritos-percentual">${percentualInscritos}%</strong>
               </div>
               <div class="corrida-progresso-trilho">
@@ -713,7 +739,7 @@ async function carregarCorridasAdmin() {
 
             <div class="corrida-progresso-vagas corrida-progresso-confirmados" aria-label="Confirmados em relação às vagas">
               <div class="corrida-progresso-topo">
-                <span>Confirmados</span>
+                <span class="corrida-progresso-rotulo corrida-confirmados-texto">Confirmados: ${textoConfirmados}</span>
                 <strong class="corrida-progresso-percentual corrida-progresso-confirmados-percentual">${percentualConfirmados}%</strong>
               </div>
               <div class="corrida-progresso-trilho">
@@ -723,29 +749,11 @@ async function carregarCorridasAdmin() {
           </div>
         ` : ""}
 
-        <p><strong>Período:</strong>
-          ${formatarPeriodoCorrida(corrida)}
-        </p>
-
-        <p><strong>Local:</strong><br>
-          ${formatarTextoComQuebra(corrida.local || "Não informado")}
-        </p>
-
-        <p><strong>Vagas:</strong>
-          ${vagasTotal > 0 ? vagasTotal : "Não informadas"}
-        </p>
-
-        <p><strong>Prazo:</strong>
-          ${
-            corrida.prazo_inscricao
-              ? formatarData(corrida.prazo_inscricao)
-              : "Não informado"
-          }
-        </p>
-
-        <p><strong>Inscritos:</strong>
-          ${totalInscritos}
-        </p>
+        <div class="corrida-resumo-sutil">
+          <div><strong>Período</strong><span>${formatarPeriodoCorrida(corrida)}</span></div>
+          <div><strong>Vagas</strong><span>${vagasTotal > 0 ? vagasTotal : "Não informadas"}</span></div>
+          <div><strong>Prazo</strong><span>${corrida.prazo_inscricao ? formatarData(corrida.prazo_inscricao) : "Não informado"}</span></div>
+        </div>
 
         <div class="gerenciar-dias">
           <button
@@ -1164,7 +1172,12 @@ function ativarBotoesStatusCorrida() {
         return;
       }
 
+      const posicaoScroll = window.scrollY;
       await carregarCorridasAdmin();
+      requestAnimationFrame(() => {
+    window.scrollTo({ top: posicaoScroll, left: 0 });
+    setTimeout(() => window.scrollTo({ top: posicaoScroll, left: 0 }), 0);
+  });
     });
   });
 }
@@ -1378,21 +1391,10 @@ async function carregarInscritosDaCorrida(
         </div>
       </div>
 
-      <div class="admin-inscritos-filtros admin-inscritos-filtros-v127">
-        <input
-          type="search"
-          class="admin-busca-inscrito"
-          placeholder="Buscar por nome..."
-        >
-
-        <div class="admin-filtros-linha">
-          <div class="admin-toggles-tipo" aria-label="Filtrar por tipo de dia">
-            <button type="button" class="admin-toggle-tipo ativo" data-tipo="kit">📦 Entrega Kit</button>
-            <button type="button" class="admin-toggle-tipo ativo" data-tipo="corrida">🏁 Dia da Corrida</button>
-          </div>
-
+      <div class="admin-inscritos-filtros admin-inscritos-filtros-v186">
+        <div class="admin-filtros-topo-v186">
           <label class="admin-status-select-wrap">
-            <span>Status</span>
+            <span>Filtro status</span>
             <select class="admin-status-select">
               <option value="todos" selected>Todos</option>
               <option value="pendente">Pendentes</option>
@@ -1401,6 +1403,20 @@ async function carregarInscritosDaCorrida(
               <option value="cancelado">Cancelados</option>
             </select>
           </label>
+
+          <label class="admin-busca-wrap-v186">
+            <span>Busca por nome</span>
+            <input
+              type="search"
+              class="admin-busca-inscrito"
+              placeholder="Digite o nome..."
+            >
+          </label>
+        </div>
+
+        <div class="admin-toggles-tipo" aria-label="Filtrar por tipo de dia">
+          <button type="button" class="admin-toggle-tipo ativo" data-tipo="kit">Entrega de kit</button>
+          <button type="button" class="admin-toggle-tipo ativo" data-tipo="corrida">Dia da corrida</button>
         </div>
       </div>
 
@@ -1411,7 +1427,7 @@ async function carregarInscritosDaCorrida(
       <div class="admin-inscritos-acoes-massa admin-inscritos-acoes-v127">
         <label class="admin-selecionar-exibidos">
           <input type="checkbox" class="checkbox-selecionar-exibidos">
-          <span>Selecionar todos os exibidos</span>
+          <span>Selecionar todos os inscritos</span>
         </label>
 
         <div class="admin-contador-selecao">
@@ -1789,7 +1805,7 @@ async function atualizarResumoCorridaCard(corridaId) {
   const percentualInscritos = calcularPercentualPreenchimento(totalInscritos, vagasTotal);
   const percentualConfirmados = calcularPercentualPreenchimento(confirmadosCorrida, vagasTotal);
   const classeProgressoInscritos = obterClasseProgressoVagas(percentualInscritos);
-  const classeProgressoConfirmados = obterClasseProgressoVagas(percentualConfirmados);
+  const classeProgressoConfirmados = "confirmados-verde";
 
   const textoInscritosEl = card.querySelector(".corrida-inscritos-texto");
   if (textoInscritosEl) textoInscritosEl.textContent = `Inscritos: ${formatarResumoVagas(totalInscritos, vagasTotal, "inscrito(s)")}`;
@@ -1813,7 +1829,7 @@ async function atualizarResumoCorridaCard(corridaId) {
   const barraConfirmadosEl = card.querySelector(".corrida-progresso-confirmados-barra");
   if (barraConfirmadosEl) {
     barraConfirmadosEl.style.width = `${percentualConfirmados}%`;
-    barraConfirmadosEl.classList.remove("baixo", "medio", "alto", "completo");
+    barraConfirmadosEl.classList.remove("baixo", "medio", "alto", "completo", "confirmados-verde");
     barraConfirmadosEl.classList.add(classeProgressoConfirmados);
   }
 }
@@ -1876,7 +1892,10 @@ async function confirmarSelecionadosEmLote(areaInscritos, corridaId, reservarRes
   const posicaoScroll = window.scrollY;
   await carregarInscritosDaCorrida(corridaId, areaInscritos);
   await atualizarResumoCorridaCard(corridaId);
-  requestAnimationFrame(() => window.scrollTo({ top: posicaoScroll, left: 0 }));
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: posicaoScroll, left: 0 });
+    setTimeout(() => window.scrollTo({ top: posicaoScroll, left: 0 }), 0);
+  });
 }
 
 // BOTÕES CONFIRMAR / CANCELAR / RESERVA
@@ -1977,7 +1996,10 @@ async function atualizarStatusInscricao(
   );
   await atualizarResumoCorridaCard(corridaId);
 
-  requestAnimationFrame(() => window.scrollTo({ top: posicaoScroll, left: 0 }));
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: posicaoScroll, left: 0 });
+    setTimeout(() => window.scrollTo({ top: posicaoScroll, left: 0 }), 0);
+  });
 }
 
 function gerarResumoInscricoes(inscricoes, totalVagasCorrida) {
