@@ -528,21 +528,24 @@ async function carregarMinhasInscricoes() {
     return;
   }
 
+  const { data: diasMinhasCorridas, error: erroDiasMinhasCorridas } = await supabaseClient
+    .from("corrida_dias")
+    .select("id, corrida_id, nome, data_dia, horario_inicio, horario_fim")
+    .in("corrida_id", corridaIds);
+
+  if (erroDiasMinhasCorridas) {
+    console.error(
+      "Erro ao buscar dias das minhas corridas:",
+      erroDiasMinhasCorridas
+    );
+  }
+
   const {
     data: disponibilidades,
     error: erroDisponibilidades
   } = await supabaseClient
     .from("inscricao_disponibilidades")
-    .select(`
-      inscricao_id,
-      corrida_dias (
-        id,
-        nome,
-        data_dia,
-        horario_inicio,
-        horario_fim
-      )
-    `)
+    .select("inscricao_id, corrida_dia_id, disponivel")
     .in("inscricao_id", inscricaoIds);
 
   if (erroDisponibilidades) {
@@ -553,22 +556,33 @@ async function carregarMinhasInscricoes() {
   }
 
   const corridasPorId = {};
+  const diasPorId = {};
   const disponibilidadesPorInscricao = {};
 
   corridas.forEach(corrida => {
     corridasPorId[corrida.id] = corrida;
   });
 
+  (diasMinhasCorridas || []).forEach(dia => {
+    diasPorId[Number(dia.id)] = dia;
+  });
+
   if (disponibilidades) {
 
     disponibilidades.forEach(item => {
+
+      const dia = diasPorId[Number(item.corrida_dia_id)];
+
+      if (item.disponivel === false || !dia) {
+        return;
+      }
 
       if (!disponibilidadesPorInscricao[item.inscricao_id]) {
         disponibilidadesPorInscricao[item.inscricao_id] = [];
       }
 
       disponibilidadesPorInscricao[item.inscricao_id]
-        .push(item.corrida_dias);
+        .push(dia);
     });
   }
 
@@ -723,3 +737,4 @@ function formatarStatusInscricao(status) {
 carregarCardStaff();
 carregarCorridas();
 carregarMinhasInscricoes();
+// v176 - leitura de minhas disponibilidades corrigida usando corrida_dia_id.

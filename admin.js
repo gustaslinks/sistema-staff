@@ -1189,7 +1189,7 @@ async function carregarInscritosDaCorrida(
   const { data: diasCorrida, error: erroDiasCorrida } =
     await supabaseClient
       .from("corrida_dias")
-      .select("id")
+      .select("id, nome, data_dia, tipo, horario_inicio, horario_fim, valor_ajuda_custo")
       .eq("corrida_id", corridaIdNumerico);
 
   if (erroDiasCorrida) {
@@ -1255,19 +1255,7 @@ async function carregarInscritosDaCorrida(
     error: erroDisponibilidades
   } = await supabaseClient
     .from("inscricao_disponibilidades")
-    .select(`
-      inscricao_id,
-      disponivel,
-      corrida_dias (
-        id,
-        nome,
-        data_dia,
-        tipo,
-        horario_inicio,
-        horario_fim,
-        valor_ajuda_custo
-      )
-    `)
+    .select("inscricao_id, corrida_dia_id, disponivel")
     .in("inscricao_id", inscricaoIds);
 
   if (erroDisponibilidades) {
@@ -1277,13 +1265,20 @@ async function carregarInscritosDaCorrida(
     );
   }
 
+  const diasCorridaPorId = {};
+  (diasCorrida || []).forEach(dia => {
+    diasCorridaPorId[Number(dia.id)] = dia;
+  });
+
   const disponibilidadesPorInscricao = {};
 
   if (disponibilidades) {
 
     disponibilidades.forEach(item => {
 
-      if (item.disponivel === false || !item.corrida_dias) {
+      const dia = diasCorridaPorId[Number(item.corrida_dia_id)];
+
+      if (item.disponivel === false || !dia) {
         return;
       }
 
@@ -1292,7 +1287,7 @@ async function carregarInscritosDaCorrida(
       }
 
       disponibilidadesPorInscricao[item.inscricao_id]
-        .push(item.corrida_dias);
+        .push(dia);
     });
   }
 
@@ -3057,19 +3052,7 @@ async function buscarDadosExportacao(corridaId) {
   if (inscricaoIds.length > 0) {
     const { data, error } = await supabaseClient
       .from("inscricao_disponibilidades")
-      .select(`
-        inscricao_id,
-        disponivel,
-        corrida_dias (
-          id,
-          nome,
-          data_dia,
-          tipo,
-          horario_inicio,
-          horario_fim,
-          valor_ajuda_custo
-        )
-      `)
+      .select("inscricao_id, corrida_dia_id, disponivel")
       .in("inscricao_id", inscricaoIds);
 
     if (error) {
@@ -3079,16 +3062,22 @@ async function buscarDadosExportacao(corridaId) {
     disponibilidades = data || [];
   }
 
+  const diasCorridaPorId = {};
+  (diasCorrida || []).forEach(dia => {
+    diasCorridaPorId[Number(dia.id)] = dia;
+  });
+
   const disponibilidadesPorInscricao = {};
 
   disponibilidades.forEach(item => {
-    if (item.disponivel === false || !item.corrida_dias) return;
+    const dia = diasCorridaPorId[Number(item.corrida_dia_id)];
+    if (item.disponivel === false || !dia) return;
 
     if (!disponibilidadesPorInscricao[item.inscricao_id]) {
       disponibilidadesPorInscricao[item.inscricao_id] = [];
     }
 
-    disponibilidadesPorInscricao[item.inscricao_id].push(item.corrida_dias);
+    disponibilidadesPorInscricao[item.inscricao_id].push(dia);
   });
 
   const totalDiasCorrida = (diasCorrida || []).length;
@@ -3703,19 +3692,7 @@ async function buscarDadosExportacao(corridaId) {
   if (inscricaoIds.length > 0) {
     const { data, error } = await supabaseClient
       .from("inscricao_disponibilidades")
-      .select(`
-        inscricao_id,
-        disponivel,
-        corrida_dias (
-          id,
-          nome,
-          data_dia,
-          tipo,
-          horario_inicio,
-          horario_fim,
-          valor_ajuda_custo
-        )
-      `)
+      .select("inscricao_id, corrida_dia_id, disponivel")
       .in("inscricao_id", inscricaoIds);
 
     if (error) {
@@ -3726,13 +3703,19 @@ async function buscarDadosExportacao(corridaId) {
     disponibilidades = data || [];
   }
 
+  const diasCorridaPorId = {};
+  (diasCorrida || []).forEach(dia => {
+    diasCorridaPorId[Number(dia.id)] = dia;
+  });
+
   const disponibilidadesPorInscricao = {};
   disponibilidades.forEach(item => {
-    if (item.disponivel === false || !item.corrida_dias) return;
+    const dia = diasCorridaPorId[Number(item.corrida_dia_id)];
+    if (item.disponivel === false || !dia) return;
     if (!disponibilidadesPorInscricao[item.inscricao_id]) {
       disponibilidadesPorInscricao[item.inscricao_id] = [];
     }
-    disponibilidadesPorInscricao[item.inscricao_id].push(item.corrida_dias);
+    disponibilidadesPorInscricao[item.inscricao_id].push(dia);
   });
 
   const totalDiasCorrida = (diasCorrida || []).length;
@@ -4233,7 +4216,8 @@ if (logoutBtn) {
   });
 }
 
-/* v175 - ajustes reais nos relatórios PDF solicitados */
+/* v176 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
+/* v176 - ajustes reais nos relatórios PDF solicitados */
 function obterDataDiaRelatorio(dia) {
   if (!dia || !dia.data_dia) return null;
   const partes = String(dia.data_dia).split("-");
