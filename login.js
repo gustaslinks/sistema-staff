@@ -13,6 +13,7 @@ const form = document.getElementById("loginForm");
 const loginCpf = document.getElementById("loginCpf");
 const loginPassword = document.getElementById("loginPassword");
 const loginBtn = document.getElementById("loginBtn");
+const keepConnected = document.getElementById("keepConnected");
 const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
 const loginStatus = document.getElementById("loginStatus");
 const MANUAL_LOGOUT_KEY = "sistemaStaffManualLogout";
@@ -34,6 +35,7 @@ async function processarLogoutManualNaTelaLogin() {
   const params = new URLSearchParams(window.location.search);
   if (!params.has("logout")) return false;
   sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+  localStorage.setItem(MANUAL_LOGOUT_KEY, String(Date.now()));
   limparSessaoLocalSupabase();
   try {
     await supabaseClient.auth.signOut({ scope: "global" });
@@ -63,6 +65,10 @@ function normalizarCpf(value) {
   return maskCPF(value);
 }
 
+function isEmailLogin(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+}
+
 function setStatus(message, type = "info") {
   if (!loginStatus) return;
   loginStatus.textContent = message || "";
@@ -74,6 +80,12 @@ function salvarStaffLogado(staff) {
     ...staff,
     is_admin: staff.is_admin === true || staff.is_admin === "true" || staff.is_admin === 1 || staff.is_admin === "1"
   }));
+}
+
+async function resolverEmailLogin(loginValue) {
+  const valor = String(loginValue || "").trim();
+  if (isEmailLogin(valor)) return valor.toLowerCase();
+  return buscarEmailPorCpf(valor);
 }
 
 async function buscarEmailPorCpf(cpfValue) {
@@ -131,12 +143,19 @@ async function carregarStaffDaSessao(userId) {
 
 async function verificarSessaoExistente() {
   if (await processarLogoutManualNaTelaLogin()) return;
-  if (sessionStorage.getItem(MANUAL_LOGOUT_KEY) === "1") return;
+  const logoutStamp = Number(localStorage.getItem(MANUAL_LOGOUT_KEY) || "0");
+  if (sessionStorage.getItem(MANUAL_LOGOUT_KEY) === "1" || (logoutStamp && Date.now() - logoutStamp < 15000)) return;
   const { data } = await supabaseClient.auth.getSession();
   const user = data && data.session && data.session.user;
   if (!user) return;
 
   try {
+    if (keepConnected && !keepConnected.checked) {
+      sessionStorage.setItem("sistemaStaffSessionOnly", "1");
+    } else {
+      sessionStorage.removeItem("sistemaStaffSessionOnly");
+    }
+
     const staff = await carregarStaffDaSessao(user.id);
     window.location.href = staff.is_admin ? "admin.html" : "corridas.html";
   } catch (error) {
@@ -161,7 +180,9 @@ function configurarToggleSenha() {
 
 if (loginCpf) {
   loginCpf.addEventListener("input", () => {
-    loginCpf.value = maskCPF(loginCpf.value);
+    if (!loginCpf.value.includes("@")) {
+      loginCpf.value = maskCPF(loginCpf.value);
+    }
     setStatus("");
   });
 }
@@ -169,6 +190,7 @@ if (loginCpf) {
 form.addEventListener("submit", async function (event) {
   event.preventDefault();
   sessionStorage.removeItem(MANUAL_LOGOUT_KEY);
+  localStorage.removeItem(MANUAL_LOGOUT_KEY);
 
   loginBtn.disabled = true;
   loginBtn.textContent = "Entrando...";
@@ -179,10 +201,10 @@ form.addEventListener("submit", async function (event) {
     const password = loginPassword.value;
 
     if (!cpf || !password) {
-      throw new Error("Digite CPF e senha.");
+      throw new Error("Digite CPF/e-mail e senha.");
     }
 
-    const email = await buscarEmailPorCpf(cpf);
+    const email = await resolverEmailLogin(cpf);
 
     const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
       email,
@@ -190,12 +212,18 @@ form.addEventListener("submit", async function (event) {
     });
 
     if (authError) {
-      throw new Error("CPF ou senha incorretos.");
+      throw new Error("CPF/e-mail ou senha incorretos.");
     }
 
     const user = authData && authData.user;
     if (!user) {
       throw new Error("Não foi possível iniciar a sessão.");
+    }
+
+    if (keepConnected && !keepConnected.checked) {
+      sessionStorage.setItem("sistemaStaffSessionOnly", "1");
+    } else {
+      sessionStorage.removeItem("sistemaStaffSessionOnly");
     }
 
     const staff = await carregarStaffDaSessao(user.id);
@@ -214,7 +242,7 @@ if (forgotPasswordBtn) {
     forgotPasswordBtn.disabled = true;
     setStatus("");
     try {
-      const email = await buscarEmailPorCpf(loginCpf.value);
+      const email = await resolverEmailLogin(loginCpf.value);
       const redirectTo = window.location.origin + window.location.pathname.replace(/index\.html?$/i, "") + "alterar-senha.html";
       const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
       if (error) throw error;

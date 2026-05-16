@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Staff</title>
-  <link rel="stylesheet" href="style.css?v=24">
+  <link rel="stylesheet" href="style.css?v=25">
 </head>
 <body class="login-page">
-  <button class="version-badge" type="button" data-version-summary="v2.4: correção definitiva do logout no celular; badge de versão com painel tocável; card de inscrições abertas alinhado com texto à esquerda e semáforo centralizado à direita; login visualmente refinado; ícone de senha flat; avisos e disponibilidade ajustados.">v2.4</button>
+  <button class="version-badge" type="button" data-version-summary="v2.5: logout do administrador corrigido; login por CPF ou e-mail; opção manter conectado; botões do login reorganizados; seleção de todos os dias na disponibilidade; campo PCD no cadastro; upload de foto reorganizado; avisos da disponibilidade e status de inscrições refinados.">v2.5</button>
   <div class="container">
     <div class="login-card">
       <h1>Área do Staff</h1>
@@ -15,8 +15,8 @@
 
       <form id="loginForm" novalidate>
         <div class="field">
-          <label for="loginCpf">CPF</label>
-          <input type="text" id="loginCpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" autocomplete="username" required>
+          <label for="loginCpf">CPF ou e-mail</label>
+          <input type="text" id="loginCpf" placeholder="Digite seu CPF ou e-mail" maxlength="120" inputmode="email" autocomplete="username" required>
         </div>
 
         <div class="field">
@@ -27,18 +27,21 @@
           </div>
         </div>
 
+        <label class="keep-connected-option"><input type="checkbox" id="keepConnected" checked> <span>Manter-me conectado</span></label>
+
         <div id="loginStatus" class="login-status" aria-live="polite"></div>
 
         <button type="submit" id="loginBtn">Entrar</button>
-        <button type="button" id="forgotPasswordBtn" class="forgot-password-btn">Esqueci minha senha</button>
+        <div class="login-secondary-actions">
+          <button type="button" id="forgotPasswordBtn" class="forgot-password-btn">Esqueci minha senha</button>
+          <a class="cadastro-link" href="cadastro.html">Ainda não tenho cadastro</a>
+        </div>
       </form>
-
-      <a class="cadastro-link" href="cadastro.html">Ainda não tenho cadastro</a>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="login.js?v=24"></script>
+  <script src="login.js?v=25"></script>
 
 <script>
 (function(){

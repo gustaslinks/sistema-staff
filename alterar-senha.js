@@ -15,6 +15,7 @@ function limparSessaoLocalSupabase() {
 }
 async function sairDoSistemaSeguro() {
   sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+  localStorage.setItem(MANUAL_LOGOUT_KEY, String(Date.now()));
   limparSessaoLocalSupabase();
   try {
     await supabaseClient.auth.signOut({ scope: "global" });

@@ -23,6 +23,7 @@ function limparSessaoLocalSupabase() {
 }
 async function sairDoSistemaSeguro() {
   sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+  localStorage.setItem(MANUAL_LOGOUT_KEY, String(Date.now()));
   limparSessaoLocalSupabase();
   try {
     await supabaseClient.auth.signOut({ scope: "global" });
@@ -4403,9 +4404,9 @@ if (abrirCorridasBtn) {
 const logoutBtn = document.getElementById("logoutBtn");
 
 if (logoutBtn) {
-  logoutBtn.addEventListener("click", function () {
-    localStorage.removeItem("staffLogado");
-    window.location.replace("index.html");
+  logoutBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    sairDoSistemaSeguro();
   });
 }
 

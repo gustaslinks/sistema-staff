@@ -23,6 +23,7 @@ function limparSessaoLocalSupabase() {
 }
 async function sairDoSistemaSeguro() {
   sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+  localStorage.setItem(MANUAL_LOGOUT_KEY, String(Date.now()));
   limparSessaoLocalSupabase();
   try {
     await supabaseClient.auth.signOut({ scope: "global" });
@@ -298,6 +299,11 @@ async function carregarCorridas() {
             </div>
           </div>
 
+          <label class="checkbox-todos-dias">
+            <input type="checkbox" class="disponibilidade-todos" data-corrida-id="${corrida.id}">
+            <span>Tenho disponibilidade para todos os dias</span>
+          </label>
+
           <div class="lista-dias-disponibilidade">
 
             ${diasDaCorrida.map(dia => `
@@ -411,6 +417,17 @@ async function carregarCorridas() {
 function ativarBotoesInscricao() {
   const botoes = document.querySelectorAll(".botao-inscricao");
   const checkboxes = document.querySelectorAll(".disponibilidade-dia");
+  const checkTodos = document.querySelectorAll(".disponibilidade-todos");
+
+checkTodos.forEach(checkTodosItem => {
+  checkTodosItem.addEventListener("change", function () {
+    const corridaId = checkTodosItem.dataset.corridaId;
+    const dias = document.querySelectorAll(`.disponibilidade-dia[data-corrida-id="${corridaId}"]`);
+    dias.forEach(dia => { dia.checked = checkTodosItem.checked; });
+    const botao = document.querySelector(`.botao-inscricao[data-corrida-id="${corridaId}"]`);
+    if (botao) botao.disabled = !checkTodosItem.checked && document.querySelectorAll(`.disponibilidade-dia[data-corrida-id="${corridaId}"]:checked`).length === 0;
+  });
+});
 
 checkboxes.forEach(checkbox => {
   checkbox.addEventListener("change", function () {
@@ -426,6 +443,12 @@ checkboxes.forEach(checkbox => {
 
     if (botao) {
       botao.disabled = !algumSelecionado;
+    }
+    const todos = document.querySelector(`.disponibilidade-todos[data-corrida-id="${corridaId}"]`);
+    if (todos) {
+      const total = document.querySelectorAll(`.disponibilidade-dia[data-corrida-id="${corridaId}"]`).length;
+      const marcados = document.querySelectorAll(`.disponibilidade-dia[data-corrida-id="${corridaId}"]:checked`).length;
+      todos.checked = total > 0 && total === marcados;
     }
   });
 });

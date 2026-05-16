@@ -20,6 +20,7 @@ function limparSessaoLocalSupabase() {
 }
 async function sairDoSistemaSeguro() {
   sessionStorage.setItem(MANUAL_LOGOUT_KEY, "1");
+  localStorage.setItem(MANUAL_LOGOUT_KEY, String(Date.now()));
   limparSessaoLocalSupabase();
   try {
     await supabaseClient.auth.signOut({ scope: "global" });
@@ -53,6 +54,7 @@ const pixOutro = document.getElementById('pixOutro');
 const foto = document.getElementById('foto');
 const fotoCamera = document.getElementById('fotoCamera');
 const observacoes = document.getElementById('observacoes');
+const pcd = document.getElementById('pcd');
 const termos = document.getElementById('termos');
 const form = document.getElementById('staffForm');
 const staffIdInput = document.getElementById('staffId');
@@ -762,6 +764,7 @@ function preencherFormularioComStaff(data){
   if (calcado) calcado.value = data.numero_calcado || '';
   indicado.value = data.indicado_por || '';
   observacoes.value = data.observacoes || '';
+  if (pcd) pcd.checked = data.pcd === true || data.pcd === 'true' || data.pcd === 1;
   fotoAtualUrl = data.foto_url || '';
   termos.checked = true;
   selecionarPixPorValor(data);
@@ -1017,7 +1020,7 @@ form.addEventListener('submit',async function(event){
     if(pixTipo==='telefone') chavePixFinal=telefone.value;
     if(pixTipo==='outro') chavePixFinal=pixOutro.value;
 
-    const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,numero_calcado: calcado ? (calcado.value ? Number(calcado.value) : null) : null,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value || null,foto_url:fotoUrlFinal};
+    const dadosCadastro={nome_completo:nome.value,cpf:cpf.value,rg:rg.value,data_nascimento:dateToDatabase(nascimento.value),telefone:telefone.value,email:email.value,cidade:cidade.value,numero_calcado: calcado ? (calcado.value ? Number(calcado.value) : null) : null,chave_pix:chavePixFinal,indicado_por:indicado.value,observacoes:observacoes.value || null,foto_url:fotoUrlFinal,pcd: pcd ? pcd.checked : false};
     if (isAdminEdicao && adminIsAdminCheckbox) {
       dadosCadastro.is_admin = adminIsAdminCheckbox.checked;
     }
