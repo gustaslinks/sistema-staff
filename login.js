@@ -102,6 +102,14 @@ function setStatus(message, type = "info") {
   loginStatus.className = `login-status ${type}`;
 }
 
+function withTimeout(promise, ms, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message || "Tempo de resposta esgotado. Verifique sua internet e tente novamente.")), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 
 function obterRedirectSeguro(){
   const params = new URLSearchParams(window.location.search);
@@ -140,9 +148,9 @@ async function buscarEmailPorCpf(cpfValue) {
     throw new Error("Digite um CPF válido.");
   }
 
-  const { data, error } = await supabaseClient.rpc("get_login_email_by_cpf", {
+  const { data, error } = await withTimeout(supabaseClient.rpc("get_login_email_by_cpf", {
     cpf_input: cpfFormatado
-  });
+  }), 18000, "Não foi possível localizar o CPF agora. Verifique a conexão e tente novamente.");
 
   if (error) {
     console.error("Erro ao buscar e-mail por CPF:", error);
@@ -191,7 +199,7 @@ async function verificarSessaoExistente() {
   if (await processarLogoutManualNaTelaLogin()) return;
   const logoutStamp = Number(localStorage.getItem(MANUAL_LOGOUT_KEY) || "0");
   if (sessionStorage.getItem(MANUAL_LOGOUT_KEY) === "1" || (logoutStamp && Date.now() - logoutStamp < 15000)) return;
-  const { data } = await supabaseClient.auth.getSession();
+  const { data } = await withTimeout(supabaseClient.auth.getSession(), 10000, "Não foi possível verificar a sessão agora.");
   const user = data && data.session && data.session.user;
   if (!user) return;
 
@@ -235,7 +243,7 @@ if (loginCpf) {
   });
 }
 
-form.addEventListener("submit", async function (event) {
+if (form) form.addEventListener("submit", async function (event) {
   event.preventDefault();
   sessionStorage.removeItem(MANUAL_LOGOUT_KEY);
   localStorage.removeItem(MANUAL_LOGOUT_KEY);
@@ -254,10 +262,10 @@ form.addEventListener("submit", async function (event) {
 
     const email = await resolverEmailLogin(cpf);
 
-    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+    const { data: authData, error: authError } = await withTimeout(supabaseClient.auth.signInWithPassword({
       email,
       password
-    });
+    }), 18000, "O login demorou para responder. Verifique a conexão e tente novamente.");
 
     if (authError) {
       throw new Error("CPF/e-mail ou senha incorretos.");
@@ -278,7 +286,8 @@ form.addEventListener("submit", async function (event) {
     window.location.href = destinoAposLogin(staff);
 
   } catch (error) {
-    setStatus(error.message, "error");
+    console.error("Erro no login:", error);
+    setStatus(error.message || "Não foi possível entrar. Tente novamente.", "error");
   } finally {
     loginBtn.disabled = false;
     loginBtn.textContent = "Entrar";

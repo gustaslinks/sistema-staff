@@ -5041,7 +5041,7 @@ async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
 document.addEventListener("DOMContentLoaded", inicializarMascarasMoeda);
 
 
-/* v3.7 - Check-in presencial por QR individual por dia */
+/* v3.9 - Check-in presencial por QR individual por dia */
 function gerarTokenCheckinLocal() {
   if (window.crypto && window.crypto.getRandomValues) {
     const arr = new Uint8Array(24);
