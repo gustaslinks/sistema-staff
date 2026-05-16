@@ -1,0 +1,38 @@
+/* Modal de recorte de foto - Sistema Staff */
+.photo-cropper-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999;backdrop-filter:blur(5px)}
+.photo-cropper-backdrop.is-open{display:flex}
+.photo-cropper-modal{width:min(560px,100%);background:#fff;border-radius:24px;box-shadow:0 24px 80px rgba(15,23,42,.35);overflow:hidden;border:1px solid rgba(148,163,184,.35)}
+.photo-cropper-header{padding:18px 20px;background:linear-gradient(135deg,#eff6ff,#f5f3ff);border-bottom:1px solid #e2e8f0}
+.photo-cropper-header h3{margin:0 0 4px;font-size:20px;color:#0f172a;line-height:1.2}
+.photo-cropper-header p{margin:0;color:#475569;font-size:14px;line-height:1.35}
+.photo-cropper-body{padding:18px 20px 16px}.photo-cropper-stage{position:relative;width:100%;aspect-ratio:1/1;background:#0f172a;border-radius:20px;overflow:hidden;touch-action:none;user-select:none;cursor:grab}.photo-cropper-stage:active{cursor:grabbing}.photo-cropper-image{position:absolute;left:50%;top:50%;max-width:none;transform-origin:center center;will-change:transform;pointer-events:none}.photo-cropper-mask{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent 0 49.5%,rgba(15,23,42,.55) 50% 100%)}.photo-cropper-frame{position:absolute;left:50%;top:50%;width:78%;height:78%;transform:translate(-50%,-50%);border:3px solid rgba(255,255,255,.95);border-radius:50%;box-shadow:0 0 0 999px rgba(15,23,42,.38);pointer-events:none}.photo-cropper-grid{position:absolute;left:11%;top:11%;width:78%;height:78%;border-radius:50%;pointer-events:none;background:linear-gradient(to right,transparent 32.9%,rgba(255,255,255,.28) 33%,rgba(255,255,255,.28) 33.5%,transparent 33.6%,transparent 66.4%,rgba(255,255,255,.28) 66.5%,rgba(255,255,255,.28) 67%,transparent 67.1%),linear-gradient(to bottom,transparent 32.9%,rgba(255,255,255,.28) 33%,rgba(255,255,255,.28) 33.5%,transparent 33.6%,transparent 66.4%,rgba(255,255,255,.28) 66.5%,rgba(255,255,255,.28) 67%,transparent 67.1%)}.photo-cropper-controls{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin-top:14px;color:#334155;font-size:13px}.photo-cropper-controls input[type=range]{width:100%;accent-color:#4f46e5}.photo-cropper-help{margin:10px 0 0;color:#64748b;font-size:13px;line-height:1.35}.photo-cropper-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px 20px}.photo-cropper-btn{border:0;border-radius:14px;padding:13px 14px;font-weight:800;cursor:pointer;font-size:14px}.photo-cropper-btn.secondary{background:#f1f5f9;color:#334155}.photo-cropper-btn.primary{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;box-shadow:0 10px 24px rgba(37,99,235,.22)}.photo-cropper-btn:active{transform:translateY(1px)}@media(max-width:520px){.photo-cropper-modal{border-radius:20px}.photo-cropper-header h3{font-size:18px}.photo-cropper-body{padding:14px}.photo-cropper-actions{padding:0 14px 14px;grid-template-columns:1fr}.photo-cropper-frame{width:82%;height:82%}.photo-cropper-grid{left:9%;top:9%;width:82%;height:82%}}
+
+
+/* v186 - suporte a recorte retangular de banner */
+.photo-cropper-stage.is-banner-crop{aspect-ratio:16/9;border-radius:18px;}
+.photo-cropper-stage.is-banner-crop .photo-cropper-frame{left:0;top:0;width:100%;height:100%;transform:none;border-radius:18px;box-sizing:border-box;}
+.photo-cropper-stage.is-banner-crop .photo-cropper-grid{left:0;top:0;width:100%;height:100%;border-radius:18px;box-sizing:border-box;}
+.photo-cropper-stage.is-photo-crop .photo-cropper-frame{border-radius:50%;}
+.photo-cropper-stage.is-photo-crop .photo-cropper-grid{border-radius:50%;}
+
+
+/* v194 - banner 16:9 deve caber inteiro no zoom mínimo */
+.photo-cropper-stage.is-banner-crop{
+  aspect-ratio:16/9 !important;
+  background:#ffffff !important;
+}
+.photo-cropper-stage.is-banner-crop .photo-cropper-frame{
+  left:0 !important;
+  top:0 !important;
+  width:100% !important;
+  height:100% !important;
+  transform:none !important;
+  border-radius:18px !important;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.96) !important;
+}
+.photo-cropper-stage.is-banner-crop .photo-cropper-grid{
+  left:0 !important;
+  top:0 !important;
+  width:100% !important;
+  height:100% !important;
+}
