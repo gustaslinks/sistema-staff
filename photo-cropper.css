@@ -10,7 +10,7 @@
 
 /* v186 - suporte a recorte retangular de banner */
 .photo-cropper-stage.is-banner-crop{aspect-ratio:16/9;border-radius:18px;}
-.photo-cropper-stage.is-banner-crop .photo-cropper-frame{left:8%;top:8%;width:84%;height:84%;transform:none;border-radius:14px;}
-.photo-cropper-stage.is-banner-crop .photo-cropper-grid{left:8%;top:8%;width:84%;height:84%;border-radius:14px;}
+.photo-cropper-stage.is-banner-crop .photo-cropper-frame{left:0;top:0;width:100%;height:100%;transform:none;border-radius:18px;box-sizing:border-box;}
+.photo-cropper-stage.is-banner-crop .photo-cropper-grid{left:0;top:0;width:100%;height:100%;border-radius:18px;box-sizing:border-box;}
 .photo-cropper-stage.is-photo-crop .photo-cropper-frame{border-radius:50%;}
 .photo-cropper-stage.is-photo-crop .photo-cropper-grid{border-radius:50%;}

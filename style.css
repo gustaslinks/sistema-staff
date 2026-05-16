@@ -6757,8 +6757,73 @@ body.pagina-editar-cadastro .header p {
   }
 }
 
-
-.corrida-resumo-grid-duplo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}.resumo-periodo{margin-bottom:8px}.admin-inscritos-acoes-v127{display:flex;flex-direction:column;gap:14px}.botao-confirmar-selecionados{width:100%;margin-top:18px}.admin-inscritos-contagem-exibidos{margin-top:14px;padding-top:8px}.admin-toggle-tipo{display:flex;align-items:center;justify-content:center;gap:8px}
-
-.corrida-resumo-grid-duplo{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.admin-selecionar-exibidos-full{display:flex;margin:14px 0;padding:16px;border:1px solid #ddd;border-radius:18px;background:#fff;align-items:center;gap:12px;font-weight:700;}
+/* AJUSTES V187 - layout solicitado */
+.corrida-resumo-sutil-v187{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+.corrida-resumo-sutil-v187 > div{
+  margin:0;
+}
+.corrida-resumo-sutil-v187 .corrida-resumo-duas-colunas{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  padding:0;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+}
+.corrida-resumo-sutil-v187 .corrida-resumo-duas-colunas > div{
+  min-width:0;
+  border:1px solid rgba(148,163,184,.28);
+  background:rgba(248,250,252,.92);
+  border-radius:18px;
+  padding:14px 16px;
+}
+.admin-inscritos-filtros-v186 .admin-toggles-tipo .admin-toggle-tipo{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.admin-inscritos-filtros-v186 .admin-toggles-tipo .btn-ico{
+  display:inline-flex;
+  line-height:1;
+}
+.admin-inscritos-filtros-v186 .admin-inscritos-contagem-exibidos{
+  margin-top:14px;
+  width:100%;
+}
+.admin-inscritos-acoes-v187{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:0;
+  margin:14px 0 14px;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+}
+.admin-inscritos-acoes-v187 .admin-contador-selecao{
+  order:1;
+  width:100%;
+}
+.admin-inscritos-acoes-v187 .admin-selecionar-exibidos{
+  order:2;
+  width:100%;
+  justify-content:flex-start;
+  padding:14px 16px;
+  border:1px solid rgba(148,163,184,.28);
+  border-radius:16px;
+  background:#fff;
+}
+.botao-confirmar-selecionados-final{
+  width:100%;
+  margin:16px 0 4px;
+}
+@media(max-width:520px){
+  .corrida-resumo-sutil-v187 .corrida-resumo-duas-colunas{grid-template-columns:1fr 1fr;gap:10px;}
+  .corrida-resumo-sutil-v187 .corrida-resumo-duas-colunas > div{padding:13px 14px;}
+}

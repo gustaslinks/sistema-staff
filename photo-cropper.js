@@ -220,7 +220,7 @@
   function cropRect(){
     const stageW = state.stage.clientWidth || 420;
     const stageH = state.stage.clientHeight || Math.round(stageW / ((state.options && state.options.aspectRatio) || 1));
-    const inset = state.options && state.options.shape === 'rect' ? 0.005 : 0.11;
+    const inset = state.options && state.options.shape === 'rect' ? 0 : 0.11;
     const cropW = stageW * (1 - inset * 2);
     const cropH = stageH * (1 - inset * 2);
     return { stageW, stageH, cropW, cropH, left:(stageW-cropW)/2, top:(stageH-cropH)/2 };
