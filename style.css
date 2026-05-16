@@ -6198,7 +6198,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 }
 
 
-/* v184 - seta outline consistente no card de inscritos */
+/* v185 - seta outline consistente no card de inscritos */
 .botao-expandir-inscrito {
   font-size: 0 !important;
   line-height: 0 !important;
@@ -6229,7 +6229,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
   transform: rotate(90deg) !important;
 }
 
-/* v184 - busca admin na edição de cadastro */
+/* v185 - busca admin na edição de cadastro */
 .admin-editar-staff-panel {
   background: #ffffff;
   border: 1px solid rgba(124, 58, 237, 0.18);
@@ -6324,7 +6324,7 @@ label.checkbox-admin-card.checkbox-admin-card-compacto {
 }
 
 
-/* v184 - melhoria visual cadastro/edição, blocos e foto */
+/* v185 - melhoria visual cadastro/edição, blocos e foto */
 body.pagina-cadastro-geral,
 body.pagina-editar-cadastro {
   min-height: 100vh;
@@ -6482,5 +6482,107 @@ body.pagina-editar-cadastro #staffForm .section-title::before {
 
   .foto-input-actions {
     grid-template-columns: 1fr;
+  }
+}
+
+/* v185 - ajustes visuais cadastro/admin */
+body.pagina-cadastro-geral .header,
+body.pagina-editar-cadastro .header {
+  color: #ffffff !important;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(14,165,233,.28), transparent 28%),
+    linear-gradient(135deg, #111827 0%, #1e1b4b 52%, #312e81 100%) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow: 0 22px 48px rgba(30, 27, 75, .22) !important;
+}
+
+body.pagina-editar-cadastro .header {
+  background:
+    radial-gradient(circle at 88% 14%, rgba(34,197,94,.24), transparent 30%),
+    linear-gradient(135deg, #052e2b 0%, #0f3b59 52%, #312e81 100%) !important;
+}
+
+body.pagina-cadastro-geral .header h1,
+body.pagina-editar-cadastro .header h1,
+body.pagina-cadastro-geral .header p,
+body.pagina-editar-cadastro .header p {
+  color: #ffffff !important;
+}
+
+body.pagina-cadastro-geral .header p,
+body.pagina-editar-cadastro .header p {
+  opacity: .88 !important;
+}
+
+.foto-input-actions {
+  gap: 12px !important;
+}
+
+.foto-input-btn {
+  min-height: 54px !important;
+  border-radius: 18px !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  padding: 13px 16px !important;
+  font-size: 14px !important;
+  background: linear-gradient(135deg, rgba(124,58,237,.10), rgba(14,165,233,.08)) !important;
+  border: 1px solid rgba(124,58,237,.26) !important;
+  box-shadow: 0 10px 22px rgba(124,58,237,.10) !important;
+}
+
+.foto-input-btn-camera {
+  color: #047857 !important;
+  background: linear-gradient(135deg, rgba(16,185,129,.12), rgba(20,184,166,.07)) !important;
+  border-color: rgba(16,185,129,.32) !important;
+  box-shadow: 0 10px 22px rgba(16,185,129,.10) !important;
+}
+
+.foto-input-ico {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 34px;
+  border-radius: 13px;
+  background: rgba(255,255,255,.82);
+  box-shadow: inset 0 0 0 1px rgba(148,163,184,.22);
+  font-size: 17px;
+}
+
+.corrida-status-card .corrida-progresso-vagas {
+  display: none !important;
+}
+
+.corrida-progressos-fora-card {
+  margin: 14px 0 24px;
+  padding: 0 12px;
+}
+
+.corrida-progressos-fora-card .corrida-progresso-vagas {
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.corrida-progressos-fora-card .corrida-progresso-topo {
+  padding: 0 2px 6px !important;
+}
+
+.corrida-progressos-fora-card .corrida-progresso-trilho {
+  height: 9px !important;
+  background: #f8fafc !important;
+  border: 1px solid rgba(148,163,184,.25) !important;
+}
+
+@media (max-width: 720px) {
+  .foto-input-btn {
+    min-height: 50px !important;
+    padding: 12px 14px !important;
+  }
+  .corrida-progressos-fora-card {
+    padding: 0 10px;
+    margin-top: 12px;
   }
 }

@@ -697,7 +697,10 @@ async function carregarCorridasAdmin() {
             </button>
           </div>
 
-          ${vagasTotal > 0 ? `
+        </div>
+
+        ${vagasTotal > 0 ? `
+          <div class="corrida-progressos-fora-card" aria-label="Resumo de preenchimento da corrida">
             <div class="corrida-progresso-vagas corrida-progresso-inscritos" aria-label="Inscritos em relação às vagas">
               <div class="corrida-progresso-topo">
                 <span>Inscritos</span>
@@ -717,8 +720,8 @@ async function carregarCorridasAdmin() {
                 <div class="corrida-progresso-barra corrida-progresso-confirmados-barra ${classeProgressoConfirmados}" style="width: ${percentualConfirmados}%;"></div>
               </div>
             </div>
-          ` : ""}
-        </div>
+          </div>
+        ` : ""}
 
         <p><strong>Período:</strong>
           ${formatarPeriodoCorrida(corrida)}
@@ -4222,10 +4225,10 @@ if (logoutBtn) {
   });
 }
 
-/* v184 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
-/* v184 - ajustes reais nos relatórios PDF solicitados */
-/* v184 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
-/* v184 - tabela numeracao preenche coluna esquerda inteira antes da direita */
+/* v185 - corrige leitura de disponibilidade por corrida_dia_id; sem depender de relacionamento embutido */
+/* v185 - ajustes reais nos relatórios PDF solicitados */
+/* v185 - corrige busca de numero_calcado na exportacao dos PDFs de tenis */
+/* v185 - tabela numeracao preenche coluna esquerda inteira antes da direita */
 function obterDataDiaRelatorio(dia) {
   if (!dia || !dia.data_dia) return null;
   const partes = String(dia.data_dia).split("-");
@@ -4793,6 +4796,6 @@ async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
   return nomeArquivo;
 }
 
-/* v184 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
+/* v185 - tabela de numeração usa fluxo por altura de página: preenche a primeira coluna até o limite antes de iniciar a segunda. */
 
-/* v184 - lista em branco com 18 linhas em uma única página. */
+/* v185 - lista em branco com 18 linhas em uma única página. */
