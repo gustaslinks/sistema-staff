@@ -777,27 +777,7 @@ async function carregarCorridasAdmin() {
         </div>
 
         ${vagasTotal > 0 ? `
-          <div class="corrida-progressos-fora-card" aria-label="Resumo de preenchimento da corrida">
-            <div class="corrida-progresso-vagas corrida-progresso-inscritos" aria-label="Inscritos em relação às vagas">
-              <div class="corrida-progresso-topo">
-                <span class="corrida-progresso-rotulo corrida-inscritos-texto">Inscritos: ${textoInscritos}</span>
-                <strong class="corrida-progresso-percentual corrida-progresso-inscritos-percentual">${percentualInscritos}%</strong>
-              </div>
-              <div class="corrida-progresso-trilho">
-                <div class="corrida-progresso-barra corrida-progresso-inscritos-barra ${classeProgressoInscritos}" style="width: ${percentualInscritos}%;"></div>
-              </div>
-            </div>
-
-            <div class="corrida-progresso-vagas corrida-progresso-confirmados" aria-label="Confirmados em relação às vagas">
-              <div class="corrida-progresso-topo">
-                <span class="corrida-progresso-rotulo corrida-confirmados-texto">Confirmados: ${textoConfirmados}</span>
-                <strong class="corrida-progresso-percentual corrida-progresso-confirmados-percentual">${percentualConfirmados}%</strong>
-              </div>
-              <div class="corrida-progresso-trilho">
-                <div class="corrida-progresso-barra corrida-progresso-confirmados-barra ${classeProgressoConfirmados}" style="width: ${percentualConfirmados}%;"></div>
-              </div>
-            </div>
-
+          <div class="corrida-progressos-fora-card corrida-progressos-unificado" aria-label="Resumo de ocupação da corrida">
             <div class="corrida-progresso-segmentado" aria-label="Ocupação das vagas por status">
               <div class="corrida-progresso-topo corrida-progresso-segmentado-topo">
                 <span class="corrida-progresso-rotulo">Ocupação das vagas</span>
@@ -809,6 +789,7 @@ async function carregarCorridasAdmin() {
                 <span class="segmento segmentado-livres" style="width: ${percentualLivresSegmento}%;" title="${vagasLivresBarra} vaga(s) livre(s)"></span>
               </div>
               <div class="corrida-progresso-segmentado-legenda">
+                <span><i class="legenda-cor inscritos"></i>${totalInscritos} inscritos</span>
                 <span><i class="legenda-cor confirmados"></i>${confirmadosCorrida} confirmados</span>
                 <span><i class="legenda-cor pendentes"></i>${pendentesCorrida} pendentes</span>
                 <span><i class="legenda-cor livres"></i>${vagasLivresBarra} livres</span>
@@ -1990,6 +1971,7 @@ async function atualizarResumoCorridaCard(corridaId) {
   const legenda = card.querySelector(".corrida-progresso-segmentado-legenda");
   if (legenda) {
     legenda.innerHTML = `
+      <span><i class="legenda-cor inscritos"></i>${totalInscritos} inscritos</span>
       <span><i class="legenda-cor confirmados"></i>${confirmadosCorrida} confirmados</span>
       <span><i class="legenda-cor pendentes"></i>${pendentesCorrida} pendentes</span>
       <span><i class="legenda-cor livres"></i>${vagasLivresBarra} livres</span>
@@ -5041,7 +5023,7 @@ async function exportarRelatorioPagamentoPix(corridaId, formato = "pdf") {
 document.addEventListener("DOMContentLoaded", inicializarMascarasMoeda);
 
 
-/* v3.9 - Check-in presencial por QR individual por dia */
+/* v4.0 - Check-in presencial por QR individual por dia */
 function gerarTokenCheckinLocal() {
   if (window.crypto && window.crypto.getRandomValues) {
     const arr = new Uint8Array(24);

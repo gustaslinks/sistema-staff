@@ -641,9 +641,27 @@ async function carregarMinhasInscricoes() {
     );
   }
 
+  let meusCheckins = [];
+  const { data: checkinsStaff, error: erroCheckinsStaff } = await supabaseClient
+    .from("checkins")
+    .select("corrida_dia_id, corrida_id, checkin_at, tipo")
+    .eq("staff_id", staffLogado.id)
+    .eq("tipo", "entrada")
+    .in("corrida_id", corridaIds);
+
+  if (erroCheckinsStaff) {
+    console.warn("Não foi possível buscar check-ins do staff:", erroCheckinsStaff);
+  } else {
+    meusCheckins = checkinsStaff || [];
+  }
+
   const corridasPorId = {};
   const diasPorId = {};
   const disponibilidadesPorInscricao = {};
+  const checkinsPorDia = {};
+  (meusCheckins || []).forEach(item => {
+    checkinsPorDia[Number(item.corrida_dia_id)] = item;
+  });
 
   corridas.forEach(corrida => {
     corridasPorId[corrida.id] = corrida;
@@ -687,6 +705,16 @@ async function carregarMinhasInscricoes() {
 
       const bannerMinhaInscricao = obterBannerCorridaUrl(corrida);
       const inscricaoAbertaMinha = corrida.status === "aberta";
+      const vagasTextoMinha = corrida.vagas_total ? `${corrida.vagas_total}` : "Não informadas";
+      const prazoTextoMinha = corrida.prazo_inscricao ? formatarData(corrida.prazo_inscricao) : "Não informado";
+      const checkinsDaInscricao = diasDisponiveis
+        .map(dia => checkinsPorDia[Number(dia.id)])
+        .filter(Boolean);
+      const checkinRealizado = checkinsDaInscricao.length > 0;
+      const textoCheckin = checkinRealizado
+        ? `Check-in realizado${checkinsDaInscricao[0].checkin_at ? ` às ${formatarHoraData(checkinsDaInscricao[0].checkin_at)}` : ""}`
+        : "Check-in pendente";
+      const classeCheckin = checkinRealizado ? "realizado" : "pendente";
 
       return `
         <article class="card-minha-inscricao ${bannerMinhaInscricao ? "card-minha-com-banner" : "card-minha-sem-banner"}">
@@ -705,38 +733,30 @@ async function carregarMinhasInscricoes() {
               <span class="status-semaforo-indicador ${inscricaoAbertaMinha ? "status-aberto" : "status-fechado"}" aria-hidden="true"></span>
             </div>
 
-            <p>
-              <strong>Data:</strong>
-              ${formatarPeriodoCorrida(corrida)}
-            </p>
-
-            <p>
-              <strong>Local:</strong>
-              ${formatarTextoComQuebra(corrida.local || "Não informado")}
-            </p>
+            <div class="corrida-resumo-grid minha-inscricao-resumo-grid">
+              <div class="corrida-resumo-item"><strong>Período</strong><span>${formatarPeriodoCorrida(corrida)}</span></div>
+              <div class="corrida-resumo-item"><strong>Horário</strong><span>${formatarHorario(corrida.horario)}</span></div>
+              <div class="corrida-resumo-item"><strong>Vagas</strong><span>${vagasTextoMinha}</span></div>
+              <div class="corrida-resumo-item"><strong>Prazo</strong><span>${prazoTextoMinha}</span></div>
+              <div class="corrida-resumo-item corrida-resumo-local"><strong>Local</strong><span>${formatarTextoComQuebra(corrida.local || "Não informado")}</span></div>
+            </div>
 
             <div class="minha-disponibilidade">
-
-              <p>
-                <strong>Minha disponibilidade:</strong>
-              </p>
-
+              <p><strong>Minha disponibilidade:</strong></p>
               <div class="tags-disponibilidade">
-
                 ${diasDisponiveis.map(dia => `
                   <span class="tag-disponibilidade">
                     ${dia.nome}
                   </span>
                 `).join("")}
-
               </div>
-
             </div>
 
-          </div>
+            <div class="minha-inscricao-badges">
+              <span class="status-inscricao-badge status-${inscricao.status}">${formatarStatusInscricao(inscricao.status)}</span>
+              <span class="status-checkin-badge ${classeCheckin}">${textoCheckin}</span>
+            </div>
 
-          <div class="status-inscricao status-${inscricao.status}">
-            ${formatarStatusInscricao(inscricao.status)}
           </div>
 
         </article>
@@ -831,6 +851,15 @@ function formatarTextoComQuebra(texto) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/\n/g, "<br>");
+}
+
+function formatarHoraData(valorIso) {
+  if (!valorIso) return "--:--";
+  try {
+    return new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date(valorIso));
+  } catch (error) {
+    return "--:--";
+  }
 }
 
 function formatarStatusInscricao(status) {

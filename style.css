@@ -10085,7 +10085,7 @@ body.cadastro-loading::after {
   z-index: 9998;
 }
 
-/* v3.9 - Check-in presencial por QR */
+/* v4.0 - Check-in presencial por QR */
 body.checkin-page {
   min-height: 100vh;
   background:
@@ -10282,7 +10282,7 @@ body.checkin-page {
 }
 .dashboard-card{max-width:1100px}.dashboard-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}.dashboard-stat{background:#111827;border:1px solid #1f2937;border-radius:18px;padding:16px;color:#fff}.dashboard-stat span{display:block;color:#9ca3af;font-size:12px}.dashboard-stat strong{font-size:28px}.dashboard-stat.warning strong{color:#f59e0b}.dashboard-progress{height:16px;background:#1f2937;border-radius:999px;overflow:hidden;margin-bottom:20px}.dashboard-progress div{height:100%;background:linear-gradient(90deg,#10b981,#22c55e);width:0}.dashboard-toolbar{display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap}.dashboard-toolbar input{flex:1;min-width:220px;background:#0f172a;border:1px solid #334155;color:#fff;padding:12px;border-radius:14px}.dashboard-lista{display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow:auto}.dashboard-item{display:flex;justify-content:space-between;align-items:center;background:#0f172a;border:1px solid #1e293b;padding:14px 16px;border-radius:14px;color:#fff}.dashboard-item small{display:block;color:#94a3b8;margin-top:4px}.dashboard-item.ok{border-left:4px solid #22c55e}.dashboard-item.pending{border-left:4px solid #64748b}.checkin-dia-acoes{display:flex;flex-direction:column;gap:10px}.botao-dashboard-checkin{text-decoration:none;display:flex;justify-content:center;align-items:center;gap:8px}@media(max-width:768px){.dashboard-stats{grid-template-columns:repeat(2,1fr)}}
 
-/* v3.9 - ajustes dashboard check-in */
+/* v4.0 - ajustes dashboard check-in */
 .dashboard-item.late{border-left:4px solid #f59e0b;}
 .dashboard-empty{background:#0f172a;border:1px solid #334155;color:#cbd5e1;border-radius:16px;padding:18px;text-align:center;}
 .dashboard-item-hora{font-weight:800;color:#e5e7eb;white-space:nowrap;}
@@ -10299,4 +10299,99 @@ body.checkin-page {
   body.checkin-page .dashboard-item small,
   body.checkin-page .dashboard-stat span{color:#475569!important;}
   body.checkin-page .dashboard-lista{max-height:none!important;overflow:visible!important;}
+}
+
+/* v4.0 - ajustes visuais, dashboard check-in e cards */
+.corrida-progressos-unificado .corrida-progresso-segmentado { margin-top: 0; }
+.corrida-progressos-unificado .corrida-progresso-segmentado-legenda { flex-wrap: wrap; gap: 10px 14px; }
+.legenda-cor.inscritos { background: #0ea5e9; }
+
+.linha-inscrito-acoes-rapidas .botao-whatsapp-inscrito.botao-acao-inscrito,
+.card-corrida-admin .botao-whatsapp-inscrito.botao-acao-inscrito,
+.botao-whatsapp-inscrito.botao-acao-inscrito {
+  width: 76px !important;
+  min-width: 76px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+.botao-whatsapp-confirmado.botao-acao-inscrito {
+  background: #dcfce7 !important;
+  color: #16a34a !important;
+  box-shadow: 0 10px 24px rgba(22, 163, 74, .16) !important;
+}
+.botao-whatsapp-bloqueado.botao-acao-inscrito {
+  background: #e9eef6 !important;
+  color: #cbd5e1 !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+.minha-inscricao-resumo-grid { margin: 18px 0; }
+.minha-inscricao-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.status-inscricao-badge,
+.status-checkin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  min-height: 38px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: .92rem;
+  border: 1px solid transparent;
+}
+.status-inscricao-badge::before,
+.status-checkin-badge::before { content: ''; width: 9px; height: 9px; border-radius: 999px; background: currentColor; }
+.status-inscricao-badge.status-confirmado { background: #dcfce7; color: #047857; border-color: #bbf7d0; }
+.status-inscricao-badge.status-lista_espera,
+.status-inscricao-badge.status-reserva { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+.status-inscricao-badge.status-pendente,
+.status-inscricao-badge.status-inscrito { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+.status-inscricao-badge.status-cancelado { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+.status-checkin-badge.realizado { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+.status-checkin-badge.pendente { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+
+.dashboard-lista { max-height: none; overflow: visible; }
+.dashboard-item { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+.dashboard-item-main { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.dashboard-qr-toggle,
+.dashboard-qr-placeholder {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 42px;
+  font-size: 22px;
+  font-weight: 900;
+}
+.dashboard-qr-toggle { border: 1px solid rgba(34, 197, 94, .42); background: rgba(34, 197, 94, .14); color: #86efac; cursor: pointer; }
+.dashboard-qr-placeholder { border: 1px solid rgba(34, 197, 94, .26); background: rgba(34, 197, 94, .08); color: #22c55e; }
+.dashboard-qr-collapse { grid-column: 1 / -1; }
+.dashboard-qr-box {
+  margin-top: 12px;
+  border: 1px solid rgba(148, 163, 184, .25);
+  border-radius: 22px;
+  background: rgba(15, 23, 42, .82);
+  padding: 18px;
+  text-align: center;
+}
+.dashboard-qr-img img { width: min(280px, 100%); max-width: 100%; border-radius: 18px; background: #fff; padding: 10px; }
+.dashboard-qr-box p { color: #cbd5e1; margin: 10px 0 0; font-weight: 700; }
+
+@media (max-width: 640px) {
+  .dashboard-item { grid-template-columns: 1fr; }
+  .dashboard-item-hora { margin-left: 54px; }
+  .status-inscricao-badge, .status-checkin-badge { width: 100%; justify-content: center; }
+}
+
+@media print {
+  .dashboard-qr-toggle, .dashboard-qr-placeholder, .dashboard-qr-collapse { display: none !important; }
 }

@@ -1,1 +1,44 @@
-<!DOCTYPE html><html lang='pt-BR'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Dashboard Check-in</title><link rel='stylesheet' href='style.css?v=39'><script src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'></script></head><body class='checkin-page'><button class='version-badge' type='button' data-version-summary='v3.9: corrige login com timeout de segurança, atualiza tags de versão e revisa dashboard de check-in em tempo real.'>v3.9</button><main class='checkin-shell'><section class='checkin-card dashboard-card'><div class='checkin-brand'><div class='checkin-logo-mark'>RCP</div><div><p class='checkin-eyebrow'>RCP Staff</p><h1>Dashboard de Check-in</h1></div></div><div class='dashboard-stats'><div class='dashboard-stat'><span>Confirmados</span><strong id='statConfirmados'>0</strong></div><div class='dashboard-stat'><span>Presentes</span><strong id='statPresentes'>0</strong></div><div class='dashboard-stat'><span>Pendentes</span><strong id='statPendentes'>0</strong></div><div class='dashboard-stat warning'><span>Fora do horário</span><strong id='statAtrasados'>0</strong></div></div><div class='dashboard-progress'><div id='dashboardProgressBar'></div></div><div class='dashboard-toolbar'><input id='buscaCheckin' placeholder='Buscar staff'><button id='btnAtualizar' class='checkin-secondary-action'>Atualizar</button><button id='btnPdf' class='checkin-primary-action'>Imprimir relatório</button></div><div id='dashboardLista' class='dashboard-lista'></div></section></main><script src='checkin-dashboard.js?v=39'></script></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Check-in</title>
+  <link rel="stylesheet" href="style.css?v=40">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body class="checkin-page">
+  <button class="version-badge" type="button" data-version-summary="v4.0: dashboard de check-in com QR expansível, relatório compacto, badges operacionais e layout de corridas simplificado.">v4.0</button>
+  <main class="checkin-shell">
+    <section class="checkin-card dashboard-card">
+      <div class="checkin-brand">
+        <div class="checkin-logo-mark">RCP</div>
+        <div>
+          <p class="checkin-eyebrow">RCP Staff</p>
+          <h1>Dashboard de Check-in</h1>
+        </div>
+      </div>
+
+      <div class="dashboard-stats">
+        <div class="dashboard-stat"><span>Confirmados</span><strong id="statConfirmados">0</strong></div>
+        <div class="dashboard-stat"><span>Presentes</span><strong id="statPresentes">0</strong></div>
+        <div class="dashboard-stat"><span>Pendentes</span><strong id="statPendentes">0</strong></div>
+        <div class="dashboard-stat warning"><span>Fora do horário</span><strong id="statAtrasados">0</strong></div>
+      </div>
+
+      <div class="dashboard-progress"><div id="dashboardProgressBar"></div></div>
+
+      <div class="dashboard-toolbar">
+        <input id="buscaCheckin" placeholder="Buscar staff">
+        <button id="btnAtualizar" class="checkin-secondary-action">Atualizar</button>
+        <button id="btnPdf" class="checkin-primary-action">Gerar PDF</button>
+      </div>
+
+      <div id="dashboardLista" class="dashboard-lista"></div>
+    </section>
+  </main>
+  <script src="checkin-dashboard.js?v=40"></script>
+</body>
+</html>
