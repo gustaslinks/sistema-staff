@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Staff</title>
   <link rel="stylesheet" href="style.css?v=42">
-  <link rel="manifest" href="manifest.json?v=42">
-  <meta name="theme-color" content="#10b981">
-  <link rel="apple-touch-icon" href="images/icon-192.png?v=42">
+  <link rel="manifest" href="manifest.json?v=4.4">
+  <meta name="theme-color" content="#14d3b5">
+  <link rel="apple-touch-icon" href="images/icon-192.png?v=4.4">
 </head>
 <body class="login-page">
-  <button class="version-badge" type="button" data-version-summary="v4.3: PWA básico, login mobile centralizado e cards de QR clicáveis no dashboard.">v4.3</button>
+  <button class="version-badge" type="button" data-version-summary="v4.4: PWA básico, login mobile centralizado e cards de QR clicáveis no dashboard.">v4.4</button>
   <div class="container">
     <div class="login-card">
       <div class="system-brand system-brand-login"><img src="images/rcp-run-staff-logo.png" alt="RCP Run Staff"></div>
@@ -81,5 +81,29 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<script>
+(function () {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const isLoginPage = location.pathname.endsWith('/') || location.pathname.endsWith('/index.html') || location.pathname.split('/').pop() === '';
+  if (!isStandalone || !isLoginPage) return;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const splash = document.createElement('div');
+    splash.className = 'pwa-splash-screen';
+    document.body.prepend(splash);
+
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        splash.classList.add('is-hidden');
+        setTimeout(function () {
+          splash.remove();
+        }, 550);
+      }, 900);
+    });
+  });
+})();
+</script>
+
 </body>
 </html>

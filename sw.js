@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rcp-run-staff-v4-3';
+const CACHE_NAME = 'rcp-run-staff-v4-4';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
