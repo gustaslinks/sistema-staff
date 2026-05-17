@@ -10085,7 +10085,7 @@ body.cadastro-loading::after {
   z-index: 9998;
 }
 
-/* v4.1 - Check-in presencial por QR */
+/* v4.2 - Check-in presencial por QR */
 body.checkin-page {
   min-height: 100vh;
   background:
@@ -10282,7 +10282,7 @@ body.checkin-page {
 }
 .dashboard-card{max-width:1100px}.dashboard-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}.dashboard-stat{background:#111827;border:1px solid #1f2937;border-radius:18px;padding:16px;color:#fff}.dashboard-stat span{display:block;color:#9ca3af;font-size:12px}.dashboard-stat strong{font-size:28px}.dashboard-stat.warning strong{color:#f59e0b}.dashboard-progress{height:16px;background:#1f2937;border-radius:999px;overflow:hidden;margin-bottom:20px}.dashboard-progress div{height:100%;background:linear-gradient(90deg,#10b981,#22c55e);width:0}.dashboard-toolbar{display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap}.dashboard-toolbar input{flex:1;min-width:220px;background:#0f172a;border:1px solid #334155;color:#fff;padding:12px;border-radius:14px}.dashboard-lista{display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow:auto}.dashboard-item{display:flex;justify-content:space-between;align-items:center;background:#0f172a;border:1px solid #1e293b;padding:14px 16px;border-radius:14px;color:#fff}.dashboard-item small{display:block;color:#94a3b8;margin-top:4px}.dashboard-item.ok{border-left:4px solid #22c55e}.dashboard-item.pending{border-left:4px solid #64748b}.checkin-dia-acoes{display:flex;flex-direction:column;gap:10px}.botao-dashboard-checkin{text-decoration:none;display:flex;justify-content:center;align-items:center;gap:8px}@media(max-width:768px){.dashboard-stats{grid-template-columns:repeat(2,1fr)}}
 
-/* v4.1 - ajustes dashboard check-in */
+/* v4.2 - ajustes dashboard check-in */
 .dashboard-item.late{border-left:4px solid #f59e0b;}
 .dashboard-empty{background:#0f172a;border:1px solid #334155;color:#cbd5e1;border-radius:16px;padding:18px;text-align:center;}
 .dashboard-item-hora{font-weight:800;color:#e5e7eb;white-space:nowrap;}
@@ -10301,7 +10301,7 @@ body.checkin-page {
   body.checkin-page .dashboard-lista{max-height:none!important;overflow:visible!important;}
 }
 
-/* v4.1 - ajustes visuais, dashboard check-in e cards */
+/* v4.2 - ajustes visuais, dashboard check-in e cards */
 .corrida-progressos-unificado .corrida-progresso-segmentado { margin-top: 0; }
 .corrida-progressos-unificado .corrida-progresso-segmentado-legenda { flex-wrap: wrap; gap: 10px 14px; }
 .legenda-cor.inscritos { background: #0ea5e9; }
@@ -10398,7 +10398,7 @@ body.checkin-page {
 
 
 /* =========================================================
-   v4.1 - identidade RCP Run Staff + grid de informações
+   v4.2 - identidade RCP Run Staff + grid de informações
 ========================================================= */
 .system-brand {
   display: flex;
@@ -10492,4 +10492,96 @@ body.checkin-page .checkin-brand {
     width: min(320px, 82vw);
     max-height: 86px;
   }
+}
+
+
+/* =========================================================
+   v4.2 - Login mobile centralizado + PWA
+   ========================================================= */
+body.login-page {
+  min-height: 100dvh !important;
+  height: 100dvh !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 14px 18px !important;
+  overflow: hidden !important;
+}
+
+.login-page .container {
+  width: 100% !important;
+  max-width: 520px !important;
+  min-height: auto !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.login-page .login-card {
+  width: 100% !important;
+  max-height: calc(100dvh - 34px) !important;
+  margin: 0 auto !important;
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 760px) {
+  body.login-page {
+    padding: 12px 18px !important;
+  }
+
+  .login-page .login-card {
+    padding: clamp(22px, 5.2vw, 32px) clamp(24px, 6vw, 34px) !important;
+  }
+
+  .login-page .subtitle {
+    margin-bottom: 22px !important;
+  }
+}
+
+@media (max-height: 760px) and (max-width: 760px) {
+  body.login-page {
+    align-items: center !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+
+  .system-brand-login {
+    margin-bottom: 10px !important;
+  }
+
+  .system-brand-login img {
+    max-height: 74px !important;
+  }
+
+  .login-page .login-card h1 {
+    font-size: clamp(30px, 8vw, 40px) !important;
+  }
+
+  .login-page .field {
+    margin-bottom: 14px !important;
+  }
+
+  .login-secondary-actions {
+    gap: 8px !important;
+  }
+}
+
+/* =========================================================
+   v4.2 - Dashboard check-in: card inteiro clicável para abrir QR
+   ========================================================= */
+.dashboard-item[data-staff-id] {
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.dashboard-item[data-staff-id]:active {
+  transform: scale(.995);
+}
+
+.dashboard-item[data-staff-id]:focus-visible {
+  outline: 3px solid rgba(34, 211, 238, .45);
+  outline-offset: 3px;
 }

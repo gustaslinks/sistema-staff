@@ -4,11 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Staffs</title>
-  <link rel="stylesheet" href="style.css?v=41" />
+  <link rel="stylesheet" href="style.css?v=42" />
   <link rel="stylesheet" href="photo-cropper.css?v=23" />
+  <link rel="manifest" href="manifest.json?v=42">
+  <meta name="theme-color" content="#10b981">
+  <link rel="apple-touch-icon" href="images/icon-192.png?v=42">
 </head>
 <body class="cadastro-loading">
-  <button class="version-badge" type="button" data-version-summary="v4.1: identidade RCP Run Staff aplicada, cards de corrida em duas colunas no mobile e ajustes visuais de check-in.">v4.1</button>
+  <button class="version-badge" type="button" data-version-summary="v4.2: PWA básico, login mobile centralizado e cards de QR clicáveis no dashboard.">v4.2</button>
   <div class="container">
     <div class="system-brand system-brand-internal"><img src="images/rcp-run-staff-logo.png" alt="RCP Run Staff"></div>
     <section id="card-staff-cadastro" class="card-staff card-staff-cadastro hidden">
@@ -315,8 +318,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="photo-cropper.js?v=31"></script>
-  <script src="script.js?v=41"></script>
-  <script src="floating-tools.js?v=41"></script>
+  <script src="script.js?v=42"></script>
+  <script src="floating-tools.js?v=42"></script>
 
 <script>
 (function(){
@@ -344,6 +347,13 @@
     badge.addEventListener('touchend', function(e){ e.preventDefault(); e.stopPropagation(); openVersionInfo(); }, {passive:false});
   });
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js?v=42').catch(function () {});
+  });
+}
 </script>
 </body>
 </html>

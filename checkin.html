@@ -4,11 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Check-in | RCP Staff</title>
-  <link rel="stylesheet" href="style.css?v=41">
+  <link rel="stylesheet" href="style.css?v=42">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="manifest" href="manifest.json?v=42">
+  <meta name="theme-color" content="#10b981">
+  <link rel="apple-touch-icon" href="images/icon-192.png?v=42">
 </head>
 <body class="checkin-page">
-  <button class="version-badge" type="button" data-version-summary="v4.1: identidade RCP Run Staff aplicada, cards de corrida em duas colunas no mobile e ajustes visuais de check-in.">v4.1</button>
+  <button class="version-badge" type="button" data-version-summary="v4.2: PWA básico, login mobile centralizado e cards de QR clicáveis no dashboard.">v4.2</button>
 
   <main class="checkin-shell">
     <section class="checkin-card" id="checkinCard">
@@ -33,7 +36,7 @@
     </section>
   </main>
 
-  <script src="checkin.js?v=41"></script>
+  <script src="checkin.js?v=42"></script>
   <script>
   (function(){
     function openVersionInfo(){
@@ -61,5 +64,12 @@
     });
   })();
   </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js?v=42').catch(function () {});
+  });
+}
+</script>
 </body>
 </html>

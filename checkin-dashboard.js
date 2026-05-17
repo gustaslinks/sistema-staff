@@ -155,7 +155,7 @@ function renderizarLista() {
   lista.innerHTML = filtrados.map((item) => {
     const botaoQr = !item.presente ? `<button type="button" class="dashboard-qr-toggle" data-staff-id="${item.staff_id}" title="Mostrar QR de check-in" aria-label="Mostrar QR de check-in">▦</button>` : `<span class="dashboard-qr-placeholder">✓</span>`;
     return `
-      <div class="dashboard-item ${item.classe}" data-staff-id="${item.staff_id}">
+      <div class="dashboard-item ${item.classe}" data-staff-id="${item.staff_id}" ${!item.presente ? 'role="button" tabindex="0" aria-label="Abrir QR de check-in de '+escapeHtml(item.nome)+'"' : ''}>
         <div class="dashboard-item-main">
           ${botaoQr}
           <div>
@@ -169,7 +169,25 @@ function renderizarLista() {
         </div>
       </div>`;
   }).join("");
-  lista.querySelectorAll(".dashboard-qr-toggle").forEach((btn) => btn.addEventListener("click", () => alternarQrStaff(btn.dataset.staffId)));
+  lista.querySelectorAll(".dashboard-qr-toggle").forEach((btn) => btn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    alternarQrStaff(btn.dataset.staffId);
+  }));
+  lista.querySelectorAll(".dashboard-item[data-staff-id]").forEach((card) => {
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("button, a, input, select, textarea")) return;
+      const item = registrosDashboard.find((r) => String(r.staff_id) === String(card.dataset.staffId));
+      if (!item || item.presente) return;
+      alternarQrStaff(card.dataset.staffId);
+    });
+    card.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const item = registrosDashboard.find((r) => String(r.staff_id) === String(card.dataset.staffId));
+      if (!item || item.presente) return;
+      event.preventDefault();
+      alternarQrStaff(card.dataset.staffId);
+    });
+  });
 }
 
 async function alternarQrStaff(staffId) {
