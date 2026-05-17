@@ -10585,28 +10585,3 @@ body.login-page {
   outline: 3px solid rgba(34, 211, 238, .45);
   outline-offset: 3px;
 }
-
-
-
-/* v4.4 - PWA custom splash overlay */
-.pwa-splash-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  background: #0f172a url("images/splash.png?v=4.4") center center / cover no-repeat;
-  opacity: 1;
-  visibility: visible;
-  transition: opacity .45s ease, visibility .45s ease;
-}
-
-.pwa-splash-screen.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-@media (min-width: 769px) {
-  .pwa-splash-screen {
-    display: none;
-  }
-}
