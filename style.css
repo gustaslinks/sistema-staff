@@ -10085,7 +10085,7 @@ body.cadastro-loading::after {
   z-index: 9998;
 }
 
-/* v4.0 - Check-in presencial por QR */
+/* v4.1 - Check-in presencial por QR */
 body.checkin-page {
   min-height: 100vh;
   background:
@@ -10282,7 +10282,7 @@ body.checkin-page {
 }
 .dashboard-card{max-width:1100px}.dashboard-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}.dashboard-stat{background:#111827;border:1px solid #1f2937;border-radius:18px;padding:16px;color:#fff}.dashboard-stat span{display:block;color:#9ca3af;font-size:12px}.dashboard-stat strong{font-size:28px}.dashboard-stat.warning strong{color:#f59e0b}.dashboard-progress{height:16px;background:#1f2937;border-radius:999px;overflow:hidden;margin-bottom:20px}.dashboard-progress div{height:100%;background:linear-gradient(90deg,#10b981,#22c55e);width:0}.dashboard-toolbar{display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap}.dashboard-toolbar input{flex:1;min-width:220px;background:#0f172a;border:1px solid #334155;color:#fff;padding:12px;border-radius:14px}.dashboard-lista{display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow:auto}.dashboard-item{display:flex;justify-content:space-between;align-items:center;background:#0f172a;border:1px solid #1e293b;padding:14px 16px;border-radius:14px;color:#fff}.dashboard-item small{display:block;color:#94a3b8;margin-top:4px}.dashboard-item.ok{border-left:4px solid #22c55e}.dashboard-item.pending{border-left:4px solid #64748b}.checkin-dia-acoes{display:flex;flex-direction:column;gap:10px}.botao-dashboard-checkin{text-decoration:none;display:flex;justify-content:center;align-items:center;gap:8px}@media(max-width:768px){.dashboard-stats{grid-template-columns:repeat(2,1fr)}}
 
-/* v4.0 - ajustes dashboard check-in */
+/* v4.1 - ajustes dashboard check-in */
 .dashboard-item.late{border-left:4px solid #f59e0b;}
 .dashboard-empty{background:#0f172a;border:1px solid #334155;color:#cbd5e1;border-radius:16px;padding:18px;text-align:center;}
 .dashboard-item-hora{font-weight:800;color:#e5e7eb;white-space:nowrap;}
@@ -10301,7 +10301,7 @@ body.checkin-page {
   body.checkin-page .dashboard-lista{max-height:none!important;overflow:visible!important;}
 }
 
-/* v4.0 - ajustes visuais, dashboard check-in e cards */
+/* v4.1 - ajustes visuais, dashboard check-in e cards */
 .corrida-progressos-unificado .corrida-progresso-segmentado { margin-top: 0; }
 .corrida-progressos-unificado .corrida-progresso-segmentado-legenda { flex-wrap: wrap; gap: 10px 14px; }
 .legenda-cor.inscritos { background: #0ea5e9; }
@@ -10394,4 +10394,102 @@ body.checkin-page {
 
 @media print {
   .dashboard-qr-toggle, .dashboard-qr-placeholder, .dashboard-qr-collapse { display: none !important; }
+}
+
+
+/* =========================================================
+   v4.1 - identidade RCP Run Staff + grid de informações
+========================================================= */
+.system-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  pointer-events: none;
+}
+.system-brand img {
+  display: block;
+  width: min(320px, 70vw);
+  max-height: 82px;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 24px rgba(15, 23, 42, .10));
+}
+.system-brand-login {
+  margin: -8px auto 22px;
+}
+.system-brand-login img {
+  width: min(360px, 78vw);
+  max-height: 92px;
+}
+.system-brand-internal {
+  margin: 2px auto 14px;
+  opacity: .78;
+}
+.system-brand-internal img {
+  width: min(210px, 48vw);
+  max-height: 56px;
+  filter: drop-shadow(0 10px 18px rgba(15, 23, 42, .08));
+}
+body.checkin-page .checkin-logo-image {
+  width: min(180px, 42vw);
+  height: auto;
+  min-height: 54px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+body.checkin-page .checkin-logo-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, .22));
+}
+body.checkin-page .checkin-brand {
+  align-items: center;
+  gap: 18px;
+}
+.corrida-resumo-grid,
+.minha-inscricao-resumo-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+.corrida-resumo-grid .corrida-resumo-local,
+.minha-inscricao-resumo-grid .corrida-resumo-local {
+  grid-column: 1 / -1 !important;
+}
+@media (max-width: 480px) {
+  .corrida-resumo-grid,
+  .minha-inscricao-resumo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .corrida-resumo-item {
+    padding: 12px 12px !important;
+    border-radius: 18px !important;
+  }
+  .corrida-resumo-item strong {
+    font-size: 10px !important;
+    letter-spacing: .09em !important;
+  }
+  .corrida-resumo-item span {
+    font-size: 13px !important;
+    line-height: 1.28 !important;
+  }
+  .corrida-resumo-grid .corrida-resumo-local span,
+  .minha-inscricao-resumo-grid .corrida-resumo-local span {
+    font-size: 14px !important;
+  }
+  .system-brand-internal {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .system-brand-internal img {
+    width: min(180px, 46vw);
+    max-height: 48px;
+  }
+  .system-brand-login img {
+    width: min(320px, 82vw);
+    max-height: 86px;
+  }
 }

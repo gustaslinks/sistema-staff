@@ -4,17 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Check-in</title>
-  <link rel="stylesheet" href="style.css?v=40">
+  <link rel="stylesheet" href="style.css?v=41">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body class="checkin-page">
-  <button class="version-badge" type="button" data-version-summary="v4.0: dashboard de check-in com QR expansível, relatório compacto, badges operacionais e layout de corridas simplificado.">v4.0</button>
+  <button class="version-badge" type="button" data-version-summary="v4.1: identidade RCP Run Staff aplicada, cards de corrida em duas colunas no mobile e ajustes visuais de check-in.">v4.1</button>
   <main class="checkin-shell">
     <section class="checkin-card dashboard-card">
       <div class="checkin-brand">
-        <div class="checkin-logo-mark">RCP</div>
+        <div class="checkin-logo-mark checkin-logo-image"><img src="images/rcp-run-staff-logo.png" alt="RCP Run Staff"></div>
         <div>
           <p class="checkin-eyebrow">RCP Staff</p>
           <h1>Dashboard de Check-in</h1>
@@ -39,6 +39,6 @@
       <div id="dashboardLista" class="dashboard-lista"></div>
     </section>
   </main>
-  <script src="checkin-dashboard.js?v=40"></script>
+  <script src="checkin-dashboard.js?v=41"></script>
 </body>
 </html>
